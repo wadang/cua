@@ -123,14 +123,3 @@ def is_telemetry_enabled() -> bool:
 
         return core_is_enabled()
     return False
-
-
-def record_agent_initialization() -> None:
-    """Record when an agent instance is initialized."""
-    if TELEMETRY_AVAILABLE and is_telemetry_enabled():
-        record_event("agent_initialized", SYSTEM_INFO)
-
-        # Set dimensions that will be attached to all events
-        set_dimension("os", SYSTEM_INFO["os"])
-        set_dimension("os_version", SYSTEM_INFO["os_version"])
-        set_dimension("python_version", SYSTEM_INFO["python_version"])
