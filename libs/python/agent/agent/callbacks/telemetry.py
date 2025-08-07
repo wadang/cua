@@ -10,7 +10,6 @@ from .base import AsyncCallbackHandler
 from ..telemetry import (
     record_event,
     is_telemetry_enabled,
-    set_dimension,
     SYSTEM_INFO,
 )
 
@@ -65,11 +64,6 @@ class TelemetryCallback(AsyncCallbackHandler):
             **SYSTEM_INFO
         }
         
-        # Set session-level dimensions
-        set_dimension("session_id", self.session_id)
-        set_dimension("agent_type", agent_info["agent_type"])
-        set_dimension("model", agent_info["model"])
-        
         record_event("agent_session_start", agent_info)
     
     async def on_run_start(self, kwargs: Dict[str, Any], old_items: List[Dict[str, Any]]) -> None:
@@ -98,7 +92,6 @@ class TelemetryCallback(AsyncCallbackHandler):
             if trajectory:
                 run_data["uploaded_trajectory"] = trajectory
         
-        set_dimension("run_id", self.run_id)
         record_event("agent_run_start", run_data)
     
     async def on_run_end(self, kwargs: Dict[str, Any], old_items: List[Dict[str, Any]], new_items: List[Dict[str, Any]]) -> None:

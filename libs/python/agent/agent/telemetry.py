@@ -19,7 +19,6 @@ def _noop(*args: Any, **kwargs: Any) -> None:
 # Define default functions with unique names to avoid shadowing
 _default_record_event = _noop
 _default_increment_counter = _noop
-_default_set_dimension = _noop
 _default_get_telemetry_client = lambda: None
 _default_flush = _noop
 _default_is_telemetry_enabled = lambda: False
@@ -28,7 +27,6 @@ _default_is_telemetry_globally_disabled = lambda: True
 # Set the actual functions to the defaults initially
 record_event = _default_record_event
 increment_counter = _default_increment_counter
-set_dimension = _default_set_dimension
 get_telemetry_client = _default_get_telemetry_client
 flush = _default_flush
 is_telemetry_enabled = _default_is_telemetry_enabled
@@ -58,10 +56,6 @@ try:
         """Wrapper for increment to maintain backward compatibility."""
         if is_telemetry_enabled():
             core_increment(counter_name, value)
-
-    def set_dimension(name: str, value: Any) -> None:
-        """Set a dimension that will be attached to all events."""
-        logger.debug(f"Setting dimension {name}={value}")
 
     TELEMETRY_AVAILABLE = True
     logger.info("Successfully imported telemetry")

@@ -20,11 +20,6 @@ try:
         if is_telemetry_enabled():
             increment(counter_name, value)
 
-    def set_dimension(name: str, value: Any) -> None:
-        """Set a dimension that will be attached to all events."""
-        logger = logging.getLogger("computer.telemetry")
-        logger.debug(f"Setting dimension {name}={value}")
-
     TELEMETRY_AVAILABLE = True
     logger = logging.getLogger("computer.telemetry")
     logger.info("Successfully imported telemetry")
@@ -47,7 +42,6 @@ if not TELEMETRY_AVAILABLE:
     logger.debug("Telemetry not available, using no-op functions")
     record_event = _noop  # type: ignore
     increment_counter = _noop  # type: ignore
-    set_dimension = _noop  # type: ignore
     get_telemetry_client = lambda: None  # type: ignore
     flush = _noop  # type: ignore
     is_telemetry_enabled = lambda: False  # type: ignore
@@ -109,8 +103,3 @@ def record_computer_initialization() -> None:
     """Record when a computer instance is initialized."""
     if TELEMETRY_AVAILABLE and is_telemetry_enabled():
         record_event("computer_initialized", SYSTEM_INFO)
-
-        # Set dimensions that will be attached to all events
-        set_dimension("os", SYSTEM_INFO["os"])
-        set_dimension("os_version", SYSTEM_INFO["os_version"])
-        set_dimension("python_version", SYSTEM_INFO["python_version"])
