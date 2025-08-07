@@ -7,12 +7,18 @@ import uuid
 from typing import List, Dict, Any, Optional, Union
 
 from .base import AsyncCallbackHandler
-from ..telemetry import (
+from core.telemetry import (
     record_event,
     is_telemetry_enabled,
-    SYSTEM_INFO,
 )
 
+import platform
+
+SYSTEM_INFO = {
+    "os": platform.system().lower(),
+    "os_version": platform.release(),
+    "python_version": platform.python_version(),
+}
 
 class TelemetryCallback(AsyncCallbackHandler):
     """
