@@ -5,7 +5,6 @@ Usage:
     from core.telemetry import record_event, increment
 
     record_event("my_event", {"foo": "bar"})
-    increment("my_counter")
 
 Configuration:
     • Disable telemetry globally by setting the environment variable
@@ -90,45 +89,8 @@ def is_telemetry_enabled() -> bool:
     _ensure_client()
     return _ENABLED and not _telemetry_disabled()
 
-
-def enable() -> None:
-    """Enable telemetry collection for this process (unless globally disabled)."""
-    global _ENABLED
-
-    if _telemetry_disabled():
-        _LOGGER.info("Telemetry has been disabled via environment variable.")
-        return
-
-    _ensure_client()
-    if _CLIENT:
-        _CLIENT.enable()
-        _ENABLED = True
-
-
-def disable() -> None:
-    """Disable telemetry for this process."""
-    global _ENABLED
-
-    if _CLIENT:
-        _CLIENT.disable()
-    _ENABLED = False
-
-
 def record_event(event_name: str, properties: Optional[Dict[str, Any]] | None = None) -> None:
     """Send an arbitrary PostHog event."""
     _ensure_client()
     if _CLIENT and _ENABLED:
         _CLIENT.record_event(event_name, properties or {})
-
-
-def increment(counter_name: str, value: int = 1) -> None:
-    """Increment a named counter."""
-    _ensure_client()
-    if _CLIENT and _ENABLED:
-        _CLIENT.increment(counter_name, value)
-
-
-def flush() -> bool:
-    """Flush any queued analytics events to PostHog."""
-    _ensure_client()
-    return bool(_CLIENT and _ENABLED and _CLIENT.flush())

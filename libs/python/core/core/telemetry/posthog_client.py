@@ -213,41 +213,6 @@ class PostHogTelemetryClient:
         logger.warning("Using random installation ID (will not persist across runs)")
         return str(uuid.uuid4())
 
-    def increment(self, counter_name: str, value: int = 1) -> None:
-        """Increment a named counter.
-
-        Args:
-            counter_name: Name of the counter
-            value: Amount to increment by (default: 1)
-        """
-        if not self.config.enabled:
-            return
-
-        # Apply sampling to reduce number of events
-        if random.random() * 100 > self.config.sample_rate:
-            return
-
-        properties = {
-            "value": value,
-            "counter_name": counter_name,
-            "version": __version__,
-        }
-
-        if self.initialized:
-            try:
-                posthog.capture(
-                    distinct_id=self.installation_id,
-                    event="counter_increment",
-                    properties=properties,
-                )
-            except Exception as e:
-                logger.debug(f"Failed to send counter event to PostHog: {e}")
-        else:
-            # Queue the event for later
-            self.queued_events.append({"event": "counter_increment", "properties": properties})
-            # Try to initialize now if not already
-            self._initialize_posthog()
-
     def record_event(self, event_name: str, properties: Optional[Dict[str, Any]] = None) -> None:
         """Record an event with optional properties.
 
@@ -307,21 +272,6 @@ class PostHogTelemetryClient:
             logger.debug(f"Failed to flush PostHog events: {e}")
             return False
 
-    def enable(self) -> None:
-        """Enable telemetry collection."""
-        self.config.enabled = True
-        if posthog:
-            posthog.disabled = False
-        logger.info("Telemetry enabled")
-        self._initialize_posthog()
-
-    def disable(self) -> None:
-        """Disable telemetry collection."""
-        self.config.enabled = False
-        if posthog:
-            posthog.disabled = True
-        logger.info("Telemetry disabled")
-
 
 # Global telemetry client instance
 _client: Optional[PostHogTelemetryClient] = None
@@ -339,9 +289,3 @@ def get_posthog_telemetry_client() -> PostHogTelemetryClient:
         _client = PostHogTelemetryClient()
 
     return _client
-
-
-def disable_telemetry() -> None:
-    """Disable telemetry collection globally."""
-    if _client is not None:
-        _client.disable()
