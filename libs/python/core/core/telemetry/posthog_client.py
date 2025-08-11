@@ -18,9 +18,6 @@ from core import __version__
 
 logger = logging.getLogger("core.telemetry")
 
-# Controls how frequently telemetry will be sent (percentage)
-TELEMETRY_SAMPLE_RATE = 100  # 100% sampling rate (was 5%)
-
 # Public PostHog config for anonymous telemetry
 # These values are intentionally public and meant for anonymous telemetry only
 # https://posthog.com/docs/product-analytics/troubleshooting#is-it-ok-for-my-api-key-to-be-exposed-and-public
@@ -33,7 +30,6 @@ class TelemetryConfig:
     """Configuration for telemetry collection."""
 
     enabled: bool = True  # Default to enabled (opt-out)
-    sample_rate: float = TELEMETRY_SAMPLE_RATE
 
     @classmethod
     def from_env(cls) -> TelemetryConfig:
@@ -47,14 +43,12 @@ class TelemetryConfig:
 
         return cls(
             enabled=not telemetry_disabled,
-            sample_rate=float(os.environ.get("CUA_TELEMETRY_SAMPLE_RATE", TELEMETRY_SAMPLE_RATE)),
         )
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert config to dictionary."""
         return {
             "enabled": self.enabled,
-            "sample_rate": self.sample_rate,
         }
 
 
@@ -85,7 +79,7 @@ class PostHogTelemetryClient:
 
         # Log telemetry status on startup
         if self.config.enabled:
-            logger.info(f"Telemetry enabled (sampling at {self.config.sample_rate}%)")
+            logger.info(f"Telemetry enabled")
             # Initialize PostHog client if config is available
             self._initialize_posthog()
         else:
@@ -222,13 +216,6 @@ class PostHogTelemetryClient:
         """
         if not self.config.enabled:
             logger.debug(f"Telemetry disabled, skipping event: {event_name}")
-            return
-
-        # Apply sampling to reduce number of events
-        if random.random() * 100 > self.config.sample_rate:
-            logger.debug(
-                f"Event sampled out due to sampling rate {self.config.sample_rate}%: {event_name}"
-            )
             return
 
         event_properties = {"version": __version__, **(properties or {})}
