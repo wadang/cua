@@ -45,12 +45,6 @@ class TelemetryConfig:
             enabled=not telemetry_disabled,
         )
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert config to dictionary."""
-        return {
-            "enabled": self.enabled,
-        }
-
 
 def get_posthog_config() -> dict:
     """Get PostHog configuration for anonymous telemetry.
