@@ -222,32 +222,27 @@ class PostHogTelemetryClient:
             logger.debug(f"Failed to flush PostHog events: {e}")
             return False
 
+    _singleton: Optional["PostHogTelemetryClient"] = None
 
-# Global telemetry client instance
-_client: Optional[PostHogTelemetryClient] = None
+    @classmethod
+    def get_client(cls) -> "PostHogTelemetryClient":
+        """Return the global PostHogTelemetryClient instance, creating it if needed."""
+        if cls._singleton is None:
+            cls._singleton = cls()
+        return cls._singleton
 
-
-def get_posthog_telemetry_client() -> PostHogTelemetryClient:
-    """Get or initialize the global PostHog telemetry client.
-
-    Returns:
-        The global telemetry client instance
-    """
-    global _client
-
-    if _client is None:
-        _client = PostHogTelemetryClient()
-
-    return _client
+    @classmethod
+    def destroy_client(cls) -> None:
+        """Destroy the global PostHogTelemetryClient instance."""
+        cls._singleton = None
 
 def destroy_telemetry_client() -> None:
-    """Destroy the global telemetry client instance."""
-    global _client
-    _client = None
+    """Destroy the global PostHogTelemetryClient instance (class-managed)."""
+    PostHogTelemetryClient.destroy_client()
 
 def is_telemetry_enabled() -> bool:
     return PostHogTelemetryClient.is_telemetry_enabled()
 
 def record_event(event_name: str, properties: Optional[Dict[str, Any]] | None = None) -> None:
     """Record an arbitrary PostHog event."""
-    get_posthog_telemetry_client().record_event(event_name, properties or {})
+    PostHogTelemetryClient.get_client().record_event(event_name, properties or {})
