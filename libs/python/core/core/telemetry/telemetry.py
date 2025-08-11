@@ -190,6 +190,10 @@ def get_telemetry_client(
 
     return _universal_client
 
+def destroy_telemetry_client() -> None:
+    """Destroy the global telemetry client."""
+    global _universal_client
+    _universal_client = None
 
 def increment(counter_name: str, value: int = 1) -> None:
     """Increment a named counter using the global telemetry client.

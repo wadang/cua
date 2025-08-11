@@ -23,7 +23,7 @@ for path in pythonpath.split(":"):
         sys.path.insert(0, path)  # Insert at beginning to prioritize
         print(f"Added to sys.path: {path}")
 
-from core.telemetry import record_event, is_telemetry_enabled
+from core.telemetry import record_event, is_telemetry_enabled, destroy_telemetry_client
 
 
 class TestTelemetry:
@@ -31,6 +31,7 @@ class TestTelemetry:
         """Reset environment variables before each test"""
         os.environ.pop('CUA_TELEMETRY', None)
         os.environ.pop('CUA_TELEMETRY_ENABLED', None)
+        destroy_telemetry_client()
     
     def test_telemetry_disabled_when_cua_telemetry_is_off(self):
         """Should return false when CUA_TELEMETRY is off"""

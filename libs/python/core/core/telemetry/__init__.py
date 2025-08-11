@@ -13,6 +13,7 @@ from core.telemetry.telemetry import (
     record_event,
     is_telemetry_enabled,
     is_telemetry_globally_disabled,
+    destroy_telemetry_client,
 )
 
 
@@ -26,4 +27,5 @@ __all__ = [
     "record_event",
     "is_telemetry_enabled",
     "is_telemetry_globally_disabled",
+    "destroy_telemetry_client",
 ]
