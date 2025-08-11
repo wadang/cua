@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import os
-import random
-import time
 import uuid
 import sys
 from dataclasses import dataclass
@@ -69,7 +66,6 @@ class PostHogTelemetryClient:
         self.installation_id = self._get_or_create_installation_id()
         self.initialized = False
         self.queued_events: List[Dict[str, Any]] = []
-        self.start_time = time.time()
 
         # Log telemetry status on startup
         if self.config.enabled:
