@@ -276,3 +276,36 @@ def get_posthog_telemetry_client() -> PostHogTelemetryClient:
         _client = PostHogTelemetryClient()
 
     return _client
+
+# ---------------------------------------------------------------------------
+# Lightweight wrapper functions (migrated from telemetry.py)
+# ---------------------------------------------------------------------------
+
+def _telemetry_disabled() -> bool:
+    return (
+        os.environ.get("CUA_TELEMETRY", "").lower() == "off"
+        or os.environ.get("CUA_TELEMETRY_ENABLED", "true").lower() not in {"1", "true", "yes", "on"}
+    )
+
+
+def destroy_telemetry_client() -> None:
+    """Destroy the global telemetry client instance."""
+    global _client
+    _client = None
+
+
+def is_telemetry_enabled() -> bool:
+    """Return True if telemetry is currently active."""
+    if _telemetry_disabled():
+        return False
+    client = get_posthog_telemetry_client()
+    return client.config.enabled if client else False
+
+
+def record_event(event_name: str, properties: Optional[Dict[str, Any]] | None = None) -> None:
+    """Record an arbitrary PostHog event."""
+    if _telemetry_disabled():
+        return
+    client = get_posthog_telemetry_client()
+    if client and client.config.enabled:
+        client.record_event(event_name, properties or {})
