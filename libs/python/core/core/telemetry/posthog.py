@@ -6,7 +6,6 @@ import logging
 import os
 import uuid
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -20,27 +19,6 @@ logger = logging.getLogger("core.telemetry")
 # https://posthog.com/docs/product-analytics/troubleshooting#is-it-ok-for-my-api-key-to-be-exposed-and-public
 PUBLIC_POSTHOG_API_KEY = "phc_eSkLnbLxsnYFaXksif1ksbrNzYlJShr35miFLDppF14"
 PUBLIC_POSTHOG_HOST = "https://eu.i.posthog.com"
-
-
-@dataclass
-class TelemetryConfig:
-    """Configuration for telemetry collection."""
-
-    enabled: bool = True  # Default to enabled (opt-out)
-
-    @classmethod
-    def from_env(cls) -> TelemetryConfig:
-        """Load config from environment variables."""
-        # Check for multiple environment variables that can disable telemetry:
-        # CUA_TELEMETRY=off to disable telemetry (legacy way)
-        # CUA_TELEMETRY_DISABLED=1 to disable telemetry (new, more explicit way)
-        telemetry_disabled = os.environ.get("CUA_TELEMETRY", "").lower() == "off" or os.environ.get(
-            "CUA_TELEMETRY_DISABLED", ""
-        ).lower() in ("1", "true", "yes", "on")
-
-        return cls(
-            enabled=not telemetry_disabled,
-        )
 
 
 def get_posthog_config() -> dict:
@@ -62,13 +40,12 @@ class PostHogTelemetryClient:
 
     def __init__(self):
         """Initialize PostHog telemetry client."""
-        self.config = TelemetryConfig.from_env()
         self.installation_id = self._get_or_create_installation_id()
         self.initialized = False
         self.queued_events: List[Dict[str, Any]] = []
 
         # Log telemetry status on startup
-        if self.config.enabled:
+        if not _telemetry_disabled():
             logger.info(f"Telemetry enabled")
             # Initialize PostHog client if config is available
             self._initialize_posthog()
@@ -93,18 +70,14 @@ class PostHogTelemetryClient:
 
             # Configure the client
             posthog.debug = os.environ.get("CUA_TELEMETRY_DEBUG", "").lower() == "on"
-            posthog.disabled = not self.config.enabled
 
             # Log telemetry status
-            if not posthog.disabled:
-                logger.info(
-                    f"Initializing PostHog telemetry with installation ID: {self.installation_id}"
-                )
-                if posthog.debug:
-                    logger.debug(f"PostHog API Key: {posthog.api_key}")
-                    logger.debug(f"PostHog Host: {posthog.host}")
-            else:
-                logger.info("PostHog telemetry is disabled")
+            logger.info(
+                f"Initializing PostHog telemetry with installation ID: {self.installation_id}"
+            )
+            if posthog.debug:
+                logger.debug(f"PostHog API Key: {posthog.api_key}")
+                logger.debug(f"PostHog Host: {posthog.host}")
 
             # Identify this installation
             self._identify()
@@ -204,10 +177,6 @@ class PostHogTelemetryClient:
             event_name: Name of the event
             properties: Event properties (must not contain sensitive data)
         """
-        if not self.config.enabled:
-            logger.debug(f"Telemetry disabled, skipping event: {event_name}")
-            return
-
         event_properties = {"version": __version__, **(properties or {})}
 
         logger.info(f"Recording event: {event_name} with properties: {event_properties}")
@@ -236,9 +205,6 @@ class PostHogTelemetryClient:
         Returns:
             bool: True if successful, False otherwise
         """
-        if not self.config.enabled:
-            return False
-
         if not self.initialized and not self._initialize_posthog():
             return False
 
@@ -286,10 +252,7 @@ def destroy_telemetry_client() -> None:
 
 def is_telemetry_enabled() -> bool:
     """Return True if telemetry is currently active."""
-    if _telemetry_disabled():
-        return False
-    client = get_posthog_telemetry_client()
-    return client.config.enabled if client else False
+    return not _telemetry_disabled()
 
 
 def record_event(event_name: str, properties: Optional[Dict[str, Any]] | None = None) -> None:
@@ -297,5 +260,5 @@ def record_event(event_name: str, properties: Optional[Dict[str, Any]] | None = 
     if _telemetry_disabled():
         return
     client = get_posthog_telemetry_client()
-    if client and client.config.enabled:
+    if client:
         client.record_event(event_name, properties or {})
