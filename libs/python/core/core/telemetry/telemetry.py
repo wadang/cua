@@ -60,6 +60,9 @@ def is_telemetry_globally_disabled() -> bool:
     Returns:
         bool: True if telemetry is globally disabled, False otherwise
     """
+    # Check legacy environment variable for telemetry opt-out
+    if os.environ.get("CUA_TELEMETRY", "").lower() == "off":
+        return True
     # Only check for CUA_TELEMETRY_ENABLED - telemetry is enabled only if explicitly set to a truthy value
     telemetry_enabled = os.environ.get("CUA_TELEMETRY_ENABLED", "true").lower()
     return telemetry_enabled not in ("1", "true", "yes", "on")
