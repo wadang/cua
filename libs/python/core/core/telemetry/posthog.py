@@ -46,14 +46,6 @@ class PostHogTelemetryClient:
             not in {"1", "true", "yes", "on"}
         )
 
-    @staticmethod
-    def _get_posthog_config() -> dict:
-        """Return PostHog configuration for anonymous telemetry (public credentials)."""
-        logger.debug("Using public PostHog configuration (from class method)")
-        return {
-            "api_key": PUBLIC_POSTHOG_API_KEY,
-            "host": PUBLIC_POSTHOG_HOST,
-        }
 
     # ------------------------------------------------------------------
     # Public helpers
@@ -73,12 +65,10 @@ class PostHogTelemetryClient:
         if self.initialized:
             return True
 
-        posthog_config = self._get_posthog_config()
-
         try:
-            # Initialize the PostHog client
-            posthog.api_key = posthog_config["api_key"]
-            posthog.host = posthog_config["host"]
+            # Allow overrides from environment for testing/region control
+            posthog.api_key = PUBLIC_POSTHOG_API_KEY
+            posthog.host = PUBLIC_POSTHOG_HOST
 
             # Configure the client
             posthog.debug = os.environ.get("CUA_TELEMETRY_DEBUG", "").lower() == "on"
