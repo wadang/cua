@@ -23,6 +23,9 @@ PUBLIC_POSTHOG_HOST = "https://eu.i.posthog.com"
 class PostHogTelemetryClient:
     """Collects and reports telemetry data via PostHog."""
 
+    # Global singleton (class-managed)
+    _singleton: Optional["PostHogTelemetryClient"] = None
+
     def __init__(self):
         """Initialize PostHog telemetry client."""
         self.installation_id = self._get_or_create_installation_id()
@@ -30,103 +33,22 @@ class PostHogTelemetryClient:
         self.queued_events: List[Dict[str, Any]] = []
 
         # Log telemetry status on startup
-        if not self._telemetry_disabled():
-            logger.info(f"Telemetry enabled")
+        if self.is_telemetry_enabled():
+            logger.info("Telemetry enabled")
             # Initialize PostHog client if config is available
             self._initialize_posthog()
         else:
             logger.info("Telemetry disabled")
 
-    @staticmethod
-    def _telemetry_disabled() -> bool:
-        """Return ``True`` when telemetry is explicitly disabled via environment variables."""
-        return (
-            os.environ.get("CUA_TELEMETRY", "").lower() == "off"
-            or os.environ.get("CUA_TELEMETRY_ENABLED", "true").lower()
-            not in {"1", "true", "yes", "on"}
-        )
-
-
-    # ------------------------------------------------------------------
-    # Public helpers
-    # ------------------------------------------------------------------
-
     @classmethod
     def is_telemetry_enabled(cls) -> bool:
         """True if telemetry is currently active for this process."""
-        return not cls._telemetry_disabled()
-
-    def _initialize_posthog(self) -> bool:
-        """Initialize the PostHog client with configuration.
-
-        Returns:
-            bool: True if initialized successfully, False otherwise
-        """
-        if self.initialized:
-            return True
-
-        try:
-            # Allow overrides from environment for testing/region control
-            posthog.api_key = PUBLIC_POSTHOG_API_KEY
-            posthog.host = PUBLIC_POSTHOG_HOST
-
-            # Configure the client
-            posthog.debug = os.environ.get("CUA_TELEMETRY_DEBUG", "").lower() == "on"
-
-            # Log telemetry status
-            logger.info(
-                f"Initializing PostHog telemetry with installation ID: {self.installation_id}"
-            )
-            if posthog.debug:
-                logger.debug(f"PostHog API Key: {posthog.api_key}")
-                logger.debug(f"PostHog Host: {posthog.host}")
-
-            # Identify this installation
-            self._identify()
-
-            # Process any queued events
-            for event in self.queued_events:
-                posthog.capture(
-                    distinct_id=self.installation_id,
-                    event=event["event"],
-                    properties=event["properties"],
-                )
-            self.queued_events = []
-
-            self.initialized = True
-            return True
-        except Exception as e:
-            logger.warning(f"Failed to initialize PostHog: {e}")
-            return False
-
-    def _identify(self) -> None:
-        """Set up user properties for the current installation with PostHog.
-        
-        Note: The Python PostHog SDK doesn't have an identify() method like the web SDK.
-        Instead, we capture an identification event with user properties.
-        """
-        try:
-            properties = {
-                "version": __version__,
-                "is_ci": "CI" in os.environ,
-                "os": os.name,
-                "python_version": sys.version.split()[0],
-            }
-
-            logger.debug(
-                f"Setting up PostHog user properties for: {self.installation_id} with properties: {properties}"
-            )
-            
-            # In the Python SDK, we capture an identification event instead of calling identify()
-            posthog.capture(
-                distinct_id=self.installation_id,
-                event="$identify",
-                properties={"$set": properties}
-            )
-            
-            logger.info(f"Set up PostHog user properties for installation: {self.installation_id}")
-        except Exception as e:
-            logger.warning(f"Failed to set up PostHog user properties: {e}")
+        return (
+            # Legacy opt-out flag
+            os.environ.get("CUA_TELEMETRY", "").lower() != "off"
+            # Opt-in flag (defaults to enabled)
+            and os.environ.get("CUA_TELEMETRY_ENABLED", "true").lower() in { "1", "true", "yes", "on" }
+        )
 
     def _get_or_create_installation_id(self) -> str:
         """Get or create a unique installation ID that persists across runs.
@@ -172,6 +94,74 @@ class PostHogTelemetryClient:
         logger.warning("Using random installation ID (will not persist across runs)")
         return str(uuid.uuid4())
 
+    def _initialize_posthog(self) -> bool:
+        """Initialize the PostHog client with configuration.
+
+        Returns:
+            bool: True if initialized successfully, False otherwise
+        """
+        if self.initialized:
+            return True
+
+        try:
+            # Allow overrides from environment for testing/region control
+            posthog.api_key = PUBLIC_POSTHOG_API_KEY
+            posthog.host = PUBLIC_POSTHOG_HOST
+
+            # Configure the client
+            posthog.debug = os.environ.get("CUA_TELEMETRY_DEBUG", "").lower() == "on"
+
+            # Log telemetry status
+            logger.info(
+                f"Initializing PostHog telemetry with installation ID: {self.installation_id}"
+            )
+            if posthog.debug:
+                logger.debug(f"PostHog API Key: {posthog.api_key}")
+                logger.debug(f"PostHog Host: {posthog.host}")
+
+            # Identify this installation
+            self._identify()
+
+            # Process any queued events
+            for event in self.queued_events:
+                posthog.capture(
+                    distinct_id=self.installation_id,
+                    event=event["event"],
+                    properties=event["properties"],
+                )
+            self.queued_events = []
+
+            self.initialized = True
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to initialize PostHog: {e}")
+            return False
+
+    def _identify(self) -> None:
+        """Set up user properties for the current installation with PostHog."""
+        try:
+            properties = {
+                "version": __version__,
+                "is_ci": "CI" in os.environ,
+                "os": os.name,
+                "python_version": sys.version.split()[0],
+            }
+
+            logger.debug(
+                f"Setting up PostHog user properties for: {self.installation_id} with properties: {properties}"
+            )
+            
+            # In the Python SDK, we capture an identification event instead of calling identify()
+            posthog.capture(
+                distinct_id=self.installation_id,
+                event="$identify",
+                properties={"$set": properties}
+            )
+            
+            logger.info(f"Set up PostHog user properties for installation: {self.installation_id}")
+        except Exception as e:
+            logger.warning(f"Failed to set up PostHog user properties: {e}")
+
     def record_event(self, event_name: str, properties: Optional[Dict[str, Any]] = None) -> None:
         """Record an event with optional properties.
 
@@ -180,7 +170,7 @@ class PostHogTelemetryClient:
             properties: Event properties (must not contain sensitive data)
         """
         # Respect runtime telemetry opt-out.
-        if self._telemetry_disabled():
+        if not self.is_telemetry_enabled():
             logger.debug("Telemetry disabled; event not recorded.")
             return
 
@@ -221,8 +211,6 @@ class PostHogTelemetryClient:
         except Exception as e:
             logger.debug(f"Failed to flush PostHog events: {e}")
             return False
-
-    _singleton: Optional["PostHogTelemetryClient"] = None
 
     @classmethod
     def get_client(cls) -> "PostHogTelemetryClient":
