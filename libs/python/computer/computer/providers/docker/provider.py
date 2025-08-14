@@ -41,7 +41,7 @@ class DockerProvider(BaseVMProvider):
         host: str = "localhost",
         storage: Optional[str] = None,
         shared_path: Optional[str] = None,
-        image: str = "cua-ubuntu:latest",
+        image: str = "trycua/cua-ubuntu:latest",
         verbose: bool = False,
         ephemeral: bool = False,
         vnc_port: Optional[int] = 6901,
@@ -49,17 +49,17 @@ class DockerProvider(BaseVMProvider):
         """Initialize the Docker VM Provider.
         
         Args:
-            port: Port for the computer-server API (default: 8000)
+            port: Currently unused (VM provider port)
             host: Hostname for the API server (default: localhost)
             storage: Path for persistent VM storage
             shared_path: Path for shared folder between host and container
-            image: Docker image to use (default: "cua-ubuntu:latest")
+            image: Docker image to use (default: "trycua/cua-ubuntu:latest")
             verbose: Enable verbose logging
             ephemeral: Use ephemeral (temporary) storage
             vnc_port: Port for VNC interface (default: 6901)
         """
         self.host = host
-        self.api_port = 8080 if port is None else port
+        self.api_port = 8000
         self.vnc_port = vnc_port
         self.ephemeral = ephemeral
         

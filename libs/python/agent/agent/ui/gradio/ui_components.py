@@ -187,7 +187,7 @@ if __name__ == "__main__":
                     """
                     <div style="display: flex; justify-content: center; margin-bottom: 0.5em">
                         <img alt="CUA Logo" style="width: 80px;"
-                             src="https://github.com/trycua/cua/blob/main/img/logo_black.png?raw=true" />
+                             src="https://github.com/trycua/cua/blob/main/img/logo_white.png?raw=true" />
                     </div>
                     """
                 )
@@ -201,22 +201,33 @@ if __name__ == "__main__":
                     )
                     
                 with gr.Accordion("Computer Configuration", open=True):
-                    computer_os = gr.Radio(
-                        choices=["macos", "linux", "windows"],
-                        label="Operating System",
-                        value="macos",
-                        info="Select the operating system for the computer",
-                    )
-                    
                     is_windows = platform.system().lower() == "windows"
                     is_mac = platform.system().lower() == "darwin"
                     
-                    providers = ["cloud", "localhost"]
+                    providers = ["cloud", "localhost", "docker"]
                     if is_mac:
                         providers += ["lume"]
                     if is_windows:
                         providers += ["winsandbox"]
 
+                    # Remove unavailable options
+                    # MacOS is unavailable if Lume is not available
+                    # Windows is unavailable if Winsandbox is not available
+                    # Linux is always available
+                    # This should be removed once we support macOS and Windows on the cloud provider
+                    computer_choices = ["macos", "linux", "windows"]
+                    if not is_mac or "lume" not in providers:
+                        computer_choices.remove("macos")
+                    if not is_windows or "winsandbox" not in providers:
+                        computer_choices.remove("windows")
+
+                    computer_os = gr.Radio(
+                        choices=computer_choices,
+                        label="Operating System",
+                        value=computer_choices[0],
+                        info="Select the operating system for the computer",
+                    )
+                    
                     computer_provider = gr.Radio(
                         choices=providers,
                         label="Provider",

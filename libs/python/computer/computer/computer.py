@@ -43,7 +43,7 @@ class Computer:
         cpu: str = "4",
         os_type: OSType = "macos",
         name: str = "",
-        image: str = "macos-sequoia-cua:latest",
+        image: Optional[str] = None,
         shared_directories: Optional[List[str]] = None,
         use_host_computer_server: bool = False,
         verbosity: Union[int, LogLevel] = logging.INFO,
@@ -87,6 +87,12 @@ class Computer:
 
         self.logger = Logger("computer", verbosity)
         self.logger.info("Initializing Computer...")
+
+        if os_type == "macos":
+            image = "macos-sequoia-cua:latest"
+        elif os_type == "linux":
+            image = "trycua/cua-ubuntu:latest"
+        image = str(image)
 
         # Store original parameters
         self.image = image
@@ -310,7 +316,7 @@ class Computer:
                                     host=host,
                                     storage=storage,
                                     shared_path=shared_path,
-                                    image=image or "cua-ubuntu:latest",
+                                    image=image or "trycua/cua-ubuntu:latest",
                                     verbose=verbose,
                                     ephemeral=ephemeral,
                                     noVNC_port=noVNC_port,

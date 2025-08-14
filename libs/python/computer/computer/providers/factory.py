@@ -147,7 +147,7 @@ class VMProviderFactory:
                     host=host,
                     storage=storage,
                     shared_path=shared_path,
-                    image=image or "cua-ubuntu:latest",
+                    image=image or "trycua/cua-ubuntu:latest",
                     verbose=verbose,
                     ephemeral=ephemeral,
                     vnc_port=noVNC_port
