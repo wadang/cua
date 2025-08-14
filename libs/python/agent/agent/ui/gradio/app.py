@@ -39,6 +39,7 @@ global_agent = None
 global_computer = None
 SETTINGS_FILE = Path(".gradio_settings.json")
 
+logging.basicConfig(level=logging.INFO)
 
 import dotenv
 if dotenv.load_dotenv():

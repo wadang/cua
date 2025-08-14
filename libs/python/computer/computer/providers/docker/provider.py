@@ -286,7 +286,7 @@ class DockerProvider(BaseVMProvider):
             
             # Add environment variables
             cmd.extend(["-e", "VNC_PW=password"])  # Set VNC password
-            cmd.extend(["-e", "DISPLAY=:0"])
+            cmd.extend(["-e", "VNCOPTIONS=-disableBasicAuth"])  # Disable VNC basic auth
             
             # Add the image
             cmd.append(docker_image)
