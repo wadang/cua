@@ -20,12 +20,62 @@ cua combines Computer (interface) + Agent (AI) for automating desktop apps. Comp
 
 <Step>
 
-## Create Your First cua Container
+## Set Up Your Computer Environment
 
-1. Go to [trycua.com/signin](https://www.trycua.com/signin)
-2. Navigate to **Dashboard > Containers > Create Instance**
-3. Create a **Medium, Ubuntu 22** container
-4. Note your container name and API key
+Choose how you want to run your cua computer. **Cloud containers are recommended** for the easiest setup:
+
+<Tabs items={['☁️ Cloud (Recommended)', 'Lume (macOS Only)', 'Windows Sandbox (Windows Only)', 'Docker (Cross-Platform)']}>
+  <Tab value="☁️ Cloud (Recommended)">
+    
+    **Easiest & safest way to get started**
+    
+    1. Go to [trycua.com/signin](https://www.trycua.com/signin)
+    2. Navigate to **Dashboard > Containers > Create Instance**
+    3. Create a **Medium, Ubuntu 22** container
+    4. Note your container name and API key
+    
+    Your cloud container will be automatically configured and ready to use.
+
+  </Tab>
+  <Tab value="Lume (macOS Only)">
+    
+    1. Install lume cli
+
+    ```bash
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh)"
+    ```
+
+    2. Start a local cua container
+
+    ```bash
+    lume run macos-sequoia-cua:latest
+    ```
+
+  </Tab>
+  <Tab value="Windows Sandbox (Windows Only)">
+    
+    1. Enable Windows Sandbox (requires Windows 10 Pro/Enterprise or Windows 11)
+    2. Install pywinsandbox dependency
+
+    ```bash
+    pip install -U git+git://github.com/karkason/pywinsandbox.git
+    ```
+
+    3. Windows Sandbox will be automatically configured when you run the CLI
+
+  </Tab>
+  <Tab value="Docker (Cross-Platform)">
+    
+    1. Install Docker Desktop or Docker Engine
+
+    2. Pull the CUA Ubuntu container
+
+    ```bash
+    docker pull trycua/cua-ubuntu:latest
+    ```
+
+  </Tab>
+</Tabs>
 
 </Step>
 
@@ -35,9 +85,15 @@ cua combines Computer (interface) + Agent (AI) for automating desktop apps. Comp
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tab value="Python">
-    ```bash pip install "cua-agent[all]" cua-computer ```
+    ```bash
+    pip install "cua-agent[all]" cua-computer
+    ```
   </Tab>
-  <Tab value="TypeScript">```bash npm install @trycua/computer ```</Tab>
+  <Tab value="TypeScript">
+    ```bash
+    npm install @trycua/computer
+    ```
+  </Tab>
 </Tabs>
 
 </Step>
