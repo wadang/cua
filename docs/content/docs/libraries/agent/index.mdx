@@ -101,15 +101,6 @@ async for result in agent.run(messages):
     ...
 ```
 
-### Supported Agent Loops
-
-- **Anthropic**: Claude 4, 3.7, 3.5 models
-- **OpenAI**: computer-use-preview
-- **UITARS**: UI-TARS 1.5 models (Hugging Face, TGI)
-- **Omni**: Omniparser + any LLM
-
-See [Agent Loops](../../agent-sdk/agent-loops) for supported models and details.
-
 ### Callbacks & Extensibility
 
 You can add preprocessing and postprocessing hooks using callbacks, or write your own by subclassing `AsyncCallbackHandler`:
