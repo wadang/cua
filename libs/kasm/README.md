@@ -19,6 +19,31 @@ Containerized virtual desktop for Computer-Using Agents (CUA). Utilizes Kasm's M
 docker build -t cua-ubuntu:latest .
 ```
 
+### Pushing to Registry
+
+To push the container to a Docker registry:
+
+```bash
+# Tag for your registry (replace with your registry URL)
+docker tag cua-ubuntu:latest your-registry.com/cua-ubuntu:latest
+
+# Push to registry
+docker push your-registry.com/cua-ubuntu:latest
+```
+
+For Docker Hub:
+
+```bash
+# Tag for Docker Hub (replace 'trycua' with your Docker Hub username)
+docker tag cua-ubuntu:latest trycua/cua-ubuntu:latest
+
+# Login to Docker Hub
+docker login
+
+# Push to Docker Hub
+docker push trycua/cua-ubuntu:latest
+```
+
 ### Running the Container Manually
 
 ```bash
