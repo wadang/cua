@@ -47,10 +47,10 @@ docker push trycua/cua-ubuntu:latest
 ### Running the Container Manually
 
 ```bash
-docker run --rm -it --shm-size=512m -p 6901:6901 -p 8000:8000 -e VNC_PW=password cua-ubuntu:latest
+docker run --rm -it --shm-size=512m -p 6901:6901 -p 8000:8000 -e VNCOPTIONS=-disableBasicAuth cua-ubuntu:latest
 ```
 
-- **VNC Access**: Available at `http://localhost:6901` (username: `kasm-user`, password: `password`)
+- **VNC Access**: Available at `http://localhost:6901`
 - **Computer Server API**: Available at `http://localhost:8000`
 
 ### Using with CUA Docker Provider
@@ -96,9 +96,9 @@ async with provider:
 - `/home/kasm-user/storage`: Persistent storage mount point
 - `/home/kasm-user/shared`: Shared folder mount point
 
-## Creating Snapshots
+## Creating Filesystem Snapshots
 
-You can create a snapshot of the container at any time:
+You can create a filesystem snapshot of the container at any time:
 
 ```bash
 docker commit <container_id> cua-ubuntu-snapshot:latest
@@ -107,8 +107,10 @@ docker commit <container_id> cua-ubuntu-snapshot:latest
 Then run the snapshot:
 
 ```bash
-docker run --rm -it --shm-size=512m -p 6901:6901 -p 8080:8080 -e VNC_PW=password cua-ubuntu-snapshot:latest
+docker run --rm -it --shm-size=512m -p 6901:6901 -p 8080:8080 -e VNCOPTIONS=-disableBasicAuth cua-ubuntu-snapshot:latest
 ```
+
+Memory snapshots are available using the experimental `docker checkpoint` command. [Docker Checkpoint Documentation](https://docs.docker.com/reference/cli/docker/checkpoint/)
 
 ## Integration with CUA System
 
