@@ -13,14 +13,16 @@ Execute shell commands and get detailed results:
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tab value="Python">
-    ```python # Run shell command result = await
-    computer.interface.run_command(cmd) # result.stdout, result.stderr,
-    result.returncode ```
+    ```python
+    # Run shell command result = await
+    computer.interface.run_command(cmd) # result.stdout, result.stderr, result.returncode
+    ```
   </Tab>
   <Tab value="TypeScript">
-    ```typescript // Run shell command const result = await
-    computer.interface.runCommand(cmd); // result.stdout, result.stderr,
-    result.returncode ```
+    ```typescript
+    // Run shell command const result = await
+    computer.interface.runCommand(cmd); // result.stdout, result.stderr, result.returncode
+    ```
   </Tab>
 </Tabs>
 
@@ -106,15 +108,12 @@ Mouse wheel and scrolling control:
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tab value="Python">
-
     ```python
     # Scrolling
     await computer.interface.scroll(x, y) # Scroll the mouse wheel
     await computer.interface.scroll_down(clicks) # Scroll down await
     computer.interface.scroll_up(clicks) # Scroll up
-
     ```
-
   </Tab>
   <Tab value="TypeScript">
     ```typescript 
@@ -122,7 +121,6 @@ Mouse wheel and scrolling control:
     await computer.interface.scroll(x, y); // Scroll the mouse wheel 
     await computer.interface.scrollDown(clicks); // Scroll down
     await computer.interface.scrollUp(clicks); // Scroll up 
-    
     ```
   </Tab>
 </Tabs>
