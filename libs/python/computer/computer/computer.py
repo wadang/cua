@@ -88,10 +88,11 @@ class Computer:
         self.logger = Logger("computer", verbosity)
         self.logger.info("Initializing Computer...")
 
-        if os_type == "macos":
-            image = "macos-sequoia-cua:latest"
-        elif os_type == "linux":
-            image = "trycua/cua-ubuntu:latest"
+        if not image:
+            if os_type == "macos":
+                image = "macos-sequoia-cua:latest"
+            elif os_type == "linux":
+                image = "trycua/cua-ubuntu:latest"
         image = str(image)
 
         # Store original parameters
