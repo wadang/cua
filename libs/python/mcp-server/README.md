@@ -35,7 +35,7 @@ This MCP server features comprehensive liteLLM integration, allowing you to use 
 
 ## Prerequisites
 
-Before installing the MCP server, you'll need to set up the full Computer-Use Agent capabilities as described in [Option 2 of the main README](../../README.md#option-2-full-computer-use-agent-capabilities). This includes:
+Before installing the MCP server, you'll need to set up full Computer-Use Agent capabilities. This includes:
 
 1. Installing the Lume CLI
 2. Pulling the latest macOS CUA image
