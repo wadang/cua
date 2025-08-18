@@ -782,10 +782,18 @@ class UITARSConfig:
             # Extract response content
             response_content = response.choices[0].message.content.strip() # type: ignore
             
+            print(response_content)
+
             # Parse the response to extract click coordinates
-            # Look for click action with coordinates
+            # Look for click action with coordinates (with special tokens)
             click_pattern = r"click\(point='<\|box_start\|>\((\d+),(\d+)\)<\|box_end\|>'\)"
             match = re.search(click_pattern, response_content)
+            
+            # Fallback: Look for simpler format without special tokens
+            if not match:
+                # Pattern for: click(start_box='(x,y)') or click(point='(x,y)')
+                fallback_pattern = r"click\((?:start_box|point)='\((\d+),(\d+)\)'\)"
+                match = re.search(fallback_pattern, response_content)
             
             if match:
                 x, y = int(match.group(1)), int(match.group(2))
