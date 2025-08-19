@@ -459,8 +459,7 @@ class ComputerAgent:
                     assert_callable_with(computer_method, **action_args)
                     await computer_method(**action_args)
                 else:
-                    print(f"Unknown computer action: {action_type}")
-                    return []
+                    raise ToolError(f"Unknown computer action: {action_type}")
                 
                 # Take screenshot after action
                 if self.screenshot_delay and self.screenshot_delay > 0:
@@ -507,7 +506,7 @@ class ComputerAgent:
                 # Perform function call
                 function = self._get_tool(item.get("name"))
                 if not function:
-                    raise ValueError(f"Function {item.get("name")} not found")
+                    raise ToolError(f"Function {item.get("name")} not found")
             
                 args = json.loads(item.get("arguments"))
 
