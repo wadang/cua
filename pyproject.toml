@@ -4,7 +4,9 @@ requires = ["pdm-backend"]
 
 [project]
 authors = [{ name = "TryCua", email = "gh@trycua.com" }]
-dependencies = []
+dependencies = [
+    "openai<1.100.0",
+]
 description = "CUA (Computer Use Agent) mono-repo"
 license = { text = "MIT" }
 name = "cua-workspace"
