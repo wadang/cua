@@ -2,8 +2,8 @@
 <h1>
   <div class="image-wrapper" style="display: inline-block;">
     <picture>
-      <source media="(prefers-color-scheme: dark)" alt="logo" height="150" srcset="../../img/logo_white.png" style="display: block; margin: auto;">
-      <source media="(prefers-color-scheme: light)" alt="logo" height="150" srcset="../../img/logo_black.png" style="display: block; margin: auto;">
+      <source media="(prefers-color-scheme: dark)" alt="logo" height="150" srcset="https://raw.githubusercontent.com/trycua/cua/main/img/logo_white.png" style="display: block; margin: auto;">
+      <source media="(prefers-color-scheme: light)" alt="logo" height="150" srcset="https://raw.githubusercontent.com/trycua/cua/main/img/logo_black.png" style="display: block; margin: auto;">
       <img alt="Shows my svg">
     </picture>
   </div>
@@ -20,7 +20,7 @@
 ### Get started with Computer
 
 <div align="center">
-    <img src="../../img/computer.png"/>
+    <img src="https://raw.githubusercontent.com/trycua/cua/main/img/computer.png"/>
 </div>
 
 ```python
@@ -63,7 +63,7 @@ The `cua-computer` PyPi package pulls automatically the latest executable versio
 
 Refer to this notebook for a step-by-step guide on how to use the Computer-Use Interface (CUI):
 
-- [Computer-Use Interface (CUI)](../../notebooks/computer_nb.ipynb)
+- [Computer-Use Interface (CUI)](https://github.com/trycua/cua/blob/main/notebooks/computer_nb.ipynb)
 
 ## Using the Gradio Computer UI
 
@@ -101,7 +101,7 @@ app = create_gradio_ui()
 app.launch(share=False)
 ```
 
-For examples, see [Computer UI Examples](../../examples/computer_ui_examples.py)
+For examples, see [Computer UI Examples](https://github.com/trycua/cua/tree/main/examples/computer_ui_examples.py)
 
 #### 3. Record Your Tasks
 
