@@ -142,12 +142,25 @@ interface AgentRequest {
 
 ```typescript
 interface AgentResponse {
-  success: boolean;
-  result?: any;
-  model: string;
-  error?: string;
+  output: AgentMessage[];
+  usage: Usage;
+}
+
+interface Usage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+  response_cost: number;
 }
 ```
+
+The `output` array contains the conversation history including:
+- User messages
+- Agent reasoning/thinking
+- Computer actions and their results
+- Final agent responses
+
+The `usage` object provides token counts and cost information for the request.
 
 ## Connection Types
 
