@@ -28,7 +28,6 @@ try:
     # Import from core telemetry for basic functions
     from core.telemetry import (
         is_telemetry_enabled,
-        flush,
         record_event,
     )
 
@@ -46,8 +45,6 @@ try:
             },
         )
 
-        # Flush events to ensure they're sent
-        flush()
     else:
         logger.info("Telemetry is disabled")
 except ImportError as e:
