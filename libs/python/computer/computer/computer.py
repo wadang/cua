@@ -160,6 +160,8 @@ class Computer:
             if not name:
                 # Normalize the name to be used for the VM
                 name = image.replace(":", "_")
+                # Remove any forward slashes
+                name = name.replace("/", "_")
 
             # Convert display parameter to Display object
             if isinstance(display, str):
