@@ -36,13 +36,14 @@ from .computers import (
     make_computer_handler
 )
 
-def is_callable_with(f, *args, **kwargs):
-    """Check if function can be called with given arguments."""
-    try:
-        inspect.signature(f).bind(*args, **kwargs)
-        return True
-    except TypeError:
-        return False
+def assert_callable_with(f, *args, **kwargs):
+   """Check if function can be called with given arguments."""
+   try:
+       inspect.signature(f).bind(*args, **kwargs)
+       return True
+   except TypeError as e:
+       sig = inspect.signature(f)
+       raise IllegalArgumentError(f"Expected {sig}, got args={args} kwargs={kwargs}") from e
 
 def get_json(obj: Any, max_depth: int = 10) -> Any:
     def custom_serializer(o: Any, depth: int = 0, seen: Optional[Set[int]] = None) -> Any:
@@ -455,8 +456,7 @@ class ComputerAgent:
                 # Execute the computer action
                 computer_method = getattr(computer, action_type, None)
                 if computer_method:
-                    if not is_callable_with(computer_method, **action_args):
-                        raise IllegalArgumentError(f"Invalid arguments for computer method {action_type}: {action_args}")
+                    assert_callable_with(computer_method, **action_args)
                     await computer_method(**action_args)
                 else:
                     print(f"Unknown computer action: {action_type}")
@@ -512,8 +512,7 @@ class ComputerAgent:
                 args = json.loads(item.get("arguments"))
 
                 # Validate arguments before execution
-                if not is_callable_with(function, **args):
-                    raise IllegalArgumentError(f"Invalid arguments for function {item.get('name')}: {args}")
+                assert_callable_with(function, **args)
 
                 # Execute function - use asyncio.to_thread for non-async functions
                 if inspect.iscoroutinefunction(function):
