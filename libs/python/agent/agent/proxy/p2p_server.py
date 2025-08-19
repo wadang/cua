@@ -5,6 +5,7 @@ P2P server implementation using peerjs-python for WebRTC connections.
 import asyncio
 import json
 import logging
+import uuid
 from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -15,7 +16,7 @@ class P2PServer:
     
     def __init__(self, handler, peer_id: Optional[str] = None, signaling_server: Optional[Dict[str, Any]] = None):
         self.handler = handler
-        self.peer_id = peer_id or "computer-agent-proxy"
+        self.peer_id = peer_id or uuid.uuid4().hex
         self.signaling_server = signaling_server or {
             "host": "0.peerjs.com",
             "port": 443,
@@ -26,8 +27,8 @@ class P2PServer:
     async def start(self):
         """Start P2P server with WebRTC connections."""
         try:
-            from peerjs import Peer, PeerOptions, PeerEventType, ConnectionEventType
-            from aiortc import RTCConfiguration, RTCIceServer
+            from peerjs_py.peer import Peer, PeerOptions
+            from peerjs_py.enums import PeerEventType, ConnectionEventType
             
             # Set up peer options
             ice_servers = [
@@ -35,27 +36,29 @@ class P2PServer:
                 {"urls": "stun:stun1.l.google.com:19302"}
             ]
             
-            options = PeerOptions(
+            # Create peer with PeerOptions (config should be a dict, not RTCConfiguration)
+            peer_options = PeerOptions(
                 host=self.signaling_server["host"],
                 port=self.signaling_server["port"],
                 secure=self.signaling_server["secure"],
-                config=RTCConfiguration(
-                    iceServers=[RTCIceServer(**srv) for srv in ice_servers]
-                )
+                config={
+                    "iceServers": ice_servers
+                }
             )
             
             # Create peer
-            self.peer = Peer(id=self.peer_id, peer_options=options)
+            self.peer = Peer(id=self.peer_id, options=peer_options)
             await self.peer.start()
-            logger.info(f"P2P peer started with ID: {self.peer_id}")
+            # logger.info(f"P2P peer started with ID: {self.peer_id}")
+            print(f"Agent proxy started at peer://{self.peer_id}")
             
-            # Set up connection handlers
-            @self.peer.on(PeerEventType.Connection)
+            # Set up connection handlers using string event names
+            @self.peer.on('connection')
             async def peer_connection(peer_connection):
                 logger.info(f"Remote peer {peer_connection.peer} trying to establish connection")
                 await self._setup_connection_handlers(peer_connection)
             
-            @self.peer.on(PeerEventType.Error)
+            @self.peer.on('error')
             async def peer_error(error):
                 logger.error(f"Peer error: {error}")
             
@@ -74,9 +77,9 @@ class P2PServer:
     async def _setup_connection_handlers(self, peer_connection):
         """Set up handlers for a peer connection."""
         try:
-            from peerjs import ConnectionEventType
+            # Use string event names instead of enum types
             
-            @peer_connection.on(ConnectionEventType.Open)
+            @peer_connection.on('open')
             async def connection_open():
                 logger.info(f"Connection opened with peer {peer_connection.peer}")
                 
@@ -88,7 +91,7 @@ class P2PServer:
                 }
                 await peer_connection.send(json.dumps(welcome_msg))
             
-            @peer_connection.on(ConnectionEventType.Data)
+            @peer_connection.on('data')
             async def connection_data(data):
                 logger.debug(f"Data received from peer {peer_connection.peer}: {data}")
                 
@@ -122,11 +125,11 @@ class P2PServer:
                     }
                     await peer_connection.send(json.dumps(error_response))
             
-            @peer_connection.on(ConnectionEventType.Close)
+            @peer_connection.on('close')
             async def connection_close():
                 logger.info(f"Connection closed with peer {peer_connection.peer}")
             
-            @peer_connection.on(ConnectionEventType.Error)
+            @peer_connection.on('error')
             async def connection_error(error):
                 logger.error(f"Connection error with peer {peer_connection.peer}: {error}")
                 

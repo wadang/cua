@@ -76,7 +76,8 @@ class ProxyServer:
     
     async def start_http(self):
         """Start HTTP server."""
-        logger.info(f"Starting HTTP server on {self.host}:{self.port}")
+        # logger.info(f"Starting HTTP server on {self.host}:{self.port}")
+        print(f"Agent proxy started at http://{self.host}:{self.port}")
         config = uvicorn.Config(
             self.app,
             host=self.host,
