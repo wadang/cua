@@ -28,12 +28,8 @@ try:
     # Import from core telemetry for basic functions
     from core.telemetry import (
         is_telemetry_enabled,
-        flush,
         record_event,
     )
-
-    # Import set_dimension from our own telemetry module
-    from .telemetry import set_dimension
 
     # Check if telemetry is enabled
     if is_telemetry_enabled():
@@ -49,11 +45,6 @@ try:
             },
         )
 
-        # Set the package version as a dimension
-        set_dimension("agent_version", __version__)
-
-        # Flush events to ensure they're sent
-        flush()
     else:
         logger.info("Telemetry is disabled")
 except ImportError as e:

@@ -16,6 +16,15 @@ Tools = Optional[Iterable[ToolParam]]
 AgentResponse = ResponsesAPIResponse 
 AgentCapability = Literal["step", "click"]
 
+# Exception types
+class ToolError(RuntimeError):
+    """Base exception for tool-related errors"""
+    pass
+
+class IllegalArgumentError(ToolError):
+    """Exception raised when function arguments are invalid"""
+    pass
+
 
 # Agent config registration
 class AgentConfigInfo(BaseModel):

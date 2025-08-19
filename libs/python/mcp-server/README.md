@@ -2,8 +2,8 @@
 <h1>
   <div class="image-wrapper" style="display: inline-block;">
     <picture>
-      <source media="(prefers-color-scheme: dark)" alt="logo" height="150" srcset="../../img/logo_white.png" style="display: block; margin: auto;">
-      <source media="(prefers-color-scheme: light)" alt="logo" height="150" srcset="../../img/logo_black.png" style="display: block; margin: auto;">
+      <source media="(prefers-color-scheme: dark)" alt="logo" height="150" srcset="https://raw.githubusercontent.com/trycua/cua/main/img/logo_white.png" style="display: block; margin: auto;">
+      <source media="(prefers-color-scheme: light)" alt="logo" height="150" srcset="https://raw.githubusercontent.com/trycua/cua/main/img/logo_black.png" style="display: block; margin: auto;">
       <img alt="Shows my svg">
     </picture>
   </div>
@@ -35,7 +35,7 @@ This MCP server features comprehensive liteLLM integration, allowing you to use 
 
 ## Prerequisites
 
-Before installing the MCP server, you'll need to set up the full Computer-Use Agent capabilities as described in [Option 2 of the main README](../../README.md#option-2-full-computer-use-agent-capabilities). This includes:
+Before installing the MCP server, you'll need to set up full Computer-Use Agent capabilities. This includes:
 
 1. Installing the Lume CLI
 2. Pulling the latest macOS CUA image

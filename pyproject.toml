@@ -4,12 +4,14 @@ requires = ["pdm-backend"]
 
 [project]
 authors = [{ name = "TryCua", email = "gh@trycua.com" }]
-dependencies = []
+dependencies = [
+    "openai<1.100.0",
+]
 description = "CUA (Computer Use Agent) mono-repo"
 license = { text = "MIT" }
 name = "cua-workspace"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 version = "0.1.0"
 
 [project.urls]
@@ -24,6 +26,7 @@ distribution = false
 
 [tool.pdm.dev-dependencies]
 dev = [
+    "-e core @ file:///${PROJECT_ROOT}/libs/python/core",
     "-e agent @ file:///${PROJECT_ROOT}/libs/python/agent",
     "-e computer @ file:///${PROJECT_ROOT}/libs/python/computer",
     "-e computer-server @ file:///${PROJECT_ROOT}/libs/python/computer-server",
@@ -50,6 +53,9 @@ test = [
 
 [tool.pdm.resolution]
 respect-source-order = true
+
+[tool.pdm.resolution.overrides]
+hud-python = "0.2.10"
 
 [tool.black]
 line-length = 100

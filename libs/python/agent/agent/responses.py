@@ -252,6 +252,53 @@ def make_failed_tool_call_items(tool_name: str, tool_kwargs: Dict[str, Any], err
         }
     ]
 
+def make_tool_error_item(error_message: str, call_id: Optional[str] = None) -> Dict[str, Any]:
+    call_id = call_id if call_id else random_id()
+    return {
+        "type": "function_call_output",
+        "call_id": call_id,
+        "output": json.dumps({"error": error_message}),
+    }
+
+def replace_failed_computer_calls_with_function_calls(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Replace computer_call items with function_call items if they share a call_id with a function_call_output.
+    This indicates the computer call failed and should be treated as a function call instead.
+    We do this because the computer_call_output items do not support text output.
+    
+    Args:
+        messages: List of message items to process
+    """
+    messages = messages.copy()
+
+    # Find all call_ids that have function_call_output items
+    failed_call_ids = set()
+    for msg in messages:
+        if msg.get("type") == "function_call_output":
+            call_id = msg.get("call_id")
+            if call_id:
+                failed_call_ids.add(call_id)
+    
+    # Replace computer_call items that have matching call_ids
+    for i, msg in enumerate(messages):
+        if (msg.get("type") == "computer_call" and 
+            msg.get("call_id") in failed_call_ids):
+            
+            # Extract action from computer_call
+            action = msg.get("action", {})
+            call_id = msg.get("call_id")
+            
+            # Create function_call replacement
+            messages[i] = {
+                "type": "function_call",
+                "id": msg.get("id", random_id()),
+                "call_id": call_id,
+                "name": "computer",
+                "arguments": json.dumps(action),
+            }
+    
+    return messages
+
 # Conversion functions between element descriptions and coordinates
 def convert_computer_calls_desc2xy(responses_items: List[Dict[str, Any]], desc2xy: Dict[str, tuple]) -> List[Dict[str, Any]]:
     """

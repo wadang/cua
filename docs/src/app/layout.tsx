@@ -14,7 +14,9 @@ export default function Layout({ children }: { children: ReactNode }) {
         <link rel="icon" href="/docs/favicon.ico" sizes="any" />
       </head>
       <body className="flex min-h-screen flex-col">
-        <RootProvider>{children}</RootProvider>
+        <RootProvider search={{ options: { api: '/docs/api/search' } }}>
+          {children}
+        </RootProvider>
       </body>
     </html>
   );
