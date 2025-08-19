@@ -14,24 +14,111 @@ export interface AgentRequest {
   };
 }
 
-// Multi-modal message types
-export interface AgentMessage {
-  role: 'user' | 'assistant';
-  content: AgentContent[];
+// Agent message types - can be one of several different message types
+export type AgentMessage = 
+  | UserMessage
+  | AssistantMessage
+  | ReasoningMessage
+  | ComputerCallMessage
+  | ComputerCallOutputMessage;
+
+// User input message
+export interface UserMessage {
+  role: 'user';
+  content: string;
 }
 
-export interface AgentContent {
-  type: 'input_text' | 'input_image';
+// Assistant response message
+export interface AssistantMessage {
+  type: 'message';
+  role: 'assistant';
+  content: OutputContent[];
+}
+
+// Reasoning/thinking message
+export interface ReasoningMessage {
+  type: 'reasoning';
+  summary: SummaryContent[];
+}
+
+// Computer action call
+export interface ComputerCallMessage {
+  type: 'computer_call';
+  call_id: string;
+  status: 'completed' | 'failed' | 'pending';
+  action: ComputerAction;
+}
+
+// Computer action output (usually screenshot)
+export interface ComputerCallOutputMessage {
+  type: 'computer_call_output';
+  call_id: string;
+  output: InputContent;
+}
+
+// Content types
+export interface OutputContent {
+  type: 'output_text';
+  text: string;
+}
+
+export interface SummaryContent {
+  type: 'summary_text';
+  text: string;
+}
+
+export interface InputContent {
+  type: 'input_image' | 'input_text';
   text?: string;
   image_url?: string;
 }
 
+// Computer action types
+export type ComputerAction = 
+  | ClickAction
+  | TypeAction
+  | KeyAction
+  | ScrollAction
+  | WaitAction;
+
+export interface ClickAction {
+  type: 'click';
+  coordinate: [number, number];
+}
+
+export interface TypeAction {
+  type: 'type';
+  text: string;
+}
+
+export interface KeyAction {
+  type: 'key';
+  key: string;
+}
+
+export interface ScrollAction {
+  type: 'scroll';
+  coordinate: [number, number];
+  direction: 'up' | 'down' | 'left' | 'right';
+}
+
+export interface WaitAction {
+  type: 'wait';
+  seconds?: number;
+}
+
+// Usage information
+export interface Usage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+  response_cost: number;
+}
+
 // Response types
 export interface AgentResponse {
-  success: boolean;
-  result?: any;
-  model: string;
-  error?: string;
+  output: AgentMessage[];
+  usage: Usage;
 }
 
 // Connection types
