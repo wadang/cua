@@ -31,7 +31,7 @@ const response = await client.responses.create({
   input: "Write a one-sentence bedtime story about a unicorn."
 });
 
-console.log(response.result);
+console.log(response.output);
 ```
 
 ### Multi-modal Requests
@@ -168,25 +168,6 @@ const client = new AgentClient("peer://agent-proxy-peer-id");
 ```
 
 The client uses PeerJS with default configuration for peer connections.
-
-## Error Handling
-
-```typescript
-try {
-  const response = await client.responses.create({
-    model: "anthropic/claude-3-5-sonnet-20241022",
-    input: "Hello!"
-  });
-  
-  if (response.success) {
-    console.log(response.result);
-  } else {
-    console.error("Agent error:", response.error);
-  }
-} catch (error) {
-  console.error("Connection error:", error.message);
-}
-```
 
 ## License
 
