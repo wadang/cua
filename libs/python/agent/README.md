@@ -84,7 +84,7 @@ if __name__ == "__main__":
 ### Anthropic Claude (Computer Use API)
 ```python
 model="anthropic/claude-3-5-sonnet-20241022"
-model="anthropic/claude-3-5-sonnet-20240620"
+model="anthropic/claude-3-7-sonnet-20250219"
 model="anthropic/claude-opus-4-20250514"
 model="anthropic/claude-sonnet-4-20250514"
 ```

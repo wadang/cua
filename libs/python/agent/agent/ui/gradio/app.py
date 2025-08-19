@@ -114,14 +114,14 @@ MODEL_MAPPINGS = {
         "Anthropic: Claude 4 Opus (20250514)": "anthropic/claude-opus-4-20250514",
         "Anthropic: Claude 4 Sonnet (20250514)": "anthropic/claude-sonnet-4-20250514",
         "Anthropic: Claude 3.7 Sonnet (20250219)": "anthropic/claude-3-7-sonnet-20250219",
-        "Anthropic: Claude 3.5 Sonnet (20240620)": "anthropic/claude-3-5-sonnet-20240620",
+        "Anthropic: Claude 3.5 Sonnet (20241022)": "anthropic/claude-3-5-sonnet-20241022",
     },
     "omni": {
         "default": "omniparser+openai/gpt-4o",
         "OMNI: OpenAI GPT-4o": "omniparser+openai/gpt-4o",
         "OMNI: OpenAI GPT-4o mini": "omniparser+openai/gpt-4o-mini",
         "OMNI: Claude 3.7 Sonnet (20250219)": "omniparser+anthropic/claude-3-7-sonnet-20250219",
-        "OMNI: Claude 3.5 Sonnet (20240620)": "omniparser+anthropic/claude-3-5-sonnet-20240620",
+        "OMNI: Claude 3.5 Sonnet (20241022)": "omniparser+anthropic/claude-3-5-sonnet-20241022",
     },
     "uitars": {
         "default": "huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B" if is_mac else "ui-tars",
