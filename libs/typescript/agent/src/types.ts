@@ -47,7 +47,9 @@ export type AgentMessage =
   | AssistantMessage
   | ReasoningMessage
   | ComputerCallMessage
-  | ComputerCallOutputMessage;
+  | ComputerCallOutputMessage
+  | FunctionCallMesssage
+  | FunctionCallOutputMessage;
 // Input message
 export interface UserMessage {
   type?: 'message';
@@ -77,6 +79,20 @@ export interface ComputerCallOutputMessage {
   type: 'computer_call_output';
   call_id: string;
   output: ComputerResultContent;
+}
+// Output function call
+export interface FunctionCallMessage {
+  type: 'function_call';
+  call_id: string;
+  status: 'completed' | 'failed' | 'pending';
+  name: string;
+  arguments: string; // JSON dict of kwargs
+}
+// Output function call result (always text)
+export interface FunctionCallOutputMessage {
+  type: 'function_call_output';
+  call_id: string;
+  output: string;
 }
 // #endregion
 
