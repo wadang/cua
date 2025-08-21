@@ -37,6 +37,7 @@ class OpenCUAModel:
             torch_dtype="auto",
             device_map=self.device,
             trust_remote_code=True,
+            attn_implementation="sdpa",
         )
         self.image_processor = AutoImageProcessor.from_pretrained(
             self.model_name, trust_remote_code=True

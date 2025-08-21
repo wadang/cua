@@ -22,7 +22,7 @@ def load_model(model_name: str, device: str = "auto"):
         )
     cfg = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
     cls = cfg.__class__.__name__
-    print(f"cls: {cls}")
+    # print(f"cls: {cls}")
     if "OpenCUA" in cls:
         return OpenCUAModel(model_name=model_name, device=device)
     return GenericHFModel(model_name=model_name, device=device)

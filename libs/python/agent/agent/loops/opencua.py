@@ -97,7 +97,7 @@ class OpenCUAConfig(AsyncAgentConfig):
                 },
                 {
                     "type": "text",
-                    "text": instruction
+                    "text": f"Click on {instruction}"
                 }
             ]
         }
@@ -116,8 +116,7 @@ class OpenCUAConfig(AsyncAgentConfig):
         
         # Extract response text
         output_text = response.choices[0].message.content
-        
-        print(output_text)
+        # print(output_text)
         
         # Extract coordinates from pyautogui format
         coordinates = extract_coordinates_from_pyautogui(output_text)
