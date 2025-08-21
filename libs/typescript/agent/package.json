@@ -39,15 +39,15 @@
   },
   "dependencies": {
     "@trycua/core": "^0.1.2",
-    "pino": "^9.7.0",
-    "peerjs": "^1.5.4"
+    "peerjs": "^1.5.4",
+    "pino": "^9.7.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^22.15.17",
     "bumpp": "^10.1.0",
     "happy-dom": "^17.4.7",
-    "tsdown": "^0.3.0",
+    "tsdown": "^0.14.1",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   }
