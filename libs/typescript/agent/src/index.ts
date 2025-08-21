@@ -20,10 +20,10 @@ export type {
   ComputerAction,
   ClickAction,
   TypeAction,
-  KeyAction,
+  KeyPressAction,
   ScrollAction,
   WaitAction,
   Usage,
   ConnectionType,
   AgentClientOptions,
-} from './types.js';
+} from './types';

@@ -6,5 +6,7 @@ export default defineConfig({
   platform: "browser",
   dts: true,
   clean: true,
+  // Remove if we don't need to support including the library via '<script/>' tags. 
+  // noExternal bundles this list of libraries within the final 'dist'
   noExternal: ['peerjs']
 });

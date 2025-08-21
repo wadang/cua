@@ -4,7 +4,7 @@ import type {
   AgentResponse,
   ConnectionType,
   AgentClientOptions,
-} from "./types.js";
+} from "./types";
 
 export class AgentClient {
   private url: string;

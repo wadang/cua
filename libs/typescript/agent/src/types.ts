@@ -48,7 +48,7 @@ export type AgentMessage =
   | ReasoningMessage
   | ComputerCallMessage
   | ComputerCallOutputMessage
-  | FunctionCallMesssage
+  | FunctionCallMessage
   | FunctionCallOutputMessage;
 // Input message
 export interface UserMessage {
