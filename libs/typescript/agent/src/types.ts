@@ -1,3 +1,9 @@
+// #region Request
+export type ConnectionType = 'http' | 'https' | 'peer';
+export interface AgentClientOptions {
+  timeout?: number;
+  retries?: number;
+}
 // Request types matching the Python proxy API
 export interface AgentRequest {
   model: string;
@@ -13,100 +19,16 @@ export interface AgentRequest {
     [key: string]: any;
   };
 }
+// #endregion
 
-// Agent message types - can be one of several different message types
-export type AgentMessage = 
-  | UserMessage
-  | AssistantMessage
-  | ReasoningMessage
-  | ComputerCallMessage
-  | ComputerCallOutputMessage;
 
-// User input message
-export interface UserMessage {
-  role: 'user';
-  content: string;
+
+// #region Response
+// Response types
+export interface AgentResponse {
+  output: AgentMessage[];
+  usage: Usage;
 }
-
-// Assistant response message
-export interface AssistantMessage {
-  type: 'message';
-  role: 'assistant';
-  content: OutputContent[];
-}
-
-// Reasoning/thinking message
-export interface ReasoningMessage {
-  type: 'reasoning';
-  summary: SummaryContent[];
-}
-
-// Computer action call
-export interface ComputerCallMessage {
-  type: 'computer_call';
-  call_id: string;
-  status: 'completed' | 'failed' | 'pending';
-  action: ComputerAction;
-}
-
-// Computer action output (usually screenshot)
-export interface ComputerCallOutputMessage {
-  type: 'computer_call_output';
-  call_id: string;
-  output: InputContent;
-}
-
-// Content types
-export interface OutputContent {
-  type: 'output_text';
-  text: string;
-}
-
-export interface SummaryContent {
-  type: 'summary_text';
-  text: string;
-}
-
-export interface InputContent {
-  type: 'input_image' | 'input_text';
-  text?: string;
-  image_url?: string;
-}
-
-// Computer action types
-export type ComputerAction = 
-  | ClickAction
-  | TypeAction
-  | KeyAction
-  | ScrollAction
-  | WaitAction;
-
-export interface ClickAction {
-  type: 'click';
-  coordinate: [number, number];
-}
-
-export interface TypeAction {
-  type: 'type';
-  text: string;
-}
-
-export interface KeyAction {
-  type: 'key';
-  key: string;
-}
-
-export interface ScrollAction {
-  type: 'scroll';
-  coordinate: [number, number];
-  direction: 'up' | 'down' | 'left' | 'right';
-}
-
-export interface WaitAction {
-  type: 'wait';
-  seconds?: number;
-}
-
 // Usage information
 export interface Usage {
   prompt_tokens: number;
@@ -114,17 +36,144 @@ export interface Usage {
   total_tokens: number;
   response_cost: number;
 }
+// #endregion
 
-// Response types
-export interface AgentResponse {
-  output: AgentMessage[];
-  usage: Usage;
+
+
+// #region Messages
+// Agent message types - can be one of several different message types
+export type AgentMessage = 
+  | UserMessage
+  | AssistantMessage
+  | ReasoningMessage
+  | ComputerCallMessage
+  | ComputerCallOutputMessage;
+// Input message
+export interface UserMessage {
+  type?: 'message';
+  role: 'user' | 'system' | 'developer';
+  content: string | InputContent[];
 }
-
-// Connection types
-export type ConnectionType = 'http' | 'https' | 'peer';
-
-export interface AgentClientOptions {
-  timeout?: number;
-  retries?: number;
+// Output message
+export interface AssistantMessage {
+  type: 'message';
+  role: 'assistant';
+  content: OutputContent[];
 }
+// Output reasoning/thinking message
+export interface ReasoningMessage {
+  type: 'reasoning';
+  summary: SummaryContent[];
+}
+// Output computer action call
+export interface ComputerCallMessage {
+  type: 'computer_call';
+  call_id: string;
+  status: 'completed' | 'failed' | 'pending';
+  action: ComputerAction;
+}
+// Output computer action result (always a screenshot)
+export interface ComputerCallOutputMessage {
+  type: 'computer_call_output';
+  call_id: string;
+  output: ComputerResultContent;
+}
+// #endregion
+
+
+
+// #region Message Content
+export interface InputContent {
+  type: 'input_image' | 'input_text';
+  text?: string;
+  image_url?: string;
+}
+export interface OutputContent {
+  type: 'output_text';
+  text: string;
+}
+export interface SummaryContent {
+  type: 'summary_text';
+  text: string;
+}
+export interface ComputerResultContent {
+  type: 'computer_screenshot' | 'input_image';
+  image_url: string;
+}
+// #endregion
+
+
+
+// #region Actions
+export type ComputerAction = 
+  | ComputerActionOpenAI
+  | ComputerActionAnthropic;
+// OpenAI Computer Actions
+export type ComputerActionOpenAI = 
+  | ClickAction
+  | DoubleClickAction
+  | DragAction
+  | KeyPressAction
+  | MoveAction
+  | ScreenshotAction
+  | ScrollAction
+  | TypeAction
+  | WaitAction;
+export interface ClickAction {
+  type: 'click';
+  button: 'left' | 'right' | 'wheel' | 'back' | 'forward';
+  x: number;
+  y: number;
+}
+export interface DoubleClickAction {
+  type: 'double_click';
+  button?: 'left' | 'right' | 'wheel' | 'back' | 'forward';
+  x: number;
+  y: number;
+}
+export interface DragAction {
+  type: 'drag';
+  button?: 'left' | 'right' | 'wheel' | 'back' | 'forward';
+  path: Array<[number, number]>;
+}
+export interface KeyPressAction {
+  type: 'keypress';
+  keys: string[];
+}
+export interface MoveAction {
+  type: 'move';
+  x: number;
+  y: number;
+}
+export interface ScreenshotAction {
+  type: 'screenshot';
+}
+export interface ScrollAction {
+  type: 'scroll';
+  scroll_x: number;
+  scroll_y: number;
+  x: number;
+  y: number;
+}
+export interface TypeAction {
+  type: 'type';
+  text: string;
+}
+export interface WaitAction {
+  type: 'wait';
+}
+// Anthropic Computer Actions
+export type ComputerActionAnthropic = 
+  | LeftMouseDownAction
+  | LeftMouseUpAction;
+export interface LeftMouseDownAction {
+  type: 'left_mouse_down';
+  x: number;
+  y: number;
+}
+export interface LeftMouseUpAction {
+  type: 'left_mouse_up';
+  x: number;
+  y: number;
+}
+// #endregion
