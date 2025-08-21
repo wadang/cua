@@ -19,8 +19,8 @@ This example demonstrates how to control a cua Cloud container using the OpenAI 
 
 2. **Set up environment variables:**
    Create a `.env` file with the following variables:
-   - `OPENAI_KEY` — your OpenAI API key
-   - `CUA_KEY` — your cua Cloud API key
+   - `OPENAI_API_KEY` — your OpenAI API key
+   - `CUA_API_KEY` — your cua Cloud API key
    - `CUA_CONTAINER_NAME` — the name of your provisioned container
 
 3. **Run the example:**
