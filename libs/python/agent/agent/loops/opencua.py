@@ -90,8 +90,10 @@ class OpenCUAConfig(AsyncAgentConfig):
             "role": "user",
             "content": [
                 {
-                    "type": "image",
-                    "image": f"data:image/png;base64,{image_b64}"
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{image_b64}"
+                    }
                 },
                 {
                     "type": "text",
@@ -109,24 +111,18 @@ class OpenCUAConfig(AsyncAgentConfig):
             **kwargs
         }
         
-        try:
-            # Use liteLLM acompletion
-            response = await litellm.acompletion(**api_kwargs)
-            
-            # Extract response text
-            output_text = response.choices[0].message.content
-            
-            if not output_text:
-                return None
-            
-            # Extract coordinates from pyautogui format
-            coordinates = extract_coordinates_from_pyautogui(output_text)
-            
-            return coordinates
-            
-        except Exception as e:
-            print(f"Error in OpenCUA predict_click: {e}")
-            return None
+        # Use liteLLM acompletion
+        response = await litellm.acompletion(**api_kwargs)
+        
+        # Extract response text
+        output_text = response.choices[0].message.content
+        
+        print(output_text)
+        
+        # Extract coordinates from pyautogui format
+        coordinates = extract_coordinates_from_pyautogui(output_text)
+        
+        return coordinates
     
     def get_capabilities(self) -> List[AgentCapability]:
         """Return the capabilities supported by this agent."""
