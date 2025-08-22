@@ -18,6 +18,11 @@ export interface AgentRequest {
     provider_type?: string;
     [key: string]: any;
   };
+  /**
+   * Optional per-request environment variable overrides.
+   * Keys and values are strings and will be forwarded to the backend proxy.
+   */
+  env?: Record<string, string>;
 }
 // #endregion
 

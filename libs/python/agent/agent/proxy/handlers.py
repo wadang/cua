@@ -6,6 +6,7 @@ import asyncio
 import json
 import logging
 import os
+from contextlib import contextmanager
 from typing import Dict, Any, List, Union, Optional
 
 from ..agent import ComputerAgent
@@ -20,48 +21,95 @@ class ResponsesHandler:
     def __init__(self):
         self.computer = None
         self.agent = None
+        # Simple in-memory caches
+        self._computer_cache: Dict[str, Any] = {}
+        self._agent_cache: Dict[str, Any] = {}
     
-    async def setup_computer(self, computer_kwargs: Optional[Dict[str, Any]] = None):
-        """Set up computer instance with provided kwargs or defaults."""
-        if self.computer is not None:
-            return  # Already set up
-            
-        # Default computer configuration
-        default_config = {
-            "os_type": "linux",
-            "provider_type": "cloud",
-            "name": os.getenv("CUA_CONTAINER_NAME"),
-            "api_key": os.getenv("CUA_API_KEY")
-        }
-        
-        # Override with provided kwargs
-        if computer_kwargs:
-            default_config.update(computer_kwargs)
-            
-        self.computer = Computer(**default_config)
-        await self.computer.__aenter__()
-        logger.info(f"Computer set up with config: {default_config}")
-    
-    async def setup_agent(self, model: str, agent_kwargs: Optional[Dict[str, Any]] = None):
-        """Set up agent instance with provided model and kwargs."""
-        if self.computer is None:
-            raise RuntimeError("Computer must be set up before agent")
-            
-        # Default agent configuration
-        default_config = {
-            "model": model,
-            "tools": [self.computer]
-        }
-        
-        # Override with provided kwargs
-        if agent_kwargs:
-            # Don't override tools unless explicitly provided
+    async def setup_computer_agent(
+        self,
+        model: str,
+        agent_kwargs: Optional[Dict[str, Any]] = None,
+        computer_kwargs: Optional[Dict[str, Any]] = None,
+    ):
+        """Set up (and cache) computer and agent instances.
+
+        Caching keys:
+        - Computer cache key: computer_kwargs
+        - Agent cache key: {"model": model, **agent_kwargs}
+        """
+        agent_kwargs = agent_kwargs or {}
+        computer_kwargs = computer_kwargs or {}
+
+        def _stable_key(obj: Dict[str, Any]) -> str:
+            try:
+                return json.dumps(obj, sort_keys=True, separators=(",", ":"))
+            except Exception:
+                # Fallback: stringify non-serializable values
+                safe_obj = {}
+                for k, v in obj.items():
+                    try:
+                        json.dumps(v)
+                        safe_obj[k] = v
+                    except Exception:
+                        safe_obj[k] = str(v)
+                return json.dumps(safe_obj, sort_keys=True, separators=(",", ":"))
+
+        # ---------- Computer setup (with cache) ----------
+        comp_key = _stable_key(computer_kwargs)
+
+        computer = self._computer_cache.get(comp_key)
+        if computer is None:
+            # Default computer configuration
+            default_c_config = {
+                "os_type": "linux",
+                "provider_type": "cloud",
+                "name": os.getenv("CUA_CONTAINER_NAME"),
+                "api_key": os.getenv("CUA_API_KEY"),
+            }
+            default_c_config.update(computer_kwargs)
+            computer = Computer(**default_c_config)
+            await computer.__aenter__()
+            self._computer_cache[comp_key] = computer
+            logger.info(f"Computer created and cached with key={comp_key} config={default_c_config}")
+        else:
+            logger.info(f"Reusing cached computer for key={comp_key}")
+
+        # Bind current computer reference
+        self.computer = computer
+
+        # ---------- Agent setup (with cache) ----------
+        # Build agent cache key from {model} + agent_kwargs (excluding tools unless explicitly passed)
+        agent_kwargs_for_key = dict(agent_kwargs)
+        agent_key_payload = {"model": model, **agent_kwargs_for_key}
+        agent_key = _stable_key(agent_key_payload)
+
+        agent = self._agent_cache.get(agent_key)
+        if agent is None:
+            # Default agent configuration
+            default_a_config = {
+                "model": model,
+                "tools": [computer],
+            }
+            # Apply user overrides, but keep tools unless user explicitly sets
+            if agent_kwargs:
+                if "tools" not in agent_kwargs:
+                    agent_kwargs["tools"] = [computer]
+                default_a_config.update(agent_kwargs)
+            agent = ComputerAgent(**default_a_config)
+            self._agent_cache[agent_key] = agent
+            logger.info(f"Agent created and cached with key={agent_key} model={model}")
+        else:
+            # Ensure cached agent uses the current computer tool (in case object differs)
+            # Only update if tools not explicitly provided in agent_kwargs
             if "tools" not in agent_kwargs:
-                agent_kwargs["tools"] = [self.computer]
-            default_config.update(agent_kwargs)
-            
-        self.agent = ComputerAgent(**default_config)
-        logger.info(f"Agent set up with model: {model}")
+                try:
+                    agent.tools = [computer]
+                except Exception:
+                    pass
+            logger.info(f"Reusing cached agent for key={agent_key}")
+
+        # Bind current agent reference
+        self.agent = agent
     
     async def process_request(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -79,27 +127,34 @@ class ResponsesHandler:
             input_data = request_data.get("input")
             agent_kwargs = request_data.get("agent_kwargs", {})
             computer_kwargs = request_data.get("computer_kwargs", {})
+            env_overrides = request_data.get("env", {}) or {}
             
             if not model:
                 raise ValueError("Model is required")
             if not input_data:
                 raise ValueError("Input is required")
             
-            # Set up computer and agent
-            await self.setup_computer(computer_kwargs)
-            await self.setup_agent(model, agent_kwargs)
-            
-            # Convert input to messages format
-            messages = self._convert_input_to_messages(input_data)
-            
-            # Run agent and get first result
-            async for result in self.agent.run(messages):
-                # Return the first result and break
-                return {
-                    "success": True,
-                    "result": result,
-                    "model": model
-                }
+            # Apply env overrides for the duration of this request
+            with self._env_overrides(env_overrides):
+                # Set up (and possibly reuse) computer and agent via caches
+                await self.setup_computer_agent(model, agent_kwargs, computer_kwargs)
+
+                # Defensive: ensure agent is initialized for type checkers
+                agent = self.agent
+                if agent is None:
+                    raise RuntimeError("Agent failed to initialize")
+
+                # Convert input to messages format
+                messages = self._convert_input_to_messages(input_data)
+
+                # Run agent and get first result
+                async for result in agent.run(messages):
+                    # Return the first result and break
+                    return {
+                        "success": True,
+                        "result": result,
+                        "model": model
+                    }
                 
             # If no results were yielded
             return {
@@ -158,3 +213,31 @@ class ResponsesHandler:
             finally:
                 self.computer = None
         self.agent = None
+
+    @staticmethod
+    @contextmanager
+    def _env_overrides(env: Dict[str, str]):
+        """Temporarily apply environment variable overrides for the current process.
+        Restores previous values after the context exits.
+
+        Args:
+            env: Mapping of env var names to override for this request.
+        """
+        if not env:
+            # No-op context
+            yield
+            return
+
+        original: Dict[str, Optional[str]] = {}
+        try:
+            for k, v in env.items():
+                original[k] = os.environ.get(k)
+                os.environ[k] = str(v)
+            yield
+        finally:
+            for k, old in original.items():
+                if old is None:
+                    # Was not set before
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = old

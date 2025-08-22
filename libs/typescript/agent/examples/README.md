@@ -35,7 +35,7 @@ A simple HTML page that demonstrates using the CUA Agent Client in a browser env
    ```
 
 3. **Open in browser:**
-   Navigate to `http://localhost:8080/examples/browser-example.html`
+   Navigate to `http://localhost:8080/examples/playground-example.html`
 
 4. **Configure and test:**
    - Enter an agent URL (e.g., `https://localhost:8000` or `peer://some-peer-id`)

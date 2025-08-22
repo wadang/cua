@@ -28,7 +28,12 @@ const peerClient = new AgentClient("peer://my-agent-proxy");
 // Send a simple text request
 const response = await client.responses.create({
   model: "anthropic/claude-3-5-sonnet-20241022",
-  input: "Write a one-sentence bedtime story about a unicorn."
+  input: "Write a one-sentence bedtime story about a unicorn.",
+  // Optional per-request env overrides
+  env: {
+    CUA_CONTAINER_NAME: "local-dev",
+    CUA_API_KEY: "sk-..."
+  }
 });
 
 console.log(response.output);
@@ -50,7 +55,8 @@ const response = await client.responses.create({
         }
       ]
     }
-  ]
+  ],
+  env: { CUA_CONTAINER_NAME: "staging" }
 });
 ```
 
@@ -72,6 +78,11 @@ const response = await client.responses.create({
   computer_kwargs: {
     os_type: "linux",
     provider_type: "cloud"
+  },
+  // Per-request env overrides
+  env: {
+    CUA_API_KEY: "sk-...",
+    CUA_CONTAINER_NAME: "ci-runner"
   }
 });
 ```
@@ -135,6 +146,8 @@ interface AgentRequest {
     provider_type?: string;
     [key: string]: any;
   };
+  // Optional per-request environment overrides
+  env?: Record<string, string>;
 }
 ```
 

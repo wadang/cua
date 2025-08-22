@@ -2,15 +2,6 @@
 
 A proxy server that exposes ComputerAgent functionality over HTTP and P2P (WebRTC) connections. This allows remote clients to interact with ComputerAgent instances through a simple REST-like API.
 
-## Features
-
-- **HTTP Server**: Standard HTTP REST API using Starlette
-- **P2P Server**: WebRTC-based peer-to-peer connections using peerjs-python
-- **No Pydantic**: Uses plain dictionaries for request/response handling
-- **OpenAI-compatible API**: Similar request format to OpenAI's API
-- **Multi-modal Support**: Handles text and image inputs
-- **Configurable**: Supports custom agent and computer configurations
-
 ## Installation
 
 The proxy requires additional dependencies:
@@ -35,10 +26,10 @@ python -m agent.proxy.cli
 python -m agent.proxy.cli --host 0.0.0.0 --port 8080
 
 # P2P server only
-python -m agent.proxy.cli --mode p2p --peer-id my-agent-proxy
+python -m agent.proxy.cli --mode p2p
 
 # Both HTTP and P2P
-python -m agent.proxy.cli --mode both --peer-id my-agent-proxy
+python -m agent.proxy.cli --mode both
 ```
 
 ### API Endpoints
@@ -52,13 +43,21 @@ Process a request using ComputerAgent and return the first result.
 {
   "model": "anthropic/claude-3-5-sonnet-20241022",
   "input": "Your instruction here",
-  "agent_kwargs": {
+  # Optional agent configuration, passed to ComputerAgent constructor
+  "agent_kwargs": { 
     "save_trajectory": true,
     "verbosity": 20
   },
+  # Optional computer configuration, passed to the Computer constructor
   "computer_kwargs": {
     "os_type": "linux",
     "provider_type": "cloud"
+  },
+  # Optional environment overrides for this request
+  "env": {
+    "OPENROUTER_API_KEY": "your-openrouter-api-key",
+    # etc.
+    # ref: https://docs.litellm.ai/docs/proxy/config_settings#environment-variables---reference
   }
 }
 ```
@@ -85,7 +84,6 @@ Process a request using ComputerAgent and return the first result.
 **Response Format:**
 ```json
 {
-  "success": true,
   "result": {
     // Agent response data
   },
@@ -105,7 +103,8 @@ curl http://localhost:8000/responses \
   -H "Content-Type: application/json" \
   -d '{
     "model": "anthropic/claude-3-5-sonnet-20241022",
-    "input": "Tell me a three sentence bedtime story about a unicorn."
+    "input": "Tell me a three sentence bedtime story about a unicorn.",
+    "env": {"CUA_API_KEY": "override-key-for-this-request"}
   }'
 
 # Multi-modal request
@@ -152,17 +151,13 @@ await connection.send(json.dumps(request))
 
 ## Configuration
 
-### Environment Variables
-
-- `CUA_CONTAINER_NAME`: Default container name for cloud provider
-- `CUA_API_KEY`: Default API key for cloud provider
-
 ### Request Parameters
 
 - `model`: Model string (required) - e.g., "anthropic/claude-3-5-sonnet-20241022"
 - `input`: String or message array (required)
 - `agent_kwargs`: Optional agent configuration
 - `computer_kwargs`: Optional computer configuration
+- `env`: Object - key/value environment variables to override for this request
 
 ### Agent Configuration (`agent_kwargs`)
 
