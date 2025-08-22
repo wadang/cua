@@ -4,13 +4,13 @@ import { executeAction } from "./helpers";
 
 import "dotenv/config";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const COMPUTER_USE_PROMPT = "Open firefox and go to trycua.com";
 
 // Initialize the Computer Connection
 const computer = new Computer({
-	apiKey: process.env.CUA_KEY!,
+	apiKey: process.env.CUA_API_KEY!,
 	name: process.env.CUA_CONTAINER_NAME!,
 	osType: OSType.LINUX,
 });
