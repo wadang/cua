@@ -31,8 +31,7 @@ const response = await client.responses.create({
   input: "Write a one-sentence bedtime story about a unicorn.",
   // Optional per-request env overrides
   env: {
-    CUA_CONTAINER_NAME: "local-dev",
-    CUA_API_KEY: "sk-..."
+    OPENAI_API_KEY: "sk-..."
   }
 });
 
@@ -56,7 +55,7 @@ const response = await client.responses.create({
       ]
     }
   ],
-  env: { CUA_CONTAINER_NAME: "staging" }
+  env: { OPENROUTER_API_KEY: "sk-..." }
 });
 ```
 
@@ -81,8 +80,8 @@ const response = await client.responses.create({
   },
   // Per-request env overrides
   env: {
-    CUA_API_KEY: "sk-...",
-    CUA_CONTAINER_NAME: "ci-runner"
+    ANTHROPIC_API_KEY: "sk-...",
+    OPENROUTER_API_KEY: "sk-..."
   }
 });
 ```
