@@ -16,7 +16,7 @@ except Exception:
 class OpenCUAModel:
     """OpenCUA model handler using AutoTokenizer, AutoModel and AutoImageProcessor."""
 
-    def __init__(self, model_name: str, device: str = "auto") -> None:
+    def __init__(self, model_name: str, device: str = "auto", trust_remote_code: bool = False) -> None:
         if not OPENCUA_AVAILABLE:
             raise ImportError(
                 "OpenCUA requirements not found. Install with: pip install \"cua-agent[opencua-hf]\""
@@ -26,21 +26,22 @@ class OpenCUAModel:
         self.model = None
         self.tokenizer = None
         self.image_processor = None
+        self.trust_remote_code = trust_remote_code
         self._load()
 
     def _load(self) -> None:
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_name, trust_remote_code=True
+            self.model_name, trust_remote_code=self.trust_remote_code
         )
         self.model = AutoModel.from_pretrained(
             self.model_name,
             torch_dtype="auto",
             device_map=self.device,
-            trust_remote_code=True,
+            trust_remote_code=self.trust_remote_code,
             attn_implementation="sdpa",
         )
         self.image_processor = AutoImageProcessor.from_pretrained(
-            self.model_name, trust_remote_code=True
+            self.model_name, trust_remote_code=self.trust_remote_code
         )
 
     @staticmethod

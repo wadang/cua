@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 # Hugging Face imports are local to avoid hard dependency at module import
 try:
     import torch  # type: ignore
-    from transformers import AutoModelForImageTextToText, AutoProcessor  # type: ignore
+    from transformers import AutoModel, AutoProcessor  # type: ignore
     HF_AVAILABLE = True
 except Exception:
     HF_AVAILABLE = False
@@ -14,7 +14,7 @@ class GenericHFModel:
     Loads an AutoModelForImageTextToText and AutoProcessor and generates text.
     """
 
-    def __init__(self, model_name: str, device: str = "auto") -> None:
+    def __init__(self, model_name: str, device: str = "auto", trust_remote_code: bool = False) -> None:
         if not HF_AVAILABLE:
             raise ImportError(
                 "HuggingFace transformers dependencies not found. Install with: pip install \"cua-agent[uitars-hf]\""
@@ -23,15 +23,17 @@ class GenericHFModel:
         self.device = device
         self.model = None
         self.processor = None
+        self.trust_remote_code = trust_remote_code
         self._load()
 
     def _load(self) -> None:
         # Load model
-        self.model = AutoModelForImageTextToText.from_pretrained(
+        self.model = AutoModel.from_pretrained(
             self.model_name,
             torch_dtype=torch.float16,
             device_map=self.device,
             attn_implementation="sdpa",
+            trust_remote_code=self.trust_remote_code,
         )
         # Load processor
         self.processor = AutoProcessor.from_pretrained(
@@ -39,6 +41,7 @@ class GenericHFModel:
             min_pixels=3136,
             max_pixels=4096 * 2160,
             device_map=self.device,
+            trust_remote_code=self.trust_remote_code,
         )
 
     def generate(self, messages: List[Dict[str, Any]], max_new_tokens: int = 128) -> str:

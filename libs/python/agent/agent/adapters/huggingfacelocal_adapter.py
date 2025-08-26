@@ -20,15 +20,17 @@ from .models import load_model as load_model_handler
 class HuggingFaceLocalAdapter(CustomLLM):
     """HuggingFace Local Adapter for running vision-language models locally."""
     
-    def __init__(self, device: str = "auto", **kwargs):
+    def __init__(self, device: str = "auto", trust_remote_code: bool = False, **kwargs):
         """Initialize the adapter.
         
         Args:
             device: Device to load model on ("auto", "cuda", "cpu", etc.)
+            trust_remote_code: Whether to trust remote code
             **kwargs: Additional arguments
         """
         super().__init__()
         self.device = device
+        self.trust_remote_code = trust_remote_code
         # Cache for model handlers keyed by model_name
         self._handlers: Dict[str, Any] = {}
         self._executor = ThreadPoolExecutor(max_workers=1)  # Single thread pool
@@ -36,7 +38,7 @@ class HuggingFaceLocalAdapter(CustomLLM):
     def _get_handler(self, model_name: str):
         """Get or create a model handler for the given model name."""
         if model_name not in self._handlers:
-            self._handlers[model_name] = load_model_handler(model_name=model_name, device=self.device)
+            self._handlers[model_name] = load_model_handler(model_name=model_name, device=self.device, trust_remote_code=self.trust_remote_code)
         return self._handlers[model_name]
     
     def _convert_messages(self, messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

@@ -106,7 +106,7 @@ class OpenCUAConfig(AsyncAgentConfig):
         api_kwargs = {
             "model": model,
             "messages": [system_message, user_message],
-            "max_new_tokens": 512,
+            "max_new_tokens": 2056,
             "temperature": 0,
             **kwargs
         }
