@@ -19,8 +19,14 @@ yarn add @trycua/agent
 ```typescript
 import AgentClient from "@trycua/agent";
 
-// Connect to HTTP server
+// Connect to local HTTP server
 const client = new AgentClient("https://localhost:8000");
+
+// Connect to a cloud container (port 8443 over HTTPS)
+const cloud = new AgentClient(
+  "https://m-linux-96lcxd2c2k.containers.cloud.trycua.com:8443",
+  { apiKey: process.env.NEXT_PUBLIC_CUA_API_KEY || "" }
+);
 
 // Connect to peer
 const peerClient = new AgentClient("peer://my-agent-proxy");
@@ -64,7 +70,8 @@ const response = await client.responses.create({
 ```typescript
 const client = new AgentClient("https://localhost:8000", {
   timeout: 60000, // 60 second timeout
-  retries: 5      // 5 retry attempts
+  retries: 5,     // 5 retry attempts
+  apiKey: "cua_...", // sent as X-API-Key header when using HTTP/HTTPS
 });
 
 const response = await client.responses.create({
@@ -181,8 +188,19 @@ The `usage` object provides token counts and cost information for the request.
 Connect to a CUA agent proxy server:
 
 ```typescript
-const client = new AgentClient("https://my-agent-server.com:8000");
+// Local
+const client = new AgentClient("https://my-agent-server.com:8000", { apiKey: "cua_..." });
+
+// Cloud container (port 8443)
+const cloud = new AgentClient(
+  "https://m-linux-96lcxd2c2k.containers.cloud.trycua.com:8443",
+  { apiKey: "cua_..." }
+);
 ```
+
+Notes:
+- The client sends the API key as `X-API-Key` for HTTP/HTTPS connections.
+- Cloud containers listen on `:8443` with HTTPS.
 
 ### Peer-to-Peer (WebRTC)
 

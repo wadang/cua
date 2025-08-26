@@ -60,11 +60,16 @@ export class AgentClient {
     );
 
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (this.options.apiKey) {
+        headers["X-API-Key"] = this.options.apiKey;
+      }
+
       const response = await fetch(`${this.url}/responses`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify(request),
         signal: controller.signal,
       });

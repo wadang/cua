@@ -1,6 +1,6 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, HTTPException, Header
 from fastapi.responses import StreamingResponse
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union, Literal, cast
 import uvicorn
 import logging
 import asyncio
@@ -14,6 +14,7 @@ import os
 import aiohttp
 import hashlib
 import time
+import platform
 
 # Set up logging with more detail
 logger = logging.getLogger(__name__)
@@ -425,6 +426,146 @@ async def cmd_endpoint(
             "Access-Control-Allow-Headers": "Content-Type, X-Container-Name, X-API-Key"
         }
     )
+
+
+@app.post("/responses")
+async def agent_response_endpoint(
+    request: Request,
+    api_key: Optional[str] = Header(None, alias="X-API-Key"),
+):
+    """
+    Run a ComputerAgent step using server-side handlers as a tool.
+
+    Security:
+    - If CONTAINER_NAME is set on the server, require X-API-Key
+      and validate using AuthenticationManager.
+    - If CUA_ENABLE_PUBLIC_PROXY is set, allow public access.
+
+    Body JSON:
+    {
+      "model": "...",                 # required
+      "input": "... or messages[]",   # required
+      "agent_kwargs": { ... },         # optional, will be merged; tools will be overridden
+      "computer_kwargs": { ... },      # optional, ignored for this endpoint
+      "env": { ... }                   # optional env overrides for agent
+    }
+    """
+    from agent.proxy.handlers import ResponsesHandler
+    from agent.computers import AsyncComputerHandler
+
+    # Authenticate via AuthenticationManager if running in cloud (CONTAINER_NAME set)
+    container_name = os.environ.get("CONTAINER_NAME")
+    if container_name:
+        is_public = os.environ.get("CUA_ENABLE_PUBLIC_PROXY", "").lower().strip() in ["1", "true", "yes", "y", "on"]
+        if not is_public:
+            if not api_key:
+                raise HTTPException(status_code=401, detail="Missing AGENT PROXY auth headers")
+            ok = await auth_manager.auth(container_name, api_key)
+            if not ok:
+                raise HTTPException(status_code=401, detail="Unauthorized")
+
+    # Parse request body
+    try:
+        body = await request.json()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid JSON body: {str(e)}")
+
+    model = body.get("model")
+    input_data = body.get("input")
+    if not model or input_data is None:
+        raise HTTPException(status_code=400, detail="'model' and 'input' are required")
+
+    agent_kwargs = body.get("agent_kwargs") or {}
+    env_overrides = body.get("env") or {}
+
+    # Local AsyncComputerHandler implementation backed by automation_handler
+    class DirectComputerHandler(AsyncComputerHandler):
+        async def get_environment(self) -> Literal["windows", "mac", "linux", "browser"]:
+            sys = platform.system().lower()
+            if "darwin" in sys or sys == "macos" or sys == "mac":
+                return "mac"
+            if "windows" in sys:
+                return "windows"
+            return "linux"
+
+        async def get_dimensions(self) -> tuple[int, int]:
+            try:
+                res = await automation_handler.get_screen_size()
+                size = res.get("size") or {}
+                return int(size.get("width", 0)), int(size.get("height", 0))
+            except Exception:
+                return (0, 0)
+
+        async def screenshot(self) -> str:
+            res = await automation_handler.screenshot()
+            if not res.get("success"):
+                raise RuntimeError(res.get("error", "screenshot failed"))
+            return res.get("image_data", "")
+
+        async def click(self, x: int, y: int, button: str = "left") -> None:
+            if button == "right":
+                await automation_handler.right_click(x, y)
+            else:
+                await automation_handler.left_click(x, y)
+
+        async def double_click(self, x: int, y: int) -> None:
+            await automation_handler.double_click(x, y)
+
+        async def scroll(self, x: int, y: int, scroll_x: int, scroll_y: int) -> None:
+            try:
+                if scroll_y:
+                    await automation_handler.scroll(scroll_y, 0)
+                if scroll_x:
+                    await automation_handler.scroll(0, scroll_x)
+            except Exception:
+                await automation_handler.scroll(scroll_y or 0, scroll_x or 0)
+
+        async def type(self, text: str) -> None:
+            await automation_handler.type_text(text)
+
+        async def wait(self, ms: int = 1000) -> None:
+            await asyncio.sleep(ms / 1000.0)
+
+        async def move(self, x: int, y: int) -> None:
+            await automation_handler.move_cursor(x, y)
+
+        async def keypress(self, keys: Union[List[str], str]) -> None:
+            if isinstance(keys, list):
+                if len(keys) <= 1:
+                    key = keys[0] if keys else ""
+                    if key:
+                        await automation_handler.press_key(key)
+                else:
+                    await cast(Any, automation_handler).hotkey([str(k) for k in keys])
+            elif isinstance(keys, str):
+                await automation_handler.press_key(keys)
+
+        async def drag(self, path: List[Dict[str, int]]) -> None:
+            await automation_handler.drag([(p["x"], p["y"]) for p in path])
+        
+        async def get_current_url(self) -> str:
+            return ""
+
+        async def left_mouse_down(self, x: Optional[int] = None, y: Optional[int] = None) -> None:
+            await automation_handler.mouse_down(x, y, button="left")
+
+        async def left_mouse_up(self, x: Optional[int] = None, y: Optional[int] = None) -> None:
+            await automation_handler.mouse_up(x, y, button="left")
+
+    custom_handler = DirectComputerHandler()
+
+    # Prepare request for ResponsesHandler and force our tool
+    rh = ResponsesHandler()
+    request_payload: Dict[str, Any] = {
+        "model": model,
+        "input": input_data,
+        "agent_kwargs": {**agent_kwargs, "tools": [custom_handler]},
+        # Don't need computer_kwargs; agent will use our tool instead
+        "env": env_overrides,
+    }
+
+    result = await rh.process_request(request_payload)
+    return result
 
 
 if __name__ == "__main__":

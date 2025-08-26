@@ -3,6 +3,8 @@ export type ConnectionType = 'http' | 'https' | 'peer';
 export interface AgentClientOptions {
   timeout?: number;
   retries?: number;
+  /** Optional CUA API key to send as X-API-Key header for HTTP requests */
+  apiKey?: string;
 }
 // Request types matching the Python proxy API
 export interface AgentRequest {
