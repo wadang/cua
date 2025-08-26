@@ -198,6 +198,14 @@ class ConnectionManager:
 manager = ConnectionManager()
 auth_manager = AuthenticationManager()
 
+@app.get("/status")
+async def status():
+    sys = platform.system().lower()
+    if "darwin" in sys or sys == "macos" or sys == "mac":
+        sys = "mac"
+    if "windows" in sys:
+        sys = "windows"
+    return {"status": "ok", "os": sys}
 
 @app.websocket("/ws", name="websocket_endpoint")
 async def websocket_endpoint(websocket: WebSocket):
@@ -332,7 +340,6 @@ async def websocket_endpoint(websocket: WebSocket):
             pass
         manager.disconnect(websocket)
 
-
 @app.post("/cmd")
 async def cmd_endpoint(
     request: Request,
@@ -426,7 +433,6 @@ async def cmd_endpoint(
             "Access-Control-Allow-Headers": "Content-Type, X-Container-Name, X-API-Key"
         }
     )
-
 
 @app.post("/responses")
 async def agent_response_endpoint(
