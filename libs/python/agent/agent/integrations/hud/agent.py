@@ -122,8 +122,8 @@ class FakeAsyncOpenAI:
                 full_input = input
                 if previous_response_id is not None:
                     prev_block_ids = self.context_cache[previous_response_id]
-                prev_blocks = [self.blocks_cache[b_id] for b_id in prev_block_ids]
-                full_input = _to_plain_dict_list(prev_blocks + input)
+                    prev_blocks = [self.blocks_cache[b_id] for b_id in prev_block_ids]
+                    full_input = _to_plain_dict_list(prev_blocks + input)
 
                 # Pre-pend instructions message
                 effective_input = full_input
