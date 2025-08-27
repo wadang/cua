@@ -276,13 +276,15 @@ class ComposedGroundedConfig:
                 grounding_agent = grounding_agent_conf.agent_class()
                 
                 for desc in element_descriptions:
-                    coords = await grounding_agent.predict_click(
-                        model=grounding_model,
-                        image_b64=last_image_b64,
-                        instruction=desc
-                    )
-                    if coords:
-                        self.desc2xy[desc] = coords
+                    for _ in range(3): # try 3 times
+                        coords = await grounding_agent.predict_click(
+                            model=grounding_model,
+                            image_b64=last_image_b64,
+                            instruction=desc
+                        )
+                        if coords:
+                            self.desc2xy[desc] = coords
+                            break
         
         # Step 6: Convert computer calls from descriptions back to xy coordinates
         final_output_items = convert_computer_calls_desc2xy(thinking_output_items, self.desc2xy)
