@@ -48,11 +48,11 @@ GROUNDED_COMPUTER_TOOL_SCHEMA = {
             "get_dimensions",
             "get_environment"
             ],
-            "description": "The action to perform"
+            "description": "The action to perform (required for all actions)"
         },
         "element_description": {
             "type": "string",
-            "description": "Description of the element to interact with (required for click, double_click, move, scroll actions, and as start/end for drag)"
+            "description": "Description of the element to interact with (required for click, double_click, move, scroll actions)"
         },
         "start_element_description": {
             "type": "string",
@@ -71,19 +71,26 @@ GROUNDED_COMPUTER_TOOL_SCHEMA = {
             "items": {
                 "type": "string"
             },
-            "description": "Key combination to press (required for keypress action). Single key for individual key press, multiple keys for combinations (e.g., 'ctrl+c')"
+            "description": "Key(s) to press (required for keypress action)"
         },
         "button": {
             "type": "string",
-            "description": "The mouse button to use for click action (left, right, wheel, back, forward) Default: left",
+            "enum": [
+                "left",
+                "right",
+                "wheel",
+                "back",
+                "forward"
+            ],
+            "description": "The mouse button to use for click action (default: left)",
         },
         "scroll_x": {
             "type": "integer",
-            "description": "Horizontal scroll amount for scroll action (positive for right, negative for left)",
+            "description": "Horizontal scroll amount for scroll action (required for scroll action)",
         },
         "scroll_y": {
             "type": "integer",
-            "description": "Vertical scroll amount for scroll action (positive for down, negative for up)",
+            "description": "Vertical scroll amount for scroll action (required for scroll action)",
         },
         },
         "required": [
