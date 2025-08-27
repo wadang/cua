@@ -45,6 +45,8 @@ def _map_agent_output_to_openai_blocks(output_items: List[Dict[str, Any]]) -> Li
                 "status": "completed",
             })
             blocks.append(comp)
+            # we will exit early here as the responses api only supports a single step
+            break
         elif t == "message" and item.get("role") == "assistant":
             content_blocks: List[ResponseOutputText] = []
             for c in item.get("content", []) or []:
@@ -161,9 +163,9 @@ class FakeAsyncOpenAI:
                     "tools": [],
                     "previous_response_id": previous_response_id,
                     "usage": ResponseUsage.model_validate({
-                        "input_tokens": usage["input_tokens"],
-                        "output_tokens": usage["output_tokens"],
-                        "total_tokens": usage["total_tokens"],
+                        "input_tokens": usage.get("input_tokens", 0),
+                        "output_tokens": usage.get("output_tokens", 0),
+                        "total_tokens": usage.get("total_tokens", 0),
                         "input_tokens_details": usage.get("input_tokens_details", { "cached_tokens": 0 }),
                         "output_tokens_details": usage.get("output_tokens_details", { "reasoning_tokens": 0 }),
                     }),
