@@ -122,9 +122,17 @@ class FakeAsyncOpenAI:
                     prev_blocks = [self.blocks_cache[b_id] for b_id in prev_block_ids]
                     full_input = _to_plain_dict_list(prev_blocks + input)
 
+                # Pre-pend instructions message
+                effective_input = full_input
+                if instructions:
+                    effective_input = [{
+                        "role": "user",
+                        "content": instructions,
+                    }] + full_input
+
                 # Run a single iteration of the ComputerAgent
                 agent_result: Optional[Dict[str, Any]] = None
-                async for result in self.agent.run(full_input):  # type: ignore[arg-type]
+                async for result in self.agent.run(effective_input):  # type: ignore[arg-type]
                     agent_result = result
                     break
                 assert agent_result is not None, "Agent failed to produce result"
