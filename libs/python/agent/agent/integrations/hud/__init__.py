@@ -41,6 +41,7 @@ class ProxyOperatorAgent(OperatorAgent):
         *,
         model: str | None = None,
         allowed_tools: list[str] | None = None,
+        trajectory_dir: str | None = None,
         **kwargs: Any,
     ) -> None:
         model = model or "computer-use-preview"
@@ -54,8 +55,7 @@ class ProxyOperatorAgent(OperatorAgent):
         computer_agent = BaseComputerAgent(
             model=model, 
             tools=[computer_shim], 
-            verbosity=20, 
-            trajectory_dir='trajectories'
+            trajectory_dir=trajectory_dir
         )
         model_client = FakeAsyncOpenAI(computer_agent)
 
@@ -115,6 +115,7 @@ async def run_full_dataset(
     max_concurrent: int = 30,
     max_steps: int = 50,
     split: str = "train",
+    trajectory_dir: str | None = None,
 ) -> list[Any]:
     """Run evaluation across the entire dataset using hud.datasets.run_dataset."""
 
@@ -134,7 +135,7 @@ async def run_full_dataset(
         name=job_name,
         dataset=dataset,
         agent_class=ProxyOperatorAgent,
-        agent_config={"model": model, "allowed_tools": allowed_tools},
+        agent_config={"model": model, "allowed_tools": allowed_tools, "trajectory_dir": trajectory_dir},
         max_concurrent=max_concurrent,
         metadata={"dataset": dataset_name},
         max_steps=max_steps,
