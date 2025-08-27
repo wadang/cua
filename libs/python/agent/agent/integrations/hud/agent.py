@@ -118,42 +118,42 @@ class FakeAsyncOpenAI:
             **_: Any,
         ) -> Any:
             for attempt in range(max_retries):
+                # Prepend cached blocks from previous_response_id to input
+                full_input = input
+                if previous_response_id is not None:
+                    prev_block_ids = self.context_cache[previous_response_id]
+                prev_blocks = [self.blocks_cache[b_id] for b_id in prev_block_ids]
+                full_input = _to_plain_dict_list(prev_blocks + input)
+
+                # Pre-pend instructions message
+                effective_input = full_input
+                if instructions:
+                    effective_input = [{
+                        "role": "user",
+                        "content": instructions,
+                    }] + full_input
+
+                # Run a single iteration of the ComputerAgent
+                agent_result: Optional[Dict[str, Any]] = None
+                async for result in self.agent.run(effective_input):  # type: ignore[arg-type]
+                    agent_result = result
+                    break
+                assert agent_result is not None, "Agent failed to produce result"
+
+                output = _map_agent_output_to_openai_blocks(agent_result["output"])
+                usage = agent_result["usage"]
+
+                # Cache conversation context using the last response id
+                block_ids: List[str] = []
+                blocks_to_cache = full_input + output
+                for b in blocks_to_cache:
+                    bid = getattr(b, "id", None) or f"tmp-{hash(repr(b))}"
+                    self.blocks_cache[bid] = b # type: ignore[assignment]
+                    block_ids.append(bid)
+                response_id = agent_result.get("id") or f"fake-{int(time.time()*1000)}"
+                self.context_cache[response_id] = block_ids
+
                 try:
-                    # Prepend cached blocks from previous_response_id to input
-                    full_input = input
-                    if previous_response_id is not None:
-                        prev_block_ids = self.context_cache[previous_response_id]
-                    prev_blocks = [self.blocks_cache[b_id] for b_id in prev_block_ids]
-                    full_input = _to_plain_dict_list(prev_blocks + input)
-
-                    # Pre-pend instructions message
-                    effective_input = full_input
-                    if instructions:
-                        effective_input = [{
-                            "role": "user",
-                            "content": instructions,
-                        }] + full_input
-
-                    # Run a single iteration of the ComputerAgent
-                    agent_result: Optional[Dict[str, Any]] = None
-                    async for result in self.agent.run(effective_input):  # type: ignore[arg-type]
-                        agent_result = result
-                        break
-                    assert agent_result is not None, "Agent failed to produce result"
-
-                    output = _map_agent_output_to_openai_blocks(agent_result["output"])
-                    usage = agent_result["usage"]
-
-                    # Cache conversation context using the last response id
-                    block_ids: List[str] = []
-                    blocks_to_cache = full_input + output
-                    for b in blocks_to_cache:
-                        bid = getattr(b, "id", None) or f"tmp-{hash(repr(b))}"
-                        self.blocks_cache[bid] = b # type: ignore[assignment]
-                        block_ids.append(bid)
-                    response_id = agent_result.get("id") or f"fake-{int(time.time()*1000)}"
-                    self.context_cache[response_id] = block_ids
-
                     return Response.model_validate({
                         "id": response_id,
                         "created_at": time.time(),
@@ -173,9 +173,9 @@ class FakeAsyncOpenAI:
                         }),
                     })
                 except Exception as e:
-                    print(f"Error while running agent (attempt {attempt + 1}/{max_retries}): ", e)
-                    print(traceback.format_exc())
+                    print(f"Error while validating agent response (attempt {attempt + 1}/{max_retries}): ", e)
                     if attempt == max_retries - 1:
+                        print(traceback.format_exc())
                         raise e
 
 __all__ = [
