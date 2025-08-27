@@ -82,7 +82,7 @@ GROUNDED_COMPUTER_TOOL_SCHEMA = {
                 "back",
                 "forward"
             ],
-            "description": "The mouse button to use for click action (required for click action)",
+            "description": "The mouse button to use for click action (required for click and double_click action)",
         },
         "scroll_x": {
             "type": "integer",
