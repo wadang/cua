@@ -658,27 +658,14 @@ async def agent_response_endpoint(
         "usage": total_usage,
     }
 
-    # Set CORS headers for allowed origins only
-    origin = request.headers.get("origin")
-    allowed_origins = {
-        "http://localhost",
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1",
-        "http://127.0.0.1:3000",
-        "https://trycua.com",
-        "https://www.trycua.com",
-    }
-
+    # CORS: allow any origin
     headers = {
         "Cache-Control": "no-cache",
         "Connection": "keep-alive",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, X-Container-Name, X-API-Key",
+        "Access-Control-Allow-Origin": "*",
     }
-    if origin and origin in allowed_origins:
-        headers["Access-Control-Allow-Origin"] = origin
-        headers["Vary"] = "Origin"
 
     return JSONResponse(content=payload, headers=headers)
 
@@ -686,30 +673,14 @@ async def agent_response_endpoint(
 @app.options("/responses")
 async def agent_response_options(request: Request):
     """CORS preflight for /responses"""
-    origin = request.headers.get("origin")
-    allowed_origins = {
-        "http://localhost",
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:5173",
-        "http://127.0.0.1",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-        "https://trycua.com",
-        "https://www.trycua.com",
-    }
-
     headers = {
         "Cache-Control": "no-cache",
         "Connection": "keep-alive",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, X-Container-Name, X-API-Key",
         "Access-Control-Max-Age": "600",
+        "Access-Control-Allow-Origin": "*",
     }
-    if origin and origin in allowed_origins:
-        headers["Access-Control-Allow-Origin"] = origin
-        headers["Vary"] = "Origin"
-
     return JSONResponse(content={}, headers=headers)
 
 

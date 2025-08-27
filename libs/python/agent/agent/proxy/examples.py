@@ -30,7 +30,7 @@ async def test_http_endpoint():
             # Simple text request
             {
                 "model": "anthropic/claude-3-5-sonnet-20241022",
-                "input": "Tell me a three sentence bedtime story about a unicorn.",
+                "input": "Hello!",
                 "env": {
                     "ANTHROPIC_API_KEY": anthropic_api_key
                 }
@@ -70,6 +70,7 @@ async def test_http_endpoint():
                     result = await response.json()
                     print(f"Status: {response.status}")
                     print(f"Response: {json.dumps(result, indent=2)}")
+                    print(f"Response Headers: {response.headers}")
                     
             except Exception as e:
                 print(f"Error: {e}")
