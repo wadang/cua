@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 kasmweb/core-ubuntu-jammy:1.17.0
+FROM kasmweb/core-ubuntu-jammy:1.17.0
 USER root
 
 ENV HOME=/home/kasm-default-profile
