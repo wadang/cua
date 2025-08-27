@@ -1,77 +1,149 @@
-"""HUD integration for ComputerAgent."""
+"""HUD integration: Generic HuggingFace dataset evaluation runner (CUA proxy).
 
-import logging
-from typing import Any, Optional, Dict
-from hud import run_job as hud_run_job
+This module exposes two helpers to evaluate HUD-compatible datasets using
+HUD's OperatorAgent, while proxying model calls through our ComputerAgent via
+`FakeAsyncOpenAI` (see `agent/integrations/hud/agent.py`).
 
-from .agent import ComputerAgent
-from .adapter import ComputerAgentAdapter
-from .computer_handler import HUDComputerHandler
+Exports:
+- run_single_task(dataset_name, *, agent_type="cua-proxy", model=None, allowed_tools=None)
+- run_full_dataset(dataset_name, *, agent_type="cua-proxy", model=None, allowed_tools=None, max_concurrent=30, max_steps=50)
+"""
+import time
+from typing import Any, Optional
+
+from PIL import Image
+from datasets import load_dataset, Dataset
+from hud.agents import OperatorAgent
+from hud.datasets import Task, run_dataset
+from hud.tools.computer.settings import computer_settings
+from hud import trace
+
+from agent.agent import ComputerAgent as BaseComputerAgent
+from .agent import FakeAsyncOpenAI
 
 
-async def run_job(
-    model: str,
-    task_or_taskset: Any,
-    job_name: str,
-    # Job kwargs
-    auto_reply_question: bool = False,
-    adapter_cls: Any = None,
-    adapter_kwargs: Optional[Dict[str, Any]] = None,
-    max_steps_per_task: int = 20,
-    run_parallel: bool = True,
-    job_metadata: Optional[Dict[str, Any]] = None,
-    show_progress: bool = True,
-    max_concurrent_env_creations: Optional[int] = 30,  # Limits gym.make calls
-    max_concurrent_agent_predictions: Optional[int] = None,  # No limit on LLM calls
-    max_concurrent_tasks: Optional[int] = 30,  # Limits overall task concurrency
-    **agent_kwargs: Any
-) -> Any:
+# ---------------------------------------------------------------------------
+# Proxy OperatorAgent
+# ---------------------------------------------------------------------------
+
+
+class ProxyOperatorAgent(OperatorAgent):
+    """OperatorAgent that proxies model calls through our ComputerAgent.
+
+    Accepts the same config keys we pass via hud.run_dataset `agent_config`:
+    - model: str | None
+    - allowed_tools: list[str] | None
+    Additional kwargs are forwarded to OperatorAgent (if any are supported).
     """
-    Run a job using ComputerAgent with the specified model.
+
+    def __init__(
+        self,
+        *,
+        model: str | None = None,
+        allowed_tools: list[str] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        model = model or "computer-use-preview"
+        allowed_tools = allowed_tools or ["openai_computer"]
+        
+        computer_shim = {
+            'screenshot': lambda: Image.new('RGB', (computer_settings.OPENAI_COMPUTER_WIDTH, computer_settings.OPENAI_COMPUTER_HEIGHT)),
+            'environment': 'linux',
+            'dimensions': (computer_settings.OPENAI_COMPUTER_WIDTH, computer_settings.OPENAI_COMPUTER_HEIGHT)
+        }
+        computer_agent = BaseComputerAgent(
+            model=model, 
+            tools=[computer_shim], 
+            verbosity=20, 
+            trajectory_dir='trajectories'
+        )
+        model_client = FakeAsyncOpenAI(computer_agent)
+
+        super().__init__( 
+            model_client=model_client, # type: ignore[arg-type]
+            model=model,
+            allowed_tools=allowed_tools,
+            **kwargs,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Single-task runner
+# ---------------------------------------------------------------------------
+
+
+async def run_single_task(
+    dataset: str | Dataset | list[dict[str, Any]],
+    *,
+    task_id: int = 0,
+    model: str | None = None,
+    allowed_tools: list[str] | None = None,
+) -> None:
+    """Load one task from the dataset and execute it with Operator+CUA proxy."""
+
+    # Load dataset and pick a sample
+    if isinstance(dataset, str):
+        dataset = load_dataset(dataset, split="train") # type: ignore[arg-type]
+    elif isinstance(dataset, list):
+        dataset = dataset
+    else:
+        dataset = dataset["train"]
     
-    Args:
-        model: Model string for ComputerAgent (e.g., "anthropic/claude-3-5-sonnet-20241022")
-        task_or_taskset: Task or TaskSet to run
-        job_name: Name for the job
-        auto_reply_question: Whether to auto-reply to questions
-        adapter_cls: Custom adapter class (defaults to ComputerAgentAdapter)
-        adapter_kwargs: Additional kwargs for the adapter
-        max_steps_per_task: Maximum steps per task
-        run_parallel: Whether to run tasks in parallel
-        job_metadata: Additional metadata for the job
-        show_progress: Whether to show progress
-        max_concurrent_env_creations: Max concurrent environment creations
-        max_concurrent_agent_predictions: Max concurrent agent predictions
-        max_concurrent_tasks: Max concurrent tasks
-        **agent_kwargs: Additional kwargs to pass to ComputerAgent
-    
-    Returns:
-        Job instance from HUD
-    """
-    # combine verbose and verbosity kwargs
-    if "verbose" in agent_kwargs:
-        agent_kwargs["verbosity"] = logging.INFO
-        del agent_kwargs["verbose"]
-    verbose = True if agent_kwargs.get("verbosity", logging.WARNING) > logging.INFO else False
-    
-    # run job
-    return await hud_run_job(
-        agent_cls=ComputerAgent,
-        agent_kwargs={"model": model, **agent_kwargs},
-        task_or_taskset=task_or_taskset,
-        job_name=job_name,
-        auto_reply_question=auto_reply_question,
-        adapter_cls=adapter_cls,
-        adapter_kwargs=adapter_kwargs,
-        max_steps_per_task=max_steps_per_task,
-        run_parallel=run_parallel,
-        job_metadata=job_metadata,
-        show_progress=show_progress,
-        verbose=verbose,
-        max_concurrent_env_creations=max_concurrent_env_creations,
-        max_concurrent_agent_predictions=max_concurrent_agent_predictions,
-        max_concurrent_tasks=max_concurrent_tasks
+    sample_task = dataset[task_id]  # type: ignore[index]
+    task_prompt = sample_task.get("prompt", f"Task {sample_task.get('id', 0)}")  # type: ignore[attr-defined]
+
+    with trace(name=task_prompt):
+        task = Task(**sample_task)  # type: ignore[arg-type]
+
+        agent = ProxyOperatorAgent(model=model, allowed_tools=allowed_tools)
+        print(f"Running: {task_prompt}")
+        result = await agent.run(task, max_steps=10)
+        print(f"✅ Reward: {getattr(result, 'reward')}")
+
+
+# ---------------------------------------------------------------------------
+# Full-dataset runner
+# ---------------------------------------------------------------------------
+
+
+async def run_full_dataset(
+    dataset: str | Dataset | list[dict[str, Any]],
+    *,
+    job_name: Optional[str] = None,
+    model: str | None = None,
+    allowed_tools: list[str] | None = None,
+    max_concurrent: int = 30,
+    max_steps: int = 50,
+    split: str = "train",
+) -> list[Any]:
+    """Run evaluation across the entire dataset using hud.datasets.run_dataset."""
+
+    # We pass OperatorAgent as the class and provide a config that injects our
+    # FakeAsyncOpenAI per agent instantiation.
+
+    if isinstance(dataset, str):
+        dataset_name = dataset.split('/')[-1]
+        job_name = job_name or f"Evaluation {dataset_name}"
+        dataset = load_dataset(dataset, split=split) # type: ignore[arg-type]
+    else:
+        dataset_name = "custom"
+        job_name = job_name or f"Evaluation {time.strftime('%H:%M %Y-%m-%d')}"
+
+    # Execute evaluation
+    return await run_dataset(
+        name=job_name,
+        dataset=dataset,
+        agent_class=ProxyOperatorAgent,
+        agent_config={"model": model, "allowed_tools": allowed_tools},
+        max_concurrent=max_concurrent,
+        metadata={"dataset": dataset_name},
+        max_steps=max_steps,
+        auto_respond=True,
     )
 
 
-__all__ = ["ComputerAgent", "ComputerAgentAdapter", "HUDComputerHandler", "run_job"]
+__all__ = [
+    "run_single_task",
+    "run_full_dataset",
+    "ProxyOperatorAgent",
+]
