@@ -1,9 +1,12 @@
 """
 Example usage of the proxy server and client requests.
 """
+import dotenv
+dotenv.load_dotenv()
 
 import asyncio
 import json
+import os
 import aiohttp
 from typing import Dict, Any
 
@@ -11,10 +14,16 @@ from typing import Dict, Any
 async def test_http_endpoint():
     """Test the HTTP /responses endpoint."""
     
+    anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+    assert isinstance(anthropic_api_key, str), "ANTHROPIC_API_KEY environment variable must be set"
+
     # Example 1: Simple text request
     simple_request = {
         "model": "anthropic/claude-3-5-sonnet-20241022",
-        "input": "Tell me a three sentence bedtime story about a unicorn."
+        "input": "Tell me a three sentence bedtime story about a unicorn.",
+        "env": {
+            "ANTHROPIC_API_KEY": anthropic_api_key
+        }
     }
     
     # Example 2: Multi-modal request with image
@@ -31,36 +40,42 @@ async def test_http_endpoint():
                     }
                 ]
             }
-        ]
+        ],
+        "env": {
+            "ANTHROPIC_API_KEY": anthropic_api_key
+        }
     }
     
     # Example 3: Request with custom agent and computer kwargs
     custom_request = {
         "model": "anthropic/claude-3-5-sonnet-20241022",
         "input": "Take a screenshot and tell me what you see",
-        "agent_kwargs": {
-            "save_trajectory": True,
-            "verbosity": 20  # INFO level
-        },
-        "computer_kwargs": {
-            "os_type": "linux",
-            "provider_type": "cloud"
+        "env": {
+            "ANTHROPIC_API_KEY": anthropic_api_key
         }
     }
     
     # Test requests
-    base_url = "http://localhost:8000"
+    base_url = "https://m-linux-96lcxd2c2k.containers.cloud.trycua.com:8443"
+    # base_url = "http://localhost:8000"
+    api_key = os.getenv("CUA_API_KEY")
+    assert isinstance(api_key, str), "CUA_API_KEY environment variable must be set"
     
     async with aiohttp.ClientSession() as session:
-        for i, request_data in enumerate([simple_request, multimodal_request, custom_request], 1):
+        for i, request_data in enumerate([
+            simple_request,
+            # multimodal_request,
+            custom_request
+        ], 1):
             print(f"\n--- Test {i} ---")
             print(f"Request: {json.dumps(request_data, indent=2)}")
             
             try:
+                print(f"Sending request to {base_url}/responses")
                 async with session.post(
                     f"{base_url}/responses",
                     json=request_data,
-                    headers={"Content-Type": "application/json"}
+                    headers={"Content-Type": "application/json", "X-API-Key": api_key}
                 ) as response:
                     result = await response.json()
                     print(f"Status: {response.status}")
