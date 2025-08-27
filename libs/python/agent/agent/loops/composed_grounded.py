@@ -67,7 +67,10 @@ GROUNDED_COMPUTER_TOOL_SCHEMA = {
             "description": "The text to type (required for type action)"
         },
         "keys": {
-            "type": "string",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
             "description": "Key combination to press (required for keypress action). Single key for individual key press, multiple keys for combinations (e.g., 'ctrl+c')"
         },
         "button": {

@@ -114,66 +114,69 @@ class FakeAsyncOpenAI:
             tools: Optional[List[Dict[str, Any]]] = None,
             instructions: Optional[str] = None,
             previous_response_id: Optional[str] = None,
+            max_retries: int = 5,
             **_: Any,
         ) -> Any:
-            try:
-                # Prepend cached blocks from previous_response_id to input
-                full_input = input
-                if previous_response_id is not None:
-                    prev_block_ids = self.context_cache[previous_response_id]
+            for attempt in range(max_retries):
+                try:
+                    # Prepend cached blocks from previous_response_id to input
+                    full_input = input
+                    if previous_response_id is not None:
+                        prev_block_ids = self.context_cache[previous_response_id]
                     prev_blocks = [self.blocks_cache[b_id] for b_id in prev_block_ids]
                     full_input = _to_plain_dict_list(prev_blocks + input)
 
-                # Pre-pend instructions message
-                effective_input = full_input
-                if instructions:
-                    effective_input = [{
-                        "role": "user",
-                        "content": instructions,
-                    }] + full_input
+                    # Pre-pend instructions message
+                    effective_input = full_input
+                    if instructions:
+                        effective_input = [{
+                            "role": "user",
+                            "content": instructions,
+                        }] + full_input
 
-                # Run a single iteration of the ComputerAgent
-                agent_result: Optional[Dict[str, Any]] = None
-                async for result in self.agent.run(effective_input):  # type: ignore[arg-type]
-                    agent_result = result
-                    break
-                assert agent_result is not None, "Agent failed to produce result"
+                    # Run a single iteration of the ComputerAgent
+                    agent_result: Optional[Dict[str, Any]] = None
+                    async for result in self.agent.run(effective_input):  # type: ignore[arg-type]
+                        agent_result = result
+                        break
+                    assert agent_result is not None, "Agent failed to produce result"
 
-                output = _map_agent_output_to_openai_blocks(agent_result["output"])
-                usage = agent_result["usage"]
+                    output = _map_agent_output_to_openai_blocks(agent_result["output"])
+                    usage = agent_result["usage"]
 
-                # Cache conversation context using the last response id
-                block_ids: List[str] = []
-                blocks_to_cache = full_input + output
-                for b in blocks_to_cache:
-                    bid = getattr(b, "id", None) or f"tmp-{hash(repr(b))}"
-                    self.blocks_cache[bid] = b # type: ignore[assignment]
-                    block_ids.append(bid)
-                response_id = agent_result.get("id") or f"fake-{int(time.time()*1000)}"
-                self.context_cache[response_id] = block_ids
+                    # Cache conversation context using the last response id
+                    block_ids: List[str] = []
+                    blocks_to_cache = full_input + output
+                    for b in blocks_to_cache:
+                        bid = getattr(b, "id", None) or f"tmp-{hash(repr(b))}"
+                        self.blocks_cache[bid] = b # type: ignore[assignment]
+                        block_ids.append(bid)
+                    response_id = agent_result.get("id") or f"fake-{int(time.time()*1000)}"
+                    self.context_cache[response_id] = block_ids
 
-                return Response.model_validate({
-                    "id": response_id,
-                    "created_at": time.time(),
-                    "object": "response",
-                    "model": model,
-                    "output": output,
-                    "parallel_tool_calls": False,
-                    "tool_choice": "auto",
-                    "tools": [],
-                    "previous_response_id": previous_response_id,
-                    "usage": ResponseUsage.model_validate({
-                        "input_tokens": usage.get("input_tokens", 0),
-                        "output_tokens": usage.get("output_tokens", 0),
-                        "total_tokens": usage.get("total_tokens", 0),
-                        "input_tokens_details": usage.get("input_tokens_details", { "cached_tokens": 0 }),
-                        "output_tokens_details": usage.get("output_tokens_details", { "reasoning_tokens": 0 }),
-                    }),
-                })
-            except Exception as e:
-                print("Error while running agent: ", e)
-                print(traceback.format_exc())
-                raise e
+                    return Response.model_validate({
+                        "id": response_id,
+                        "created_at": time.time(),
+                        "object": "response",
+                        "model": model,
+                        "output": output,
+                        "parallel_tool_calls": False,
+                        "tool_choice": "auto",
+                        "tools": [],
+                        "previous_response_id": previous_response_id,
+                        "usage": ResponseUsage.model_validate({
+                            "input_tokens": usage.get("input_tokens", 0),
+                            "output_tokens": usage.get("output_tokens", 0),
+                            "total_tokens": usage.get("total_tokens", 0),
+                            "input_tokens_details": usage.get("input_tokens_details", { "cached_tokens": 0 }),
+                            "output_tokens_details": usage.get("output_tokens_details", { "reasoning_tokens": 0 }),
+                        }),
+                    })
+                except Exception as e:
+                    print(f"Error while running agent (attempt {attempt + 1}/{max_retries}): ", e)
+                    print(traceback.format_exc())
+                    if attempt == max_retries - 1:
+                        raise e
 
 __all__ = [
     "FakeAsyncOpenAI",
