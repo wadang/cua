@@ -431,7 +431,7 @@ def create_ui():
             with gr.Column(scale=2):
                 with gr.Group():
                     screenshot_image = gr.Image(
-                        label="Screenshot",
+                        label="Interactive Screenshot",
                         interactive=False,
                         height=600
                     )
@@ -440,7 +440,7 @@ def create_ui():
                     with gr.Group(visible=False) as click_actions_group:
                         with gr.Row():
                             action_type_radio = gr.Dropdown(
-                                label="Interactive Action",
+                                label="Action",
                                 choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
                                 value="click",
                                 scale=2
@@ -454,7 +454,7 @@ def create_ui():
                             )
                     
                     conversation_chatbot = gr.Chatbot(
-                        label="Messages",
+                        label="Conversation",
                         type="messages",
                         height=500,
                         show_copy_button=True
