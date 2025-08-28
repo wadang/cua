@@ -102,37 +102,37 @@ class OperatorNormalizerCallback(AsyncCallbackHandler):
                 _keep_keys(action, keep)
             
 
-        # Second pass: if an assistant message is immediately followed by a computer_call,
-        # replace the assistant message itself with a reasoning message with summary text.
-        if isinstance(output, list):
-            for i, item in enumerate(output):
-                # AssistantMessage shape: { type: 'message', role: 'assistant', content: OutputContent[] }
-                if item.get("type") == "message" and item.get("role") == "assistant":
-                    next_idx = i + 1
-                    if next_idx >= len(output):
-                        continue
-                    next_item = output[next_idx]
-                    if not isinstance(next_item, dict):
-                        continue
-                    if next_item.get("type") != "computer_call":
-                        continue
-                    contents = item.get("content") or []
-                    # Extract text from OutputContent[]
-                    text_parts: List[str] = []
-                    if isinstance(contents, list):
-                        for c in contents:
-                            if isinstance(c, dict) and c.get("type") == "output_text" and isinstance(c.get("text"), str):
-                                text_parts.append(c["text"])
-                    text_content = "\n".join(text_parts).strip()
-                    # Replace assistant message with reasoning message
-                    output[i] = {
-                        "type": "reasoning",
-                        "summary": [
-                            {
-                                "type": "summary_text",
-                                "text": text_content,
-                            }
-                        ],
-                    }
+        # # Second pass: if an assistant message is immediately followed by a computer_call,
+        # # replace the assistant message itself with a reasoning message with summary text.
+        # if isinstance(output, list):
+        #     for i, item in enumerate(output):
+        #         # AssistantMessage shape: { type: 'message', role: 'assistant', content: OutputContent[] }
+        #         if item.get("type") == "message" and item.get("role") == "assistant":
+        #             next_idx = i + 1
+        #             if next_idx >= len(output):
+        #                 continue
+        #             next_item = output[next_idx]
+        #             if not isinstance(next_item, dict):
+        #                 continue
+        #             if next_item.get("type") != "computer_call":
+        #                 continue
+        #             contents = item.get("content") or []
+        #             # Extract text from OutputContent[]
+        #             text_parts: List[str] = []
+        #             if isinstance(contents, list):
+        #                 for c in contents:
+        #                     if isinstance(c, dict) and c.get("type") == "output_text" and isinstance(c.get("text"), str):
+        #                         text_parts.append(c["text"])
+        #             text_content = "\n".join(text_parts).strip()
+        #             # Replace assistant message with reasoning message
+        #             output[i] = {
+        #                 "type": "reasoning",
+        #                 "summary": [
+        #                     {
+        #                         "type": "summary_text",
+        #                         "text": text_content,
+        #                     }
+        #                 ],
+        #             }
 
         return output
