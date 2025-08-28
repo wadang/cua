@@ -368,6 +368,10 @@ class HumanCompletionUI:
         """Submit a hotkey action."""
         return self.submit_action("keypress", keys=keys)
     
+    def submit_wait_action(self) -> str:
+        """Submit a wait action with no kwargs."""
+        return self.submit_action("wait")
+    
     def submit_description_click(self, description: str, action_type: str = "click", button: str = "left") -> str:
         """Submit a description-based action."""
         if action_type == "click":
@@ -515,6 +519,16 @@ def create_ui():
                             )
                         description_submit_btn = gr.Button("Submit Description Action")
                 
+                # Misc actions
+                with gr.Accordion("🧰 Misc Actions", open=False):
+                    with gr.Group():
+                        misc_action_dropdown = gr.Dropdown(
+                            label="Misc Action",
+                            choices=["wait"],
+                            value="wait"
+                        )
+                        misc_submit_btn = gr.Button("Submit Misc Action")
+                
                 status_display = gr.Textbox(
                     label="Status",
                     interactive=False,
@@ -609,6 +623,23 @@ def create_ui():
         description_submit_btn.click(
             fn=handle_description_submit,
             inputs=[description_text, description_action_type, description_button],
+            outputs=[status_display]
+        ).then(
+            fn=ui_handler.wait_for_pending_calls,
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
+        )
+        
+        # Misc action handler
+        def handle_misc_submit(selected_action):
+            if selected_action == "wait":
+                result = ui_handler.submit_wait_action()
+                ui_handler.wait_for_pending_calls()
+                return result
+            return f"Unsupported misc action: {selected_action}"
+
+        misc_submit_btn.click(
+            fn=handle_misc_submit,
+            inputs=[misc_action_dropdown],
             outputs=[status_display]
         ).then(
             fn=ui_handler.wait_for_pending_calls,
