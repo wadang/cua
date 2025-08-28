@@ -466,69 +466,51 @@ def create_ui():
                     submit_btn = gr.Button("📤 Submit Response", variant="primary", interactive=False)
                 
                 # Action Accordions
-                with gr.Accordion("🖱️ Click Actions", open=False):
-                    with gr.Group():
-                        with gr.Row():
-                            click_x = gr.Number(label="X", value=0, minimum=0)
-                            click_y = gr.Number(label="Y", value=0, minimum=0)
-                        with gr.Row():
-                            click_action_type = gr.Dropdown(
-                                label="Action Type",
-                                choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
-                                value="click"
+                with gr.Tabs():
+                    with gr.Tab("🖱️ Click Actions"):
+                        with gr.Group():
+                            description_text = gr.Textbox(
+                                label="Element Description",
+                                placeholder="e.g., 'Privacy and security option in left sidebar'"
                             )
-                            click_button = gr.Dropdown(
-                                label="Button (for click only)",
-                                choices=["left", "right", "wheel", "back", "forward"],
-                                value="left"
+                            with gr.Row():
+                                description_action_type = gr.Dropdown(
+                                    label="Action Type",
+                                    choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
+                                    value="click"
+                                )
+                                description_button = gr.Radio(
+                                    label="Button (for click only)",
+                                    choices=["left", "right", "wheel", "back", "forward"],
+                                    value="left"
+                                )
+                            description_submit_btn = gr.Button("Submit Click Action")
+                    
+                    with gr.Tab("📝 Type Action"):
+                        with gr.Group():
+                            type_text = gr.Textbox(
+                                label="Text to Type",
+                                placeholder="Enter text to type..."
                             )
-                        click_submit_btn = gr.Button("Submit Action")
-                
-                with gr.Accordion("📝 Type Action", open=False):
-                    with gr.Group():
-                        type_text = gr.Textbox(
-                            label="Text to Type",
-                            placeholder="Enter text to type..."
-                        )
-                        type_submit_btn = gr.Button("Submit Type")
-                
-                with gr.Accordion("⌨️ Keypress Action", open=False):
-                    with gr.Group():
-                        keypress_text = gr.Textbox(
-                            label="Keys",
-                            placeholder="e.g., ctrl+c, alt+tab"
-                        )
-                        keypress_submit_btn = gr.Button("Submit Keypress")
-                
-                with gr.Accordion("🎯 Description Action", open=False):
-                    with gr.Group():
-                        description_text = gr.Textbox(
-                            label="Element Description",
-                            placeholder="e.g., 'Privacy and security option in left sidebar'"
-                        )
-                        with gr.Row():
-                            description_action_type = gr.Dropdown(
-                                label="Action Type",
-                                choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
-                                value="click"
+                            type_submit_btn = gr.Button("Submit Type")
+                    
+                    with gr.Tab("⌨️ Keypress Action"):
+                        with gr.Group():
+                            keypress_text = gr.Textbox(
+                                label="Keys",
+                                placeholder="e.g., ctrl+c, alt+tab"
                             )
-                            description_button = gr.Radio(
-                                label="Button (for click only)",
-                                choices=["left", "right", "wheel", "back", "forward"],
-                                value="left"
+                            keypress_submit_btn = gr.Button("Submit Keypress")
+                    
+                    with gr.Tab("🧰 Misc Actions"):
+                        with gr.Group():
+                            misc_action_dropdown = gr.Dropdown(
+                                label="Misc Action",
+                                choices=["wait"],
+                                value="wait"
                             )
-                        description_submit_btn = gr.Button("Submit Description Action")
-                
-                # Misc actions
-                with gr.Accordion("🧰 Misc Actions", open=False):
-                    with gr.Group():
-                        misc_action_dropdown = gr.Dropdown(
-                            label="Misc Action",
-                            choices=["wait"],
-                            value="wait"
-                        )
-                        misc_submit_btn = gr.Button("Submit Misc Action")
-                
+                            misc_submit_btn = gr.Button("Submit Misc Action")
+                    
                 status_display = gr.Textbox(
                     label="Status",
                     interactive=False,
@@ -583,16 +565,6 @@ def create_ui():
             fn=toggle_button_visibility,
             inputs=[action_type_radio],
             outputs=[action_button_radio]
-        )
-
-        # Action accordion handlers
-        click_submit_btn.click(
-            fn=ui_handler.submit_click_action,
-            inputs=[click_x, click_y, click_action_type, click_button],
-            outputs=[status_display]
-        ).then(
-            fn=ui_handler.wait_for_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
         )
         
         type_submit_btn.click(
