@@ -19,7 +19,7 @@ from hud.tools.computer.settings import computer_settings
 from hud import trace
 
 from agent.agent import ComputerAgent as BaseComputerAgent
-from .agent import FakeAsyncOpenAI
+from .proxy import FakeAsyncOpenAI
 
 
 # ---------------------------------------------------------------------------
