@@ -29,12 +29,13 @@ export interface AgentRequest {
 // #endregion
 
 
-
 // #region Response
 // Response types
 export interface AgentResponse {
   output: AgentMessage[];
   usage: Usage;
+  status: 'completed' | 'failed';
+  error?: string;
 }
 // Usage information
 export interface Usage {

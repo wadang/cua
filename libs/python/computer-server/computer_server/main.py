@@ -632,6 +632,8 @@ async def agent_response_endpoint(
     #     return out
     # messages = inline_image_urls(messages)
 
+    error = None
+
     with _EnvOverride(env_overrides):
         # Prepare tools: if caller did not pass tools, inject our DirectComputer
         tools = agent_kwargs.get("tools")
@@ -645,26 +647,32 @@ async def agent_response_endpoint(
         total_usage: Dict[str, Any] = {}
 
         turns = 0
-        async for result in agent.run(messages):
-            total_output += result["output"]
-            # Try to collect usage if present
-            if isinstance(result, dict) and "usage" in result and isinstance(result["usage"], dict):
-                # Merge usage counters
-                for k, v in result["usage"].items():
-                    if isinstance(v, (int, float)):
-                        total_usage[k] = total_usage.get(k, 0) + v
-                    else:
-                        total_usage[k] = v
-            turns += 1
-            if turns > 2:
-                break
-
+        try:
+            async for result in agent.run(messages):
+                total_output += result["output"]
+                # Try to collect usage if present
+                if isinstance(result, dict) and "usage" in result and isinstance(result["usage"], dict):
+                    # Merge usage counters
+                    for k, v in result["usage"].items():
+                        if isinstance(v, (int, float)):
+                            total_usage[k] = total_usage.get(k, 0) + v
+                        else:
+                            total_usage[k] = v
+                turns += 1
+                if turns > 2:
+                    break
+        except Exception as e:
+            logger.error(f"Error running agent: {str(e)}")
+            logger.error(traceback.format_exc())
+            error = str(e)
+    
     # Build response payload
     payload = {
-        "success": True,
         "model": model,
+        "error": error,
         "output": total_output,
         "usage": total_usage,
+        "status": "completed" if not error else "failed"
     }
 
     # CORS: allow any origin
