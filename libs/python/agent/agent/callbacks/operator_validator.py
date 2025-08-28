@@ -7,6 +7,7 @@ Ensures agent output actions conform to expected schemas by fixing common issues
 - etc.
 
 This runs in on_llm_end, which receives the output array (AgentMessage[] as dicts).
+The purpose is to avoid spending another LLM call to fix broken computer call syntax when possible.
 """
 from __future__ import annotations
 
@@ -41,6 +42,10 @@ class OperatorNormalizerCallback(AsyncCallbackHandler):
                 action["type"] = "click"
             if "click" in action and "type" not in action:
                 action["type"] = "click"
+            if ("scroll_x" in action or "scroll_y" in action) and "type" not in action:
+                action["type"] = "scroll"
+            if "text" in action and "type" not in action:
+                action["type"] = "type"
 
             action_type = action.get("type")
             def _keep_keys(action: Dict[str, Any], keys_to_keep: List[str]):
