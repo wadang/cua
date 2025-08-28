@@ -459,11 +459,16 @@ def create_ui():
 
                 with gr.Group():
                     response_text = gr.Textbox(
-                        label="Response",
+                        label="Message",
                         lines=3,
-                        placeholder="Enter your response here..."
+                        placeholder="Enter your message here..."
                     )
-                    submit_btn = gr.Button("📤 Submit Response", variant="primary", interactive=False)
+                    submit_btn = gr.Button("📤 Submit Message", variant="primary", interactive=False)
+                    status_display = gr.Textbox(
+                        label="Status",
+                        interactive=False,
+                        value="Ready to receive calls..."
+                    )
                 
                 # Action Accordions
                 with gr.Tabs():
@@ -505,17 +510,11 @@ def create_ui():
                     with gr.Tab("🧰 Misc Actions"):
                         with gr.Group():
                             misc_action_dropdown = gr.Dropdown(
-                                label="Misc Action",
+                                label="Action",
                                 choices=["wait"],
                                 value="wait"
                             )
-                            misc_submit_btn = gr.Button("Submit Misc Action")
-                    
-                status_display = gr.Textbox(
-                    label="Status",
-                    interactive=False,
-                    value="Ready to receive calls..."
-                )
+                            misc_submit_btn = gr.Button("Submit Action")
         
         # Event handlers
         refresh_btn.click(
