@@ -54,8 +54,8 @@ class ImageRetentionCallback(AsyncCallbackHandler):
         # Gather indices of all computer_call_output messages that contain an image_url
         output_indices: List[int] = []
         for idx, msg in enumerate(messages):
-            if msg["type"] == "computer_call_output":
-                out = msg["output"]
+            if msg.get("type") == "computer_call_output":
+                out = msg.get("output")
                 if isinstance(out, dict) and ("image_url" in out):
                     output_indices.append(idx)
 
@@ -76,13 +76,13 @@ class ImageRetentionCallback(AsyncCallbackHandler):
             to_remove.add(idx)  # remove the computer_call_output itself
 
             # Remove the immediately preceding computer_call with matching call_id (if present)
-            call_id = messages[idx]["call_id"]
+            call_id = messages[idx].get("call_id")
             prev_idx = idx - 1
-            if prev_idx >= 0 and messages[prev_idx]["type"] == "computer_call" and messages[prev_idx]["call_id"] == call_id:
+            if prev_idx >= 0 and messages[prev_idx].get("type") == "computer_call" and messages[prev_idx].get("call_id") == call_id:
                 to_remove.add(prev_idx)
                 # Check a single reasoning immediately before that computer_call
                 r_idx = prev_idx - 1
-                if r_idx >= 0 and messages[r_idx]["type"] == "reasoning":
+                if r_idx >= 0 and messages[r_idx].get("type") == "reasoning":
                     to_remove.add(r_idx)
 
         # Construct filtered list
