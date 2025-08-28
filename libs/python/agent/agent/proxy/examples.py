@@ -10,10 +10,50 @@ import os
 import aiohttp
 from typing import Dict, Any
 
+def print_agent_response(result: dict):
+    # Pretty-print AgentResponse per your schema
+    output = result.get("output", []) or []
+    usage = result.get("usage") or {}
+
+    for msg in output:
+        t = msg.get("type")
+        if t == "message":
+            role = msg.get("role")
+            if role == "assistant":
+                for c in msg.get("content", []):
+                    if c.get("type") == "output_text":
+                        print(f"assistant> {c.get('text','')}")
+        elif t == "reasoning":
+            for s in msg.get("summary", []):
+                if s.get("type") == "summary_text":
+                    print(f"(thought) {s.get('text','')}")
+        elif t == "computer_call":
+            action = msg.get("action", {})
+            a_type = action.get("type", "action")
+            # Compact action preview (omit bulky fields)
+            preview = {k: v for k, v in action.items() if k not in ("type", "path", "image")}
+            print(f"🛠 computer_call {a_type} {preview} (id={msg.get('call_id')})")
+        elif t == "computer_call_output":
+            print(f"🖼 screenshot (id={msg.get('call_id')})")
+        elif t == "function_call":
+            print(f"🔧 fn {msg.get('name')}({msg.get('arguments')}) (id={msg.get('call_id')})")
+        elif t == "function_call_output":
+            print(f"🔧 fn result: {msg.get('output')} (id={msg.get('call_id')})")
+
+    if usage:
+        print(
+            f"[usage] prompt={usage.get('prompt_tokens',0)} "
+            f"completion={usage.get('completion_tokens',0)} "
+            f"total={usage.get('total_tokens',0)} "
+            f"cost=${usage.get('response_cost',0)}"
+        )
+
 
 async def test_http_endpoint():
     """Test the HTTP /responses endpoint."""
     
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    assert isinstance(openai_api_key, str), "OPENAI_API_KEY environment variable must be set"
     anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
     assert isinstance(anthropic_api_key, str), "ANTHROPIC_API_KEY environment variable must be set"
 
@@ -35,6 +75,14 @@ async def test_http_endpoint():
                     "ANTHROPIC_API_KEY": anthropic_api_key
                 }
             },
+
+            # {
+            #     "model": "openai/computer-use-preview",
+            #     "input": "Hello!",
+            #     "env": {
+            #         "OPENAI_API_KEY": openai_api_key
+            #     }
+            # },
 
             # Multimodal request with image
             # {
@@ -67,14 +115,51 @@ async def test_http_endpoint():
                     json=request_data,
                     headers={"Content-Type": "application/json", "X-API-Key": api_key}
                 ) as response:
-                    result = await response.json()
+                    text_result = await response.text()
+                    print(f"Response Text: {text_result}")
+                    
+                    result = json.loads(text_result)
                     print(f"Status: {response.status}")
                     print(f"Response: {json.dumps(result, indent=2)}")
-                    print(f"Response Headers: {response.headers}")
+                    print(f"Response Headers:")
+                    for header in response.headers:
+                        print(f"- {header}: {response.headers[header]}")
                     
             except Exception as e:
                 print(f"Error: {e}")
 
+async def simple_repl():
+    base_url = "https://m-linux-96lcxd2c2k.containers.cloud.trycua.com:8443"
+    api_key = os.getenv("CUA_API_KEY", "")
+    anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    openai_api_key = os.getenv("OPENAI_API_KEY", "")
+    model = "openai/computer-use-preview"
+
+    messages = []
+    async with aiohttp.ClientSession() as session:
+        while True:
+            if not messages or messages[-1].get("type") == "message":
+                user_text = input("you> ").strip()
+                if user_text == "exit":
+                    break
+                if user_text:
+                    messages += [{"role": "user", "content": user_text}]  # loop
+
+            payload = {
+                "model": model,
+                "input": messages,
+                "env": {
+                    "ANTHROPIC_API_KEY": anthropic_api_key,
+                    "OPENAI_API_KEY": openai_api_key
+                }
+            }
+            async with session.post(f"{base_url}/responses",
+                                    json=payload,
+                                    headers={"Content-Type": "application/json", "X-API-Key": api_key}) as resp:
+                result = json.loads(await resp.text())
+                print_agent_response(result)
+
+            messages += result.get("output", [])  # request
 
 async def test_p2p_client():
     """Example P2P client using peerjs-python."""
@@ -128,5 +213,7 @@ if __name__ == "__main__":
     
     if len(sys.argv) > 1 and sys.argv[1] == "p2p":
         asyncio.run(test_p2p_client())
+    elif len(sys.argv) > 1 and sys.argv[1] == "repl":
+        asyncio.run(simple_repl())
     else:
         asyncio.run(test_http_endpoint())
