@@ -3,6 +3,7 @@ ComputerAgent - Main agent class that selects and runs agent loops
 """
 
 import asyncio
+from pathlib import Path
 from typing import Dict, List, Any, Optional, AsyncGenerator, Union, cast, Callable, Set, Tuple
 
 from litellm.responses.utils import Usage
@@ -162,7 +163,7 @@ class ComputerAgent:
         only_n_most_recent_images: Optional[int] = None,
         callbacks: Optional[List[Any]] = None,
         verbosity: Optional[int] = None,
-        trajectory_dir: Optional[str] = None,
+        trajectory_dir: Optional[str | Path | dict] = None,
         max_retries: Optional[int] = 3,
         screenshot_delay: Optional[float | int] = 0.5,
         use_prompt_caching: Optional[bool] = False,
@@ -223,7 +224,10 @@ class ComputerAgent:
         
         # Add trajectory saver callback if trajectory_dir is set
         if self.trajectory_dir:
-            self.callbacks.append(TrajectorySaverCallback(self.trajectory_dir))
+            if isinstance(self.trajectory_dir, dict):
+                self.callbacks.append(TrajectorySaverCallback(**self.trajectory_dir))
+            elif isinstance(self.trajectory_dir, (str, Path)):
+                self.callbacks.append(TrajectorySaverCallback(str(self.trajectory_dir)))
         
         # Add budget manager if max_trajectory_budget is set
         if max_trajectory_budget:

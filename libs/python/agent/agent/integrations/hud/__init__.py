@@ -41,7 +41,7 @@ class ProxyOperatorAgent(OperatorAgent):
         *,
         model: str | None = None,
         allowed_tools: list[str] | None = None,
-        trajectory_dir: str | None = None,
+        trajectory_dir: str | dict | None = None,
         # === ComputerAgent kwargs ===
         tools: list[Any] | None = None,
         custom_loop: Any | None = None,
@@ -109,7 +109,7 @@ async def run_single_task(
     only_n_most_recent_images: int | None = None,
     callbacks: list[Any] | None = None,
     verbosity: int | None = None,
-    trajectory_dir: str | None = None,
+    trajectory_dir: str | dict | None = None,
     max_retries: int | None = 3,
     screenshot_delay: float | int = 0.5,
     use_prompt_caching: bool | None = False,
@@ -167,7 +167,7 @@ async def run_full_dataset(
     max_concurrent: int = 30,
     max_steps: int = 50,
     split: str = "train",
-    trajectory_dir: str | None = None,
+    trajectory_dir: str | dict | None = None,
     # === ComputerAgent kwargs ===
     tools: list[Any] | None = None,
     custom_loop: Any | None = None,
