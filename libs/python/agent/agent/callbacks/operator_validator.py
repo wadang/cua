@@ -38,9 +38,12 @@ class OperatorNormalizerCallback(AsyncCallbackHandler):
                     action["type"] = "keypress"
 
             action_type = action.get("type")
-            def _remove_keys(action: Dict[str, Any], keys: List[str]):
-                for key in keys:
-                    if key in action:
+            def _keep_keys(action: Dict[str, Any], keys_to_keep: List[str]):
+                """Keep only the provided keys on action; delete everything else.
+                Always ensures required 'type' is present if listed in keys_to_keep.
+                """
+                for key in list(action.keys()):
+                    if key not in keys_to_keep:
                         del action[key]
             # rename "coordinate" to "x", "y"
             if "coordinate" in action:
@@ -55,18 +58,36 @@ class OperatorNormalizerCallback(AsyncCallbackHandler):
             if action_type == "scroll":
                 action["scroll_x"] = action.get("scroll_x", 0)
                 action["scroll_y"] = action.get("scroll_y", 0)
-            # remove coordinate, x, y if action_type is keyboard or non-mouse action
-            if action_type in ["type", "keypress", "screenshot", "wait"]:
-                _remove_keys(action, ["coordinate", "x", "y"])
-            # ensure keys arg is a list
-            elif action_type == "keypress":
+            # ensure keys arg is a list (normalize aliases first)
+            if action_type == "keypress":
                 keys = action.get("keys")
                 for keys_alias in ["keypress", "key", "press", "key_press", "text"]:
                     if keys_alias in action:
                         action["keys"] = action[keys_alias]
                         del action[keys_alias]
+                keys = action.get("keys")
                 if isinstance(keys, str):
                     action["keys"] = keys.replace("-", "+").split("+") if len(keys) > 1 else [keys]
+            # put here for: "please replace _remove_keys with _keep_keys and only keep the keys that are required"
+            required_keys_by_type = {
+                # OpenAI actions
+                "click": ["type", "button", "x", "y"],
+                "double_click": ["type", "x", "y"],
+                "drag": ["type", "path"],
+                "keypress": ["type", "keys"],
+                "move": ["type", "x", "y"],
+                "screenshot": ["type"],
+                "scroll": ["type", "scroll_x", "scroll_y", "x", "y"],
+                "type": ["type", "text"],
+                "wait": ["type"],
+                # Anthropic actions
+                "left_mouse_down": ["type", "x", "y"],
+                "left_mouse_up": ["type", "x", "y"],
+                "triple_click": ["type", "button", "x", "y"],
+            }
+            keep = required_keys_by_type.get(action_type or "")
+            if keep:
+                _keep_keys(action, keep)
             
 
         # Second pass: if an assistant message is immediately followed by a computer_call,
