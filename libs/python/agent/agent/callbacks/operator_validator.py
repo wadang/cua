@@ -26,27 +26,45 @@ class OperatorNormalizerCallback(AsyncCallbackHandler):
             action = item.get("action")
             if not isinstance(action, dict):
                 continue
+
+            # rename mouse click actions to "click"
+            for mouse_btn in ["left", "right", "wheel", "back", "forward"]:
+                if action.get("type", "") == f"{mouse_btn}_click":
+                    action["type"] = "click"
+                    action["button"] = mouse_btn
+            # rename hotkey actions to "keypress"
+            for alias in ["hotkey", "key", "press", "key_press"]:
+                if action.get("type", "") == alias:
+                    action["type"] = "keypress"
+
             action_type = action.get("type")
             def _remove_keys(action: Dict[str, Any], keys: List[str]):
                 for key in keys:
                     if key in action:
                         del action[key]
-            for mouse_btn in ["left", "right", "wheel", "back", "forward"]:
-                if f"{mouse_btn}_click" in action:
-                    action["type"] = "click"
-                    action["button"] = mouse_btn
+            # rename "coordinate" to "x", "y"
+            if "coordinate" in action:
+                action["x"] = action["coordinate"][0]
+                action["y"] = action["coordinate"][1]
+                del action["coordinate"]
+            # add default click button if missing
             if action_type == "click":
-                # Add default button if missing
                 if "button" not in action or action.get("button") is None:
                     action["button"] = "left"
-                if "coordinate" in action:
-                    action["x"] = action["coordinate"][0]
-                    action["y"] = action["coordinate"][1]
-                    del action["coordinate"]
+            # add default scroll x, y if missing
+            if action_type == "scroll":
+                action["scroll_x"] = action.get("scroll_x", 0)
+                action["scroll_y"] = action.get("scroll_y", 0)
+            # remove coordinate, x, y if action_type is keyboard or non-mouse action
             if action_type in ["type", "keypress", "screenshot", "wait"]:
                 _remove_keys(action, ["coordinate", "x", "y"])
+            # ensure keys arg is a list
             elif action_type == "keypress":
                 keys = action.get("keys")
+                for keys_alias in ["keypress", "key", "press", "key_press", "text"]:
+                    if keys_alias in action:
+                        action["keys"] = action[keys_alias]
+                        del action[keys_alias]
                 if isinstance(keys, str):
                     action["keys"] = keys.replace("-", "+").split("+") if len(keys) > 1 else [keys]
             
