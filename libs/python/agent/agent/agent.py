@@ -29,7 +29,7 @@ from .callbacks import (
     TrajectorySaverCallback, 
     BudgetManagerCallback,
     TelemetryCallback,
-    OperatorValidatorCallback
+    OperatorNormalizerCallback
 )
 from .computers import (
     AsyncComputerHandler,
@@ -202,8 +202,8 @@ class ComputerAgent:
 
         # == Add built-in callbacks ==
 
-        # Prepend operator validator callback
-        self.callbacks.insert(0, OperatorValidatorCallback())
+        # Prepend operator normalizer callback
+        self.callbacks.insert(0, OperatorNormalizerCallback())
 
         # Add telemetry callback if telemetry_enabled is set
         if self.telemetry_enabled:

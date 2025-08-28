@@ -42,6 +42,17 @@ class ProxyOperatorAgent(OperatorAgent):
         model: str | None = None,
         allowed_tools: list[str] | None = None,
         trajectory_dir: str | None = None,
+        # === ComputerAgent kwargs ===
+        tools: list[Any] | None = None,
+        custom_loop: Any | None = None,
+        only_n_most_recent_images: int | None = None,
+        callbacks: list[Any] | None = None,
+        verbosity: int | None = None,
+        max_retries: int | None = 3,
+        screenshot_delay: float | int = 0.5,
+        use_prompt_caching: bool | None = False,
+        max_trajectory_budget: float | dict | None = None,
+        telemetry_enabled: bool | None = True,
         **kwargs: Any,
     ) -> None:
         model = model or "computer-use-preview"
@@ -52,10 +63,24 @@ class ProxyOperatorAgent(OperatorAgent):
             'environment': 'linux',
             'dimensions': (computer_settings.OPENAI_COMPUTER_WIDTH, computer_settings.OPENAI_COMPUTER_HEIGHT)
         }
+        # Build tools ensuring the computer_shim is included
+        agent_tools: list[Any] = [computer_shim]
+        if tools:
+            agent_tools.extend(tools)
+
         computer_agent = BaseComputerAgent(
-            model=model, 
-            tools=[computer_shim], 
-            trajectory_dir=trajectory_dir
+            model=model,
+            tools=agent_tools,
+            custom_loop=custom_loop,
+            only_n_most_recent_images=only_n_most_recent_images,
+            callbacks=callbacks,
+            verbosity=verbosity,
+            trajectory_dir=trajectory_dir,
+            max_retries=max_retries,
+            screenshot_delay=screenshot_delay,
+            use_prompt_caching=use_prompt_caching,
+            max_trajectory_budget=max_trajectory_budget,
+            telemetry_enabled=telemetry_enabled,
         )
         model_client = FakeAsyncOpenAI(computer_agent)
 
@@ -78,6 +103,18 @@ async def run_single_task(
     task_id: int = 0,
     model: str | None = None,
     allowed_tools: list[str] | None = None,
+    # === ComputerAgent kwargs ===
+    tools: list[Any] | None = None,
+    custom_loop: Any | None = None,
+    only_n_most_recent_images: int | None = None,
+    callbacks: list[Any] | None = None,
+    verbosity: int | None = None,
+    trajectory_dir: str | None = None,
+    max_retries: int | None = 3,
+    screenshot_delay: float | int = 0.5,
+    use_prompt_caching: bool | None = False,
+    max_trajectory_budget: float | dict | None = None,
+    telemetry_enabled: bool | None = True,
 ) -> None:
     """Load one task from the dataset and execute it with Operator+CUA proxy."""
 
@@ -95,7 +132,22 @@ async def run_single_task(
     with trace(name=task_prompt):
         task = Task(**sample_task)  # type: ignore[arg-type]
 
-        agent = ProxyOperatorAgent(model=model, allowed_tools=allowed_tools)
+        agent = ProxyOperatorAgent(
+            model=model,
+            allowed_tools=allowed_tools,
+            # === ComputerAgent kwargs passthrough ===
+            tools=tools,
+            custom_loop=custom_loop,
+            only_n_most_recent_images=only_n_most_recent_images,
+            callbacks=callbacks,
+            verbosity=verbosity,
+            trajectory_dir=trajectory_dir,
+            max_retries=max_retries,
+            screenshot_delay=screenshot_delay,
+            use_prompt_caching=use_prompt_caching,
+            max_trajectory_budget=max_trajectory_budget,
+            telemetry_enabled=telemetry_enabled,
+        )
         print(f"Running: {task_prompt}")
         result = await agent.run(task, max_steps=10)
         print(f"✅ Reward: {getattr(result, 'reward')}")
@@ -116,6 +168,17 @@ async def run_full_dataset(
     max_steps: int = 50,
     split: str = "train",
     trajectory_dir: str | None = None,
+    # === ComputerAgent kwargs ===
+    tools: list[Any] | None = None,
+    custom_loop: Any | None = None,
+    only_n_most_recent_images: int | None = 5,
+    callbacks: list[Any] | None = None,
+    verbosity: int | None = None,
+    max_retries: int | None = 3,
+    screenshot_delay: float | int = 0.5,
+    use_prompt_caching: bool | None = False,
+    max_trajectory_budget: float | dict | None = None,
+    telemetry_enabled: bool | None = True,
 ) -> list[Any]:
     """Run evaluation across the entire dataset using hud.datasets.run_dataset."""
 
@@ -135,7 +198,22 @@ async def run_full_dataset(
         name=job_name,
         dataset=dataset,
         agent_class=ProxyOperatorAgent,
-        agent_config={"model": model, "allowed_tools": allowed_tools, "trajectory_dir": trajectory_dir},
+        agent_config={
+            "model": model,
+            "allowed_tools": allowed_tools,
+            "trajectory_dir": trajectory_dir,
+            # === ComputerAgent kwargs passthrough ===
+            "tools": tools,
+            "custom_loop": custom_loop,
+            "only_n_most_recent_images": only_n_most_recent_images,
+            "callbacks": callbacks,
+            "verbosity": verbosity,
+            "max_retries": max_retries,
+            "screenshot_delay": screenshot_delay,
+            "use_prompt_caching": use_prompt_caching,
+            "max_trajectory_budget": max_trajectory_budget,
+            "telemetry_enabled": telemetry_enabled,
+        },
         max_concurrent=max_concurrent,
         metadata={"dataset": dataset_name},
         max_steps=max_steps,

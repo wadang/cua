@@ -4,6 +4,7 @@ OperatorValidatorCallback
 Ensures agent output actions conform to expected schemas by fixing common issues:
 - click: add default button='left' if missing
 - keypress: wrap keys string into a list
+- etc.
 
 This runs in on_llm_end, which receives the output array (AgentMessage[] as dicts).
 """
@@ -14,14 +15,12 @@ from typing import Any, Dict, List
 from .base import AsyncCallbackHandler
 
 
-class OperatorValidatorCallback(AsyncCallbackHandler):
-    """Validates and normalizes operator/computer actions in LLM outputs."""
+class OperatorNormalizerCallback(AsyncCallbackHandler):
+    """Normalizes common computer call hallucinations / errors in computer call syntax."""
 
     async def on_llm_end(self, output: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         # Mutate in-place as requested, but still return the list for chaining
         for item in output or []:
-            if not isinstance(item, dict):
-                continue
             if item.get("type") != "computer_call":
                 continue
             action = item.get("action")
@@ -56,8 +55,6 @@ class OperatorValidatorCallback(AsyncCallbackHandler):
         # replace the assistant message itself with a reasoning message with summary text.
         if isinstance(output, list):
             for i, item in enumerate(output):
-                if not isinstance(item, dict):
-                    continue
                 # AssistantMessage shape: { type: 'message', role: 'assistant', content: OutputContent[] }
                 if item.get("type") == "message" and item.get("role") == "assistant":
                     next_idx = i + 1
