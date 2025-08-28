@@ -94,6 +94,10 @@ class TrajectorySaverCallback(AsyncCallbackHandler):
             # format: turn_000/0000_name.json
             artifact_filename = f"{self.current_artifact:04d}_{name}"
             artifact_path = turn_dir / f"{artifact_filename}.json"
+            # add created_at
+            if isinstance(artifact, dict):
+                artifact = artifact.copy()
+                artifact["created_at"] = str(uuid.uuid1().time)
             with open(artifact_path, "w") as f:
                 json.dump(sanitize_image_urls(artifact), f, indent=2)
         self.current_artifact += 1
@@ -171,7 +175,7 @@ class TrajectorySaverCallback(AsyncCallbackHandler):
             "status": "completed",
             "completed_at": str(uuid.uuid1().time),
             "total_usage": self.total_usage,
-            "new_items": sanitize_image_urls(new_items),
+            "new_items": new_items,
             "total_turns": self.current_turn
         })
         

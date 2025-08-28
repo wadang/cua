@@ -30,6 +30,7 @@ from .callbacks import (
     TrajectorySaverCallback, 
     BudgetManagerCallback,
     TelemetryCallback,
+    OperatorNormalizerCallback
 )
 from .computers import (
     AsyncComputerHandler,
@@ -201,6 +202,9 @@ class ComputerAgent:
         self.kwargs = kwargs
 
         # == Add built-in callbacks ==
+
+        # Prepend operator normalizer callback
+        self.callbacks.insert(0, OperatorNormalizerCallback())
 
         # Add telemetry callback if telemetry_enabled is set
         if self.telemetry_enabled:
