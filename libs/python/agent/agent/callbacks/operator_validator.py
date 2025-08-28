@@ -36,6 +36,11 @@ class OperatorNormalizerCallback(AsyncCallbackHandler):
             for alias in ["hotkey", "key", "press", "key_press"]:
                 if action.get("type", "") == alias:
                     action["type"] = "keypress"
+            # assume click actions
+            if "button" in action and "type" not in action:
+                action["type"] = "click"
+            if "click" in action and "type" not in action:
+                action["type"] = "click"
 
             action_type = action.get("type")
             def _keep_keys(action: Dict[str, Any], keys_to_keep: List[str]):
@@ -50,10 +55,13 @@ class OperatorNormalizerCallback(AsyncCallbackHandler):
                 action["x"] = action["coordinate"][0]
                 action["y"] = action["coordinate"][1]
                 del action["coordinate"]
-            # add default click button if missing
             if action_type == "click":
-                if "button" not in action or action.get("button") is None:
-                    action["button"] = "left"
+                # convert "click" to "button"
+                if "button" not in action and "click" in action:
+                    action["button"] = action["click"]
+                    del action["click"]
+                # default button to "left"
+                action["button"] = action.get("button", "left")
             # add default scroll x, y if missing
             if action_type == "scroll":
                 action["scroll_x"] = action.get("scroll_x", 0)
