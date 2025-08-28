@@ -30,6 +30,7 @@ app = FastAPI(
     description="API for the Computer project",
     version="0.1.0",
     websocket_max_size=WEBSOCKET_MAX_SIZE,
+    debug=True
 )
 
 # CORS configuration
