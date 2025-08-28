@@ -196,7 +196,9 @@ class HumanCompletionUI:
                 gr.update(choices=["latest"], value="latest"),  # dropdown
                 gr.update(value=None),  # image (no image)
                 gr.update(value=[]),  # chatbot (empty messages)
-                gr.update(interactive=False)  # submit button
+                gr.update(interactive=False),  # submit button
+                gr.update(visible=False),  # click_actions_group hidden
+                gr.update(visible=False),  # actions_group hidden
             )
         
         # Sort pending calls by created_at to get oldest first
@@ -237,7 +239,9 @@ class HumanCompletionUI:
             gr.update(choices=choices, value="latest"),
             gr.update(value=self.last_image),
             gr.update(value=conversation),
-            gr.update(interactive=bool(choices))
+            gr.update(interactive=bool(choices)),
+            gr.update(visible=True),  # click_actions_group visible when there is a call
+            gr.update(visible=True),  # actions_group visible when there is a call
         )
     
     def on_call_selected(self, selected_choice):
@@ -246,7 +250,9 @@ class HumanCompletionUI:
             return (
                 gr.update(value=None),  # no image
                 gr.update(value=[]),  # empty chatbot
-                gr.update(interactive=False)
+                gr.update(interactive=False),
+                gr.update(visible=False),  # click_actions_group hidden
+                gr.update(visible=False),  # actions_group hidden
             )
         
         pending_calls = self.get_pending_calls()
@@ -254,7 +260,9 @@ class HumanCompletionUI:
             return (
                 gr.update(value=None),  # no image
                 gr.update(value=[]),  # empty chatbot
-                gr.update(interactive=False)
+                gr.update(interactive=False),
+                gr.update(visible=False),  # click_actions_group hidden
+                gr.update(visible=False),  # actions_group hidden
             )
         
         # Handle "latest" option
@@ -286,7 +294,9 @@ class HumanCompletionUI:
             return (
                 gr.update(value=None),  # no image
                 gr.update(value=[]),  # empty chatbot
-                gr.update(interactive=False)
+                gr.update(interactive=False),
+                gr.update(visible=False),  # click_actions_group hidden
+                gr.update(visible=False),  # actions_group hidden
             )
         
         conversation = self.format_messages_for_chatbot(selected_call.get("messages", []))
@@ -297,7 +307,9 @@ class HumanCompletionUI:
         return (
             gr.update(value=self.last_image),
             gr.update(value=conversation),
-            gr.update(interactive=True)
+            gr.update(interactive=True),
+            gr.update(visible=True),  # click_actions_group visible
+            gr.update(visible=True),  # actions_group visible
         )
     
     def submit_response(self, response_text: str):
@@ -368,6 +380,10 @@ class HumanCompletionUI:
         """Submit a hotkey action."""
         return self.submit_action("keypress", keys=keys)
     
+    def submit_wait_action(self) -> str:
+        """Submit a wait action with no kwargs."""
+        return self.submit_action("wait")
+    
     def submit_description_click(self, description: str, action_type: str = "click", button: str = "left") -> str:
         """Submit a description-based action."""
         if action_type == "click":
@@ -407,7 +423,7 @@ def create_ui():
     """Create the Gradio interface."""
     ui_handler = HumanCompletionUI()
     
-    with gr.Blocks(title="Human-in-the-Loop Agent Tool") as demo:
+    with gr.Blocks(title="Human-in-the-Loop Agent Tool", fill_width=True) as demo:
         gr.Markdown("# 🤖 Human-in-the-Loop Agent Tool")
         gr.Markdown("Review AI conversation requests and provide human responses.")
         
@@ -415,29 +431,30 @@ def create_ui():
             with gr.Column(scale=2):
                 with gr.Group():
                     screenshot_image = gr.Image(
-                        label="Screenshot",
+                        label="Interactive Screenshot",
                         interactive=False,
                         height=600
                     )
                     
-                    # Action type selection for image clicks
-                    with gr.Row():
-                        action_type_radio = gr.Radio(
-                            label="Action Type",
-                            choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
-                            value="click",
-                            scale=2
-                        )
-                        action_button_radio = gr.Radio(
-                            label="Button (for click only)",
-                            choices=["left", "right", "wheel", "back", "forward"],
-                            value="left",
-                            visible=True,
-                            scale=1
-                        )
+                    # Action type selection for image clicks (wrapped for visibility control)
+                    with gr.Group(visible=False) as click_actions_group:
+                        with gr.Row():
+                            action_type_radio = gr.Dropdown(
+                                label="Action",
+                                choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
+                                value="click",
+                                scale=2
+                            )
+                            action_button_radio = gr.Dropdown(
+                                label="Button",
+                                choices=["left", "right", "wheel", "back", "forward"],
+                                value="left",
+                                visible=True,
+                                scale=1
+                            )
                     
                     conversation_chatbot = gr.Chatbot(
-                        label="Messages",
+                        label="Conversation",
                         type="messages",
                         height=500,
                         show_copy_button=True
@@ -446,91 +463,83 @@ def create_ui():
             with gr.Column(scale=1):
                 with gr.Group():
                     call_dropdown = gr.Dropdown(
-                        label="Select a pending call",
+                        label="Select a pending conversation request",
                         choices=["latest"],
                         interactive=True,
                         value="latest"
                     )
                     refresh_btn = gr.Button("🔄 Refresh", variant="secondary")
+                    status_display = gr.Textbox(
+                        label="Status",
+                        interactive=False,
+                        value="Ready to receive requests..."
+                    )
 
                 with gr.Group():
                     response_text = gr.Textbox(
-                        label="Response",
+                        label="Message",
                         lines=3,
-                        placeholder="Enter your response here..."
+                        placeholder="Enter your message here..."
                     )
-                    submit_btn = gr.Button("📤 Submit Response", variant="primary", interactive=False)
+                    submit_btn = gr.Button("📤 Submit Message", variant="primary", interactive=False)
                 
-                # Action Accordions
-                with gr.Accordion("🖱️ Click Actions", open=False):
-                    with gr.Group():
-                        with gr.Row():
-                            click_x = gr.Number(label="X", value=0, minimum=0)
-                            click_y = gr.Number(label="Y", value=0, minimum=0)
-                        with gr.Row():
-                            click_action_type = gr.Dropdown(
-                                label="Action Type",
-                                choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
-                                value="click"
-                            )
-                            click_button = gr.Dropdown(
-                                label="Button (for click only)",
-                                choices=["left", "right", "wheel", "back", "forward"],
-                                value="left"
-                            )
-                        click_submit_btn = gr.Button("Submit Action")
-                
-                with gr.Accordion("📝 Type Action", open=False):
-                    with gr.Group():
-                        type_text = gr.Textbox(
-                            label="Text to Type",
-                            placeholder="Enter text to type..."
-                        )
-                        type_submit_btn = gr.Button("Submit Type")
-                
-                with gr.Accordion("⌨️ Keypress Action", open=False):
-                    with gr.Group():
-                        keypress_text = gr.Textbox(
-                            label="Keys",
-                            placeholder="e.g., ctrl+c, alt+tab"
-                        )
-                        keypress_submit_btn = gr.Button("Submit Keypress")
-                
-                with gr.Accordion("🎯 Description Action", open=False):
-                    with gr.Group():
-                        description_text = gr.Textbox(
-                            label="Element Description",
-                            placeholder="e.g., 'Privacy and security option in left sidebar'"
-                        )
-                        with gr.Row():
-                            description_action_type = gr.Dropdown(
-                                label="Action Type",
-                                choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
-                                value="click"
-                            )
-                            description_button = gr.Radio(
-                                label="Button (for click only)",
-                                choices=["left", "right", "wheel", "back", "forward"],
-                                value="left"
-                            )
-                        description_submit_btn = gr.Button("Submit Description Action")
-                
-                status_display = gr.Textbox(
-                    label="Status",
-                    interactive=False,
-                    value="Ready to receive calls..."
-                )
+                # Action Accordions (wrapped for visibility control)
+                with gr.Group(visible=False) as actions_group:
+                    with gr.Tabs():
+                        with gr.Tab("🖱️ Click Actions"):
+                            with gr.Group():
+                                description_text = gr.Textbox(
+                                    label="Element Description",
+                                    placeholder="e.g., 'Privacy and security option in left sidebar'"
+                                )
+                                with gr.Row():
+                                    description_action_type = gr.Dropdown(
+                                        label="Action",
+                                        choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
+                                        value="click"
+                                    )
+                                    description_button = gr.Dropdown(
+                                        label="Button",
+                                        choices=["left", "right", "wheel", "back", "forward"],
+                                        value="left"
+                                    )
+                                description_submit_btn = gr.Button("Submit Click Action")
+                        
+                        with gr.Tab("📝 Type Action"):
+                            with gr.Group():
+                                type_text = gr.Textbox(
+                                    label="Text to Type",
+                                    placeholder="Enter text to type..."
+                                )
+                                type_submit_btn = gr.Button("Submit Type")
+                        
+                        with gr.Tab("⌨️ Keypress Action"):
+                            with gr.Group():
+                                keypress_text = gr.Textbox(
+                                    label="Keys",
+                                    placeholder="e.g., ctrl+c, alt+tab"
+                                )
+                                keypress_submit_btn = gr.Button("Submit Keypress")
+                        
+                        with gr.Tab("🧰 Misc Actions"):
+                            with gr.Group():
+                                misc_action_dropdown = gr.Dropdown(
+                                    label="Action",
+                                    choices=["wait"],
+                                    value="wait"
+                                )
+                                misc_submit_btn = gr.Button("Submit Action")
         
         # Event handlers
         refresh_btn.click(
             fn=ui_handler.refresh_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
         
         call_dropdown.change(
             fn=ui_handler.on_call_selected,
             inputs=[call_dropdown],
-            outputs=[screenshot_image, conversation_chatbot, submit_btn]
+            outputs=[screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
         
         def handle_image_click(evt: gr.SelectData):
@@ -548,7 +557,7 @@ def create_ui():
             outputs=[status_display]
         ).then(
             fn=ui_handler.wait_for_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
 
         # Response submission
@@ -558,7 +567,7 @@ def create_ui():
             outputs=[response_text, status_display]
         ).then(
             fn=ui_handler.refresh_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
         
         # Toggle button radio visibility based on action type
@@ -570,16 +579,6 @@ def create_ui():
             inputs=[action_type_radio],
             outputs=[action_button_radio]
         )
-
-        # Action accordion handlers
-        click_submit_btn.click(
-            fn=ui_handler.submit_click_action,
-            inputs=[click_x, click_y, click_action_type, click_button],
-            outputs=[status_display]
-        ).then(
-            fn=ui_handler.wait_for_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
-        )
         
         type_submit_btn.click(
             fn=ui_handler.submit_type_action,
@@ -587,7 +586,7 @@ def create_ui():
             outputs=[status_display]
         ).then(
             fn=ui_handler.wait_for_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
         
         keypress_submit_btn.click(
@@ -596,7 +595,7 @@ def create_ui():
             outputs=[status_display]
         ).then(
             fn=ui_handler.wait_for_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
         
         def handle_description_submit(description, action_type, button):
@@ -612,13 +611,30 @@ def create_ui():
             outputs=[status_display]
         ).then(
             fn=ui_handler.wait_for_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
+        )
+        
+        # Misc action handler
+        def handle_misc_submit(selected_action):
+            if selected_action == "wait":
+                result = ui_handler.submit_wait_action()
+                ui_handler.wait_for_pending_calls()
+                return result
+            return f"Unsupported misc action: {selected_action}"
+
+        misc_submit_btn.click(
+            fn=handle_misc_submit,
+            inputs=[misc_action_dropdown],
+            outputs=[status_display]
+        ).then(
+            fn=ui_handler.wait_for_pending_calls,
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
         
         # Load initial data
         demo.load(
             fn=ui_handler.refresh_pending_calls,
-            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn]
+            outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
     
     return demo
