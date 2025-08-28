@@ -646,7 +646,7 @@ async def agent_response_endpoint(
         total_output: List[Any] = []
         total_usage: Dict[str, Any] = {}
 
-        turns = 0
+        pending_computer_call_ids = set()
         try:
             async for result in agent.run(messages):
                 total_output += result["output"]
@@ -658,8 +658,13 @@ async def agent_response_endpoint(
                             total_usage[k] = total_usage.get(k, 0) + v
                         else:
                             total_usage[k] = v
-                turns += 1
-                if turns > 2:
+                for msg in result.get("output", []):
+                    if msg.get("type") == "computer_call":
+                        pending_computer_call_ids.add(msg["call_id"])
+                    elif msg.get("type") == "computer_call_output":
+                        pending_computer_call_ids.discard(msg["call_id"])
+                # exit if no pending computer calls
+                if not pending_computer_call_ids:
                     break
         except Exception as e:
             logger.error(f"Error running agent: {str(e)}")
