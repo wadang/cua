@@ -188,7 +188,11 @@ class ComputerAgent:
             max_trajectory_budget: If set, adds BudgetManagerCallback to track usage costs and stop when budget is exceeded
             telemetry_enabled: If set, adds TelemetryCallback to track anonymized usage data. Enabled by default.
             **kwargs: Additional arguments passed to the agent loop
-        """
+        """        
+        # If the loop is "human/human", we need to prefix a grounding model fallback
+        if model in ["human/human", "human"]:
+            model = "openai/computer-use-preview+human/human"
+        
         self.model = model
         self.tools = tools or []
         self.custom_loop = custom_loop
@@ -252,10 +256,6 @@ class ComputerAgent:
         litellm.suppress_debug_info = True
 
         # == Initialize computer agent ==
-
-        # If the loop is "human/human", we need to prefix a grounding model fallback
-        if model in ["human/human", "human"]:
-            model = "openai/computer-use-preview+human/human"
 
         # Find the appropriate agent loop
         if custom_loop:
