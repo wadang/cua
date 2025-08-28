@@ -78,8 +78,6 @@ class MLXVLMAdapter(CustomLLM):
             **kwargs: Additional arguments
         """
         super().__init__()
-        if not MLX_AVAILABLE:
-            raise ImportError("MLX VLM dependencies not available. Please install mlx-vlm.")
         
         self.models = {}  # Cache for loaded models
         self.processors = {}  # Cache for loaded processors
@@ -95,6 +93,9 @@ class MLXVLMAdapter(CustomLLM):
         Returns:
             Tuple of (model, processor, config)
         """
+        if not MLX_AVAILABLE:
+            raise ImportError("MLX VLM dependencies not available. Please install mlx-vlm.")
+        
         if model_name not in self.models:
             # Load model and processor
             model_obj, processor = load(
