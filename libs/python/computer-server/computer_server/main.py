@@ -15,6 +15,7 @@ import aiohttp
 import hashlib
 import time
 import platform
+from fastapi.middleware.cors import CORSMiddleware
 
 # Set up logging with more detail
 logger = logging.getLogger(__name__)
@@ -29,6 +30,16 @@ app = FastAPI(
     description="API for the Computer project",
     version="0.1.0",
     websocket_max_size=WEBSOCKET_MAX_SIZE,
+)
+
+# CORS configuration
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 protocol_version = 1
@@ -428,9 +439,6 @@ async def cmd_endpoint(
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, X-Container-Name, X-API-Key"
         }
     )
 
@@ -662,26 +670,9 @@ async def agent_response_endpoint(
     headers = {
         "Cache-Control": "no-cache",
         "Connection": "keep-alive",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, X-Container-Name, X-API-Key",
-        "Access-Control-Allow-Origin": "*",
     }
 
     return JSONResponse(content=payload, headers=headers)
-
-
-@app.options("/responses")
-async def agent_response_options(request: Request):
-    """CORS preflight for /responses"""
-    headers = {
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, X-Container-Name, X-API-Key",
-        "Access-Control-Max-Age": "600",
-        "Access-Control-Allow-Origin": "*",
-    }
-    return JSONResponse(content={}, headers=headers)
 
 
 if __name__ == "__main__":
