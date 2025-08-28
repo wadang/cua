@@ -68,7 +68,6 @@ class OperatorNormalizerCallback(AsyncCallbackHandler):
                 keys = action.get("keys")
                 if isinstance(keys, str):
                     action["keys"] = keys.replace("-", "+").split("+") if len(keys) > 1 else [keys]
-            # put here for: "please replace _remove_keys with _keep_keys and only keep the keys that are required"
             required_keys_by_type = {
                 # OpenAI actions
                 "click": ["type", "button", "x", "y"],
