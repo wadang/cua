@@ -253,6 +253,10 @@ class ComputerAgent:
 
         # == Initialize computer agent ==
 
+        # If the loop is "human/human", we need to prefix a grounding model fallback
+        if self.agent_loop in ["human/human", "human"]:
+            self.agent_loop = "openai/computer-use-preview+human/human"
+
         # Find the appropriate agent loop
         if custom_loop:
             self.agent_loop = custom_loop
