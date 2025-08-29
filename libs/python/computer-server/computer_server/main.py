@@ -568,13 +568,13 @@ async def agent_response_endpoint(
 
         async def keypress(self, keys: Union[List[str], str]) -> None:
             if isinstance(keys, str):
-                parts = keys.replace("-", "+").split("+")
+                parts = keys.replace("-", "+").split("+") if len(keys) > 1 else [keys]
             else:
                 parts = keys
             if len(parts) == 1:
                 await self._auto.press_key(parts[0])
             else:
-                await self._auto.hotkey(*parts)
+                await self._auto.hotkey(parts)
 
         async def drag(self, path: List[Dict[str, int]]) -> None:
             if not path:
