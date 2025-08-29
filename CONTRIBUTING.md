@@ -51,6 +51,6 @@ Documentation improvements are always welcome. You can:
 - Improve API documentation
 - Add tutorials or guides
 
-For detailed instructions on setting up your development environment and submitting code contributions, please see our [Developer-Guide](./docs/Developer-Guide.md) guide.
+For detailed instructions on setting up your development environment and submitting code contributions, please see our [Developer-Guide](./docs/Developer-Guide.md).
 
 Feel free to join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss ideas or get help with your contributions. 
