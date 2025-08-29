@@ -187,6 +187,14 @@ The base image `kasmweb/core-ubuntu-jammy` is maintained by [Kasm Technologies](
 
 Microsoft's OmniParser, which is used in this project, is licensed under the Creative Commons Attribution 4.0 International License (CC-BY-4.0) - see the [OmniParser LICENSE](https://github.com/microsoft/OmniParser/blob/master/LICENSE) file for details.
 
+### Third-Party Licenses and Optional Components
+
+Some optional extras for this project depend on third-party packages that are licensed under terms different from the MIT License.
+
+- The optional "omni" extra (installed via `pip install "cua-agent[omni]"`) installs the `cua-som` module, which includes `ultralytics` and is licensed under the AGPL-3.0.
+
+When you choose to install and use such optional extras, your use, modification, and distribution of those third-party components are governed by their respective licenses (e.g., AGPL-3.0 for `ultralytics`).
+
 ## Contributing
 
 We welcome contributions to Cua! Please refer to our [Contributing Guidelines](CONTRIBUTING.md) for details.
