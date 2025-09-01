@@ -13,6 +13,11 @@
   <a href="https://trendshift.io/repositories/13685" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13685" alt="trycua%2Fcua | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </div>
 
+> We’re hosting the **Computer-Use Agents SOTA Challenge** at [Hack the North](https://hackthenorth.com) and online!  
+>> **Track A (On-site @ UWaterloo)**: Reserved for participants accepted to Hack the North. 🏆 Prize: **YC interview guaranteed**.  
+>> **Track B (Remote)**: Open to everyone worldwide. 🏆 Prize: **Cash award**.    
+>>> 👉 Sign up here: [trycua.com/hackathon](https://www.trycua.com/hackathon)  
+
 **cua** ("koo-ah") is Docker for [Computer-Use Agents](https://www.oneusefulthing.org/p/when-you-give-a-claude-a-mouse) - it enables AI agents to control full operating systems in virtual containers and deploy them locally or to the cloud.
 
 <div align="center">
