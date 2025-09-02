@@ -109,7 +109,7 @@ cua provides local containers using different providers depending on your host o
 
     ```bash
     # Option 1: Pull from Docker Hub
-    docker pull trycua/cua-ubuntu:latest
+    docker pull --platform=linux/amd64 trycua/cua-ubuntu:latest
 
     # Option 2: Build locally
     cd libs/kasm

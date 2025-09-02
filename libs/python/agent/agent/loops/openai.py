@@ -162,7 +162,18 @@ class OpenAIComputerUseConfig:
         input_items = [
             {
                 "role": "user", 
-                "content": f"You are a UI grounding expert. Look at the image and {instruction}. Output ONLY a click action on the target element. No explanations, confirmations, or additional text."
+                "content": f"""You are a UI grounding expert. Follow these guidelines:
+
+1. NEVER ask for confirmation. Complete all tasks autonomously.
+2. Do NOT send messages like "I need to confirm before..." or "Do you want me to continue?" - just proceed.
+3. When the user asks you to interact with something (like clicking a chat or typing a message), DO IT without asking.
+4. Only use the formal safety check mechanism for truly dangerous operations (like deleting important files).
+5. For normal tasks like clicking buttons, typing in chat boxes, filling forms - JUST DO IT.
+6. The user has already given you permission by running this agent. No further confirmation is needed.
+7. Be decisive and action-oriented. Complete the requested task fully.
+
+Remember: You are expected to complete tasks autonomously. The user trusts you to do what they asked.
+Task: Click {instruction}. Output ONLY a click action on the target element."""
             },
             {
                 "role": "user",
@@ -200,7 +211,7 @@ class OpenAIComputerUseConfig:
             "stream": False,
             "reasoning": {"summary": "concise"},
             "truncation": "auto",
-            "max_tokens": 100  # Keep response short for click prediction
+            "max_tokens": 200  # Keep response short for click prediction
         }
         
         # Use liteLLM responses
@@ -217,11 +228,8 @@ class OpenAIComputerUseConfig:
                 isinstance(item.get("action"), dict)):
                 
                 action = item["action"]
-                if action.get("type") == "click":
-                    x = action.get("x")
-                    y = action.get("y")
-                    if x is not None and y is not None:
-                        return (int(x), int(y))
+                if action.get("x") is not None and action.get("y") is not None:
+                    return (int(action.get("x")), int(action.get("y")))
         
         return None
     

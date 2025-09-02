@@ -3,6 +3,7 @@ ComputerAgent - Main agent class that selects and runs agent loops
 """
 
 import asyncio
+from pathlib import Path
 from typing import Dict, List, Any, Optional, AsyncGenerator, Union, cast, Callable, Set, Tuple
 
 from litellm.responses.utils import Usage
@@ -22,6 +23,7 @@ import inspect
 from .adapters import (
     HuggingFaceLocalAdapter,
     HumanAdapter,
+    MLXVLMAdapter,
 )
 from .callbacks import (
     ImageRetentionCallback, 
@@ -29,6 +31,7 @@ from .callbacks import (
     TrajectorySaverCallback, 
     BudgetManagerCallback,
     TelemetryCallback,
+    OperatorNormalizerCallback
 )
 from .computers import (
     AsyncComputerHandler,
@@ -160,7 +163,7 @@ class ComputerAgent:
         only_n_most_recent_images: Optional[int] = None,
         callbacks: Optional[List[Any]] = None,
         verbosity: Optional[int] = None,
-        trajectory_dir: Optional[str] = None,
+        trajectory_dir: Optional[str | Path | dict] = None,
         max_retries: Optional[int] = 3,
         screenshot_delay: Optional[float | int] = 0.5,
         use_prompt_caching: Optional[bool] = False,
@@ -185,7 +188,11 @@ class ComputerAgent:
             max_trajectory_budget: If set, adds BudgetManagerCallback to track usage costs and stop when budget is exceeded
             telemetry_enabled: If set, adds TelemetryCallback to track anonymized usage data. Enabled by default.
             **kwargs: Additional arguments passed to the agent loop
-        """
+        """        
+        # If the loop is "human/human", we need to prefix a grounding model fallback
+        if model in ["human/human", "human"]:
+            model = "openai/computer-use-preview+human/human"
+        
         self.model = model
         self.tools = tools or []
         self.custom_loop = custom_loop
@@ -200,6 +207,9 @@ class ComputerAgent:
         self.kwargs = kwargs
 
         # == Add built-in callbacks ==
+
+        # Prepend operator normalizer callback
+        self.callbacks.insert(0, OperatorNormalizerCallback())
 
         # Add telemetry callback if telemetry_enabled is set
         if self.telemetry_enabled:
@@ -218,7 +228,10 @@ class ComputerAgent:
         
         # Add trajectory saver callback if trajectory_dir is set
         if self.trajectory_dir:
-            self.callbacks.append(TrajectorySaverCallback(self.trajectory_dir))
+            if isinstance(self.trajectory_dir, dict):
+                self.callbacks.append(TrajectorySaverCallback(**self.trajectory_dir))
+            elif isinstance(self.trajectory_dir, (str, Path)):
+                self.callbacks.append(TrajectorySaverCallback(str(self.trajectory_dir)))
         
         # Add budget manager if max_trajectory_budget is set
         if max_trajectory_budget:
@@ -234,9 +247,11 @@ class ComputerAgent:
             device="auto"
         )
         human_adapter = HumanAdapter()
+        mlx_adapter = MLXVLMAdapter()
         litellm.custom_provider_map = [
             {"provider": "huggingface-local", "custom_handler": hf_adapter},
-            {"provider": "human", "custom_handler": human_adapter}
+            {"provider": "human", "custom_handler": human_adapter},
+            {"provider": "mlx", "custom_handler": mlx_adapter}
         ]
         litellm.suppress_debug_info = True
 
