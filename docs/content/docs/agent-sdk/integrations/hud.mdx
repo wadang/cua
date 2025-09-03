@@ -38,7 +38,7 @@ You can run a single task from a HUD dataset for quick verification.
 from agent.integrations.hud import run_single_task
 
 await run_single_task(
-    dataset="hud-evals/OSWorld-Verified-XLang",   # or another HUD dataset
+    dataset="hud-evals/OSWorld-Verified",   # or another HUD dataset
     model="openai/computer-use-preview+openai/gpt-5-nano",  # any supported model string
     task_id=155,  # e.g., reopen last closed tab
 )
@@ -59,7 +59,7 @@ To benchmark your agent at scale, you can run an entire dataset (or a subset) in
 from agent.integrations.hud import run_full_dataset
 
 results = await run_full_dataset(
-    dataset="hud-evals/OSWorld-Verified-XLang",   # can also pass a Dataset or list[dict]
+    dataset="hud-evals/OSWorld-Verified",   # can also pass a Dataset or list[dict]
     model="openai/computer-use-preview",
     split="train[:3]",           # try a few tasks to start
     max_concurrent=20,            # tune to your infra
@@ -83,7 +83,7 @@ results = await run_full_dataset(
 Both single-task and full-dataset runs share a common set of configuration options. These let you fine-tune how the evaluation runs.
 
 - `dataset` (`str` | `Dataset` | `list[dict]`): **Required**
-  HUD dataset name (e.g. `"hud-evals/OSWorld-Verified-XLang"`), a loaded `Dataset`, or a list of tasks.
+  HUD dataset name (e.g. `"hud-evals/OSWorld-Verified"`), a loaded `Dataset`, or a list of tasks.
 - `model` (`str`): Default: `"computer-use-preview"`
   Model string, e.g. `"openai/computer-use-preview+openai/gpt-5-nano"`. Supports composition with `+` (planning + grounding).
 - `allowed_tools` (`list[str]`): Default: `["openai_computer"]`
