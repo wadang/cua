@@ -416,11 +416,11 @@ class WindowsAutomationHandler(BaseAutomationHandler):
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def hotkey(self, keys: str) -> Dict[str, Any]:
+    async def hotkey(self, keys: List[str]) -> Dict[str, Any]:
         """Press a combination of keys simultaneously.
         
         Args:
-            keys (str): The keys to press together (e.g., 'ctrl+c', 'alt+tab').
+            keys (List[str]): The keys to press together (e.g., ['ctrl', 'c'], ['alt', 'tab']).
             
         Returns:
             Dict[str, Any]: A dictionary with success status and optional error message.

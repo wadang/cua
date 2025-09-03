@@ -167,7 +167,7 @@ class BaseAutomationHandler(ABC):
         pass
 
     @abstractmethod
-    async def hotkey(self, *keys: str) -> Dict[str, Any]:
+    async def hotkey(self, keys: List[str]) -> Dict[str, Any]:
         """Press a combination of keys together."""
         pass
 
