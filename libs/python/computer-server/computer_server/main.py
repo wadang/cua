@@ -17,6 +17,12 @@ import time
 import platform
 from fastapi.middleware.cors import CORSMiddleware
 
+try:
+    from agent import ComputerAgent
+    HAS_AGENT = True
+except ImportError:
+    HAS_AGENT = False
+
 # Set up logging with more detail
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -212,11 +218,18 @@ auth_manager = AuthenticationManager()
 @app.get("/status")
 async def status():
     sys = platform.system().lower()
+    # get os type
     if "darwin" in sys or sys == "macos" or sys == "mac":
-        sys = "mac"
-    if "windows" in sys:
-        sys = "windows"
-    return {"status": "ok", "os": sys}
+        os_type = "macos"
+    elif "windows" in sys:
+        os_type = "windows"
+    else:
+        os_type = "linux"
+    # get computer-server features
+    features = []
+    if HAS_AGENT:
+        features.append("agent")
+    return {"status": "ok", "os_type": os_type, "features": features}
 
 @app.websocket("/ws", name="websocket_endpoint")
 async def websocket_endpoint(websocket: WebSocket):
@@ -462,8 +475,9 @@ async def agent_response_endpoint(
       "env": { ... }                   # optional env overrides for agent
     }
     """
-    from agent.agent import ComputerAgent
-
+    if not HAS_AGENT:
+        raise HTTPException(status_code=501, detail="ComputerAgent not available")
+    
     # Authenticate via AuthenticationManager if running in cloud (CONTAINER_NAME set)
     container_name = os.environ.get("CONTAINER_NAME")
     if container_name:
