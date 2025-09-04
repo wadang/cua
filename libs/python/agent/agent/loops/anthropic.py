@@ -132,23 +132,22 @@ def _convert_responses_items_to_completion_messages(messages: Messages) -> List[
                 converted_content = []
                 for item in content:
                     if isinstance(item, dict) and item.get("type") == "input_image":
-                        # Convert input_image to Anthropic image format
+                        # Convert input_image to OpenAI image format
                         image_url = item.get("image_url", "")
                         if image_url and image_url != "[omitted]":
-                            # Extract base64 data from data URL
-                            if "," in image_url:
-                                base64_data = image_url.split(",")[-1]
-                            else:
-                                base64_data = image_url
-                            
                             converted_content.append({
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "image/png",
-                                    "data": base64_data
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": image_url
                                 }
                             })
+                    elif isinstance(item, dict) and item.get("type") == "input_text":
+                        # Convert input_text to OpenAI text format
+                        text = item.get("text", "")
+                        converted_content.append({
+                            "type": "text",
+                            "text": text
+                        })
                     else:
                         # Keep other content types as-is
                         converted_content.append(item)
