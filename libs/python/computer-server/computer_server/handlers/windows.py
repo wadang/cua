@@ -11,6 +11,8 @@ import asyncio
 import base64
 import os
 from io import BytesIO
+from pynput.mouse import Controller as MouseController
+from pynput.keyboard import Controller as KeyboardController
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -166,6 +168,8 @@ class WindowsAccessibilityHandler(BaseAccessibilityHandler):
 class WindowsAutomationHandler(BaseAutomationHandler):
     """Windows implementation of automation handler using pyautogui and Windows APIs."""
     
+    mouse = MouseController()
+
     # Mouse Actions
     async def mouse_down(self, x: Optional[int] = None, y: Optional[int] = None, button: str = "left") -> Dict[str, Any]:
         """Press and hold a mouse button at the specified coordinates.
@@ -449,8 +453,7 @@ class WindowsAutomationHandler(BaseAutomationHandler):
             return {"success": False, "error": "pyautogui not available"}
         
         try:
-            # pyautogui.scroll() only takes one parameter (vertical scroll)
-            pyautogui.scroll(y)
+            self.mouse.scroll(x, y)
             return {"success": True}
         except Exception as e:
             return {"success": False, "error": str(e)}

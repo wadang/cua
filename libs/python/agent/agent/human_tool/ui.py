@@ -15,6 +15,11 @@ class HumanCompletionUI:
         self.current_call_id: Optional[str] = None
         self.refresh_interval = 2.0  # seconds
         self.last_image = None  # Store the last image for display
+        # Track current interactive action controls
+        self.current_action_type: str = "click"
+        self.current_button: str = "left"
+        self.current_scroll_x: int = 0
+        self.current_scroll_y: int = -120
     
     def format_messages_for_chatbot(self, messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Format messages for display in gr.Chatbot with type='messages'."""
@@ -440,8 +445,8 @@ def create_ui():
                     with gr.Group(visible=False) as click_actions_group:
                         with gr.Row():
                             action_type_radio = gr.Dropdown(
-                                label="Action",
-                                choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down"],
+                                label="Interactive Action",
+                                choices=["click", "double_click", "move", "left_mouse_up", "left_mouse_down", "scroll"],
                                 value="click",
                                 scale=2
                             )
@@ -450,6 +455,18 @@ def create_ui():
                                 choices=["left", "right", "wheel", "back", "forward"],
                                 value="left",
                                 visible=True,
+                                scale=1
+                            )
+                            scroll_x_input = gr.Number(
+                                label="scroll_x",
+                                value=0,
+                                visible=False,
+                                scale=1
+                            )
+                            scroll_y_input = gr.Number(
+                                label="scroll_y",
+                                value=-120,
+                                visible=False,
                                 scale=1
                             )
                     
@@ -545,9 +562,15 @@ def create_ui():
         def handle_image_click(evt: gr.SelectData):
             if evt.index is not None:
                 x, y = evt.index
-                action_type = action_type_radio.value or "click"
-                button = action_button_radio.value or "left"
-                result = ui_handler.submit_click_action(x, y, action_type, button)
+                action_type = ui_handler.current_action_type or "click"
+                button = ui_handler.current_button or "left"
+                if action_type == "scroll":
+                    sx_i = int(ui_handler.current_scroll_x or 0)
+                    sy_i = int(ui_handler.current_scroll_y or 0)
+                    # Submit a scroll action with x,y position and scroll deltas
+                    result = ui_handler.submit_action("scroll", x=x, y=y, scroll_x=sx_i, scroll_y=sy_i)
+                else:
+                    result = ui_handler.submit_click_action(x, y, action_type, button)
                 ui_handler.wait_for_pending_calls()
                 return result
             return "No coordinates selected"
@@ -570,14 +593,49 @@ def create_ui():
             outputs=[call_dropdown, screenshot_image, conversation_chatbot, submit_btn, click_actions_group, actions_group]
         )
         
-        # Toggle button radio visibility based on action type
-        def toggle_button_visibility(action_type):
-            return gr.update(visible=(action_type == "click"))
+        # Toggle visibility of controls based on action type
+        def toggle_action_controls(action_type):
+            # Button visible only for click
+            button_vis = gr.update(visible=(action_type == "click"))
+            # Scroll inputs visible only for scroll
+            scroll_x_vis = gr.update(visible=(action_type == "scroll"))
+            scroll_y_vis = gr.update(visible=(action_type == "scroll"))
+            # Update state
+            ui_handler.current_action_type = action_type or "click"
+            return button_vis, scroll_x_vis, scroll_y_vis
         
         action_type_radio.change(
-            fn=toggle_button_visibility,
+            fn=toggle_action_controls,
             inputs=[action_type_radio],
-            outputs=[action_button_radio]
+            outputs=[action_button_radio, scroll_x_input, scroll_y_input]
+        )
+
+        # Keep other control values in ui_handler state
+        def on_button_change(val):
+            ui_handler.current_button = (val or "left")
+        action_button_radio.change(
+            fn=on_button_change,
+            inputs=[action_button_radio]
+        )
+
+        def on_scroll_x_change(val):
+            try:
+                ui_handler.current_scroll_x = int(val) if val is not None else 0
+            except Exception:
+                ui_handler.current_scroll_x = 0
+        scroll_x_input.change(
+            fn=on_scroll_x_change,
+            inputs=[scroll_x_input]
+        )
+
+        def on_scroll_y_change(val):
+            try:
+                ui_handler.current_scroll_y = int(val) if val is not None else 0
+            except Exception:
+                ui_handler.current_scroll_y = 0
+        scroll_y_input.change(
+            fn=on_scroll_y_change,
+            inputs=[scroll_y_input]
         )
         
         type_submit_btn.click(
