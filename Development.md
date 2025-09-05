@@ -102,7 +102,6 @@ pdm install -d
 The Python workspace includes launch configurations for all packages:
 
 - "Run Computer Examples" - Runs computer examples
-- "Run Computer API Server" - Runs the computer-server
 - "Run Agent Examples" - Runs agent examples
 - "SOM" configurations - Various settings for running SOM
 
