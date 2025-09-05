@@ -58,7 +58,7 @@ Using the workspace file is strongly recommended as it:
 
 ## Lume Development
 
-Refer to the [Lume README](../libs/lume/docs/Development.md) for instructions on how to develop the Lume CLI.
+Refer to the [Lume README](./libs/lume/Development.md) for instructions on how to develop the Lume CLI.
 
 ## Python Development
 
