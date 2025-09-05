@@ -1,7 +1,3 @@
----
-title: Developer Guide
-description: Cua Monorepo Developer Guide
----
 # Getting Started
 
 ## Project Structure
