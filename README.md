@@ -188,9 +188,9 @@ Join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss i
 
 Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE) file for details.  
 
-The base image `kasmweb/core-ubuntu-jammy` is maintained by [Kasm Technologies](https://github.com/kasmtech/workspaces-core-images) and distributed under the Apache License 2.0. Usage of that image is subject to its own license terms.  
+Portions of this project, specifically components adapted from Kasm Technologies Inc., are also licensed under the MIT License. See [libs/kasm/LICENSE](libs/kasm/LICENSE) for details.
 
-Microsoft's OmniParser, which is used in this project, is licensed under the Creative Commons Attribution 4.0 International License (CC-BY-4.0) - see the [OmniParser LICENSE](https://github.com/microsoft/OmniParser/blob/master/LICENSE) file for details.
+Microsoft's OmniParser, which is used in this project, is licensed under the Creative Commons Attribution 4.0 International License (CC-BY-4.0). See the [OmniParser LICENSE](https://github.com/microsoft/OmniParser/blob/master/LICENSE) for details.
 
 ### Third-Party Licenses and Optional Components
 
