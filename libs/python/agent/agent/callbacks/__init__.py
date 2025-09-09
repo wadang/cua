@@ -9,6 +9,7 @@ from .trajectory_saver import TrajectorySaverCallback
 from .budget_manager import BudgetManagerCallback
 from .telemetry import TelemetryCallback
 from .operator_validator import OperatorNormalizerCallback
+from .prompt_instructions import PromptInstructionsCallback
 
 __all__ = [
     "AsyncCallbackHandler",
@@ -18,4 +19,5 @@ __all__ = [
     "BudgetManagerCallback",
     "TelemetryCallback",
     "OperatorNormalizerCallback",
+    "PromptInstructionsCallback",
 ]

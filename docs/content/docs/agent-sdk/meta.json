@@ -6,6 +6,7 @@
         "supported-agents",
 		"supported-model-providers",
 		"chat-history",
+		"customizing-computeragent",
 		"callbacks",
         "custom-tools",
 		"custom-computer-handlers",
