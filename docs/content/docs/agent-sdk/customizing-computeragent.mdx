@@ -13,8 +13,6 @@ This guide shows four proven ways to increase capabilities and success rate:
 - 3 — Intermediate: Callbacks
 - 4 — Expert: Custom `@register_agent`
 
-For a hands-on walkthrough, see the companion notebook: [notebooks/customizing_computeragent.ipynb](../../../notebooks/customizing_computeragent.ipynb).
-
 ## 1) Simple: Prompt engineering
 
 Provide guiding instructions to shape behavior. `ComputerAgent` accepts an optional `instructions: str | None` which acts like a system-style preface. Internally, this uses a callback that pre-pends a user message before each LLM call.
