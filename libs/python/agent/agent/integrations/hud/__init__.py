@@ -20,6 +20,7 @@ from hud import trace
 
 from agent.agent import ComputerAgent as BaseComputerAgent
 from .proxy import FakeAsyncOpenAI
+from agent.callbacks import PromptInstructionsCallback
 
 
 # ---------------------------------------------------------------------------
@@ -47,6 +48,7 @@ class ProxyOperatorAgent(OperatorAgent):
         custom_loop: Any | None = None,
         only_n_most_recent_images: int | None = None,
         callbacks: list[Any] | None = None,
+        instructions: str | None = None,
         verbosity: int | None = None,
         max_retries: int | None = 3,
         screenshot_delay: float | int = 0.5,
@@ -68,12 +70,17 @@ class ProxyOperatorAgent(OperatorAgent):
         if tools:
             agent_tools.extend(tools)
 
+        # Build callbacks, injecting prompt instructions if provided
+        agent_callbacks = list(callbacks or [])
+        if instructions:
+            agent_callbacks.append(PromptInstructionsCallback(instructions))
+
         computer_agent = BaseComputerAgent(
             model=model,
             tools=agent_tools,
             custom_loop=custom_loop,
             only_n_most_recent_images=only_n_most_recent_images,
-            callbacks=callbacks,
+            callbacks=agent_callbacks,
             verbosity=verbosity,
             trajectory_dir=trajectory_dir,
             max_retries=max_retries,
@@ -96,7 +103,6 @@ class ProxyOperatorAgent(OperatorAgent):
 # Single-task runner
 # ---------------------------------------------------------------------------
 
-
 async def run_single_task(
     dataset: str | Dataset | list[dict[str, Any]],
     *,
@@ -108,6 +114,7 @@ async def run_single_task(
     custom_loop: Any | None = None,
     only_n_most_recent_images: int | None = None,
     callbacks: list[Any] | None = None,
+    instructions: str | None = None,
     verbosity: int | None = None,
     trajectory_dir: str | dict | None = None,
     max_retries: int | None = 3,
@@ -140,6 +147,7 @@ async def run_single_task(
             custom_loop=custom_loop,
             only_n_most_recent_images=only_n_most_recent_images,
             callbacks=callbacks,
+            instructions=instructions,
             verbosity=verbosity,
             trajectory_dir=trajectory_dir,
             max_retries=max_retries,
@@ -157,7 +165,6 @@ async def run_single_task(
 # Full-dataset runner
 # ---------------------------------------------------------------------------
 
-
 async def run_full_dataset(
     dataset: str | Dataset | list[dict[str, Any]],
     *,
@@ -173,6 +180,7 @@ async def run_full_dataset(
     custom_loop: Any | None = None,
     only_n_most_recent_images: int | None = 5,
     callbacks: list[Any] | None = None,
+    instructions: str | None = None,
     verbosity: int | None = None,
     max_retries: int | None = 3,
     screenshot_delay: float | int = 0.5,
@@ -207,6 +215,7 @@ async def run_full_dataset(
             "custom_loop": custom_loop,
             "only_n_most_recent_images": only_n_most_recent_images,
             "callbacks": callbacks,
+            "instructions": instructions,
             "verbosity": verbosity,
             "max_retries": max_retries,
             "screenshot_delay": screenshot_delay,
