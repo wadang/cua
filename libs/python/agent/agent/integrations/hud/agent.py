@@ -11,6 +11,7 @@ Key differences from the OpenAI OperatorAgent variant:
 """
 from __future__ import annotations
 
+import io
 from typing import Any, ClassVar, Optional
 
 from agent.agent import ComputerAgent as BaseComputerAgent
@@ -109,9 +110,15 @@ class MCPComputerAgent(MCPAgent):
         if isinstance(trajectory_dir, dict):
             trajectory_dir["reset_on_run"] = False
 
+        self.last_screenshot_b64 = None
+
+        buffer = io.BytesIO()
+        Image.new('RGB', (self.metadata["display_width"], self.metadata["display_height"])).save(buffer, format='PNG')
+        self.last_screenshot_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
         # Ensure a computer shim is present so width/height/environment are known
         computer_shim = {
-            "screenshot": lambda: lambda: Image.new('RGB', (self.metadata["display_width"], self.metadata["display_height"])),
+            "screenshot": lambda: self.last_screenshot_b64,
             "environment": self.environment,
             "dimensions": (
                 self.metadata["display_width"],
@@ -160,7 +167,6 @@ class MCPComputerAgent(MCPAgent):
 
         Converts TextContent blocks to input_text dicts and ImageContent blocks to input_image dicts.
         """  # noqa: E501
-        print("format_blocks")
         formatted = []
         for block in blocks:
             if isinstance(block, types.TextContent):
@@ -170,6 +176,7 @@ class MCPComputerAgent(MCPAgent):
                 formatted.append(
                     {"type": "input_image", "image_url": f"data:{mime_type};base64,{block.data}"}
                 )
+                self.last_screenshot_b64 = block.data
         return [{"role": "user", "content": formatted}]
 
     @hud.instrument(
@@ -183,7 +190,6 @@ class MCPComputerAgent(MCPAgent):
         Returns an Agent SDK-style response dict:
         { "output": [AgentMessage, ...], "usage": Usage }
         """
-        print("get_response")
         tool_calls: list[MCPToolCall] = []
         output_text: list[str] = []
         is_done: bool = True
@@ -194,7 +200,7 @@ class MCPComputerAgent(MCPAgent):
         async for result in self.computer_agent.run(messages):  # type: ignore[arg-type]
             items = result['output']
             if not items or tool_calls:
-                continue
+                break
 
             for item in items:
                 if item['type'] in ['reasoning', 'message', 'computer_call', 'function_call', 'function_call_output']:
@@ -221,12 +227,16 @@ class MCPComputerAgent(MCPAgent):
                     id = item["call_id"]
                     tool_calls.append(MCPToolCall(
                         name="openai_computer",
-                        arguments=result["action"],
+                        arguments=item["action"],
                         id=id,
                     ))
                     is_done = False
                     self.tool_call_inputs[id] = agent_result
                     break
+            
+            # if we have tool calls, we should exit the loop
+            if tool_calls:
+                break
 
         return AgentResponse(
             content="\n".join(output_text),
@@ -252,7 +262,6 @@ class MCPComputerAgent(MCPAgent):
         Expects results to already be in the message-format content dicts.
         Returns a list of input content dicts suitable for follow-up calls.
         """
-        print("format_tool_results")
         messages = []
 
         for call, result in zip(tool_calls, tool_results):
@@ -285,6 +294,7 @@ class MCPComputerAgent(MCPAgent):
                 # Add the resulting screenshot
                 if screenshots:
                     self._log_image(screenshots[0])
+                    self.last_screenshot_b64 = screenshots[0]
                     messages.append({
                         "type": "computer_call_output",
                         "call_id": call.id,
