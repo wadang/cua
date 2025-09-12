@@ -11,7 +11,7 @@ description = "CUA (Computer Use Agent) mono-repo"
 license = { text = "MIT" }
 name = "cua-workspace"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = "<3.14,>=3.12"
 version = "0.1.0"
 
 [project.urls]
@@ -55,7 +55,7 @@ test = [
 respect-source-order = true
 
 [tool.pdm.resolution.overrides]
-hud-python = "0.2.10"
+hud-python = "0.4.12"
 
 [tool.black]
 line-length = 100

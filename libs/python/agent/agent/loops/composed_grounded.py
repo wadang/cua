@@ -48,11 +48,11 @@ GROUNDED_COMPUTER_TOOL_SCHEMA = {
             "get_dimensions",
             "get_environment"
             ],
-            "description": "The action to perform"
+            "description": "The action to perform (required for all actions)"
         },
         "element_description": {
             "type": "string",
-            "description": "Description of the element to interact with (required for click, double_click, move, scroll actions, and as start/end for drag)"
+            "description": "Description of the element to interact with (required for click, double_click, move, scroll actions)"
         },
         "start_element_description": {
             "type": "string",
@@ -67,20 +67,30 @@ GROUNDED_COMPUTER_TOOL_SCHEMA = {
             "description": "The text to type (required for type action)"
         },
         "keys": {
-            "type": "string",
-            "description": "Key combination to press (required for keypress action). Single key for individual key press, multiple keys for combinations (e.g., 'ctrl+c')"
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Key(s) to press (required for keypress action)"
         },
         "button": {
             "type": "string",
-            "description": "The mouse button to use for click action (left, right, wheel, back, forward) Default: left",
+            "enum": [
+                "left",
+                "right",
+                "wheel",
+                "back",
+                "forward"
+            ],
+            "description": "The mouse button to use for click action (required for click and double_click action)",
         },
         "scroll_x": {
             "type": "integer",
-            "description": "Horizontal scroll amount for scroll action (positive for right, negative for left)",
+            "description": "Horizontal scroll amount for scroll action (required for scroll action)",
         },
         "scroll_y": {
             "type": "integer",
-            "description": "Vertical scroll amount for scroll action (positive for down, negative for up)",
+            "description": "Vertical scroll amount for scroll action (required for scroll action)",
         },
         },
         "required": [
@@ -266,13 +276,15 @@ class ComposedGroundedConfig(AsyncAgentConfig):
                 grounding_agent = grounding_agent_conf.agent_class()
                 
                 for desc in element_descriptions:
-                    coords = await grounding_agent.predict_click(
-                        model=grounding_model,
-                        image_b64=last_image_b64,
-                        instruction=desc
-                    )
-                    if coords:
-                        self.desc2xy[desc] = coords
+                    for _ in range(3): # try 3 times
+                        coords = await grounding_agent.predict_click(
+                            model=grounding_model,
+                            image_b64=last_image_b64,
+                            instruction=desc
+                        )
+                        if coords:
+                            self.desc2xy[desc] = coords
+                            break
         
         # Step 6: Convert computer calls from descriptions back to xy coordinates
         final_output_items = convert_computer_calls_desc2xy(thinking_output_items, self.desc2xy)

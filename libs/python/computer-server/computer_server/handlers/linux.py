@@ -88,6 +88,7 @@ class LinuxAccessibilityHandler(BaseAccessibilityHandler):
 class LinuxAutomationHandler(BaseAutomationHandler):
     """Linux implementation of automation handler using pyautogui."""
     keyboard = KeyboardController()
+    mouse = MouseController()
     
     # Mouse Actions
     async def mouse_down(self, x: Optional[int] = None, y: Optional[int] = None, button: str = "left") -> Dict[str, Any]:
@@ -217,7 +218,7 @@ class LinuxAutomationHandler(BaseAutomationHandler):
     # Scrolling Actions
     async def scroll(self, x: int, y: int) -> Dict[str, Any]:
         try:
-            pyautogui.scroll(x, y)
+            self.mouse.scroll(x, y)
             return {"success": True}
         except Exception as e:
             return {"success": False, "error": str(e)}

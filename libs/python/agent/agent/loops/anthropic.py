@@ -132,23 +132,22 @@ def _convert_responses_items_to_completion_messages(messages: Messages) -> List[
                 converted_content = []
                 for item in content:
                     if isinstance(item, dict) and item.get("type") == "input_image":
-                        # Convert input_image to Anthropic image format
+                        # Convert input_image to OpenAI image format
                         image_url = item.get("image_url", "")
                         if image_url and image_url != "[omitted]":
-                            # Extract base64 data from data URL
-                            if "," in image_url:
-                                base64_data = image_url.split(",")[-1]
-                            else:
-                                base64_data = image_url
-                            
                             converted_content.append({
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "image/png",
-                                    "data": base64_data
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": image_url
                                 }
                             })
+                    elif isinstance(item, dict) and item.get("type") == "input_text":
+                        # Convert input_text to OpenAI text format
+                        text = item.get("text", "")
+                        converted_content.append({
+                            "type": "text",
+                            "text": text
+                        })
                     else:
                         # Keep other content types as-is
                         converted_content.append(item)
@@ -1530,7 +1529,18 @@ class AnthropicHostedToolsConfig(AsyncAgentConfig):
                 "content": [
                     {
                         "type": "text",
-                        "text": f"You are a UI grounding expert. Look at the image and {instruction}. Output ONLY a click action on the target element. No explanations, confirmations, or additional text."
+                        "text": f"""You are a UI grounding expert. Follow these guidelines:
+
+1. NEVER ask for confirmation. Complete all tasks autonomously.
+2. Do NOT send messages like "I need to confirm before..." or "Do you want me to continue?" - just proceed.
+3. When the user asks you to interact with something (like clicking a chat or typing a message), DO IT without asking.
+4. Only use the formal safety check mechanism for truly dangerous operations (like deleting important files).
+5. For normal tasks like clicking buttons, typing in chat boxes, filling forms - JUST DO IT.
+6. The user has already given you permission by running this agent. No further confirmation is needed.
+7. Be decisive and action-oriented. Complete the requested task fully.
+
+Remember: You are expected to complete tasks autonomously. The user trusts you to do what they asked.
+Task: Click {instruction}. Output ONLY a click action on the target element."""
                     },
                     {
                         "type": "image_url",

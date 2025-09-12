@@ -13,6 +13,11 @@
   <a href="https://trendshift.io/repositories/13685" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13685" alt="trycua%2Fcua | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </div>
 
+> We’re hosting the **Computer-Use Agents SOTA Challenge** at [Hack the North](https://hackthenorth.com) and online!  
+>> **Track A (On-site @ UWaterloo)**: Reserved for participants accepted to Hack the North. 🏆 Prize: **YC interview guaranteed**.  
+>> **Track B (Remote)**: Open to everyone worldwide. 🏆 Prize: **Cash award**.    
+>>> 👉 Sign up here: [trycua.com/hackathon](https://www.trycua.com/hackathon)  
+
 **cua** ("koo-ah") is Docker for [Computer-Use Agents](https://www.oneusefulthing.org/p/when-you-give-a-claude-a-mouse) - it enables AI agents to control full operating systems in virtual containers and deploy them locally or to the cloud.
 
 <div align="center">
@@ -47,7 +52,7 @@ Missing a model? [Raise a feature request](https://github.com/trycua/cua/issues/
 
 - [Get started with a Computer-Use Agent UI](https://docs.trycua.com/docs/quickstart-ui)
 - [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
-- [Get Started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
+- [Get started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
 
 <br/>
 
@@ -181,17 +186,31 @@ Join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss i
 
 ## License
 
-Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE) file for details.
+Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE) file for details.  
+
+The base image `kasmweb/core-ubuntu-jammy` is maintained by [Kasm Technologies](https://github.com/kasmtech/workspaces-core-images) and distributed under the Apache License 2.0. Usage of that image is subject to its own license terms.  
 
 Microsoft's OmniParser, which is used in this project, is licensed under the Creative Commons Attribution 4.0 International License (CC-BY-4.0) - see the [OmniParser LICENSE](https://github.com/microsoft/OmniParser/blob/master/LICENSE) file for details.
 
+### Third-Party Licenses and Optional Components
+
+Some optional extras for this project depend on third-party packages that are licensed under terms different from the MIT License.
+
+- The optional "omni" extra (installed via `pip install "cua-agent[omni]"`) installs the `cua-som` module, which includes `ultralytics` and is licensed under the AGPL-3.0.
+
+When you choose to install and use such optional extras, your use, modification, and distribution of those third-party components are governed by their respective licenses (e.g., AGPL-3.0 for `ultralytics`).
+
 ## Contributing
 
-We welcome contributions to CUA! Please refer to our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions to Cua! Please refer to our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ## Trademarks
 
-Apple, macOS, and Apple Silicon are trademarks of Apple Inc. Ubuntu and Canonical are registered trademarks of Canonical Ltd. Microsoft is a registered trademark of Microsoft Corporation. This project is not affiliated with, endorsed by, or sponsored by Apple Inc., Canonical Ltd., or Microsoft Corporation.
+Apple, macOS, and Apple Silicon are trademarks of Apple Inc.  
+Ubuntu and Canonical are registered trademarks of Canonical Ltd.  
+Microsoft is a registered trademark of Microsoft Corporation.  
+
+This project is not affiliated with, endorsed by, or sponsored by Apple Inc., Canonical Ltd., Microsoft Corporation, or Kasm Technologies.
 
 ## Stargazers
 
