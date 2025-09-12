@@ -128,10 +128,11 @@ class MCPComputerAgent(MCPAgent):
         }
         agent_tools: list[Any] = [computer_shim]
         if tools:
-            for tool in tools:
-                if is_agent_computer(tool):
-                    raise ValueError(f"Too many Computer tools: MCPComputerAgent already includes a Computer interface. Received a Computer tool in tools= (e.g., {tool!r}). Remove it and retry.")
-            agent_tools.extend(tools)
+            agent_tools.extend([
+                tool 
+                for tool in tools 
+                if not is_agent_computer(tool)
+            ])
         
         agent_kwargs = {
             "model": self.model,
