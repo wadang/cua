@@ -80,6 +80,7 @@ class MCPComputerAgent(MCPAgent):
 
         # Stateful tracking of tool call inputs
         self.tool_call_inputs: dict[str, list[dict[str, Any]]] = {}
+        self.previous_output: list[dict[str, Any]] = []
 
         # Build system prompt
         operator_instructions = """
@@ -238,6 +239,8 @@ class MCPComputerAgent(MCPAgent):
             if tool_calls:
                 break
 
+        self.previous_output = agent_result
+
         return AgentResponse(
             content="\n".join(output_text),
             tool_calls=tool_calls,
@@ -265,6 +268,32 @@ class MCPComputerAgent(MCPAgent):
         messages = []
 
         for call, result in zip(tool_calls, tool_results):
+            if call.id not in self.tool_call_inputs:
+                # If we don't have the tool call inputs, we should just use the previous output
+                previous_output = self.previous_output.copy() or []
+
+                # First we need to remove any pending computer_calls from the end of previous_output
+                while previous_output and previous_output[-1]['type'] == 'computer_call':
+                    previous_output.pop()
+                messages.extend(previous_output)
+
+                # If the call is a 'response', don't add the result
+                if call.name == 'response':
+                    continue
+                # Otherwise, if we have a result, we should add it to the messages
+                content = [
+                    { "type": "input_text", "text": content.text } if isinstance(content, types.TextContent)
+                    else { "type": "input_image", "image_url": f"data:image/png;base64,{content.data}" } if isinstance(content, types.ImageContent)
+                    else { "type": "input_text", "text": "" }
+                    for content in result.content
+                ]
+                messages.append({
+                    "role": "user",
+                    "content": content,
+                })
+
+                continue
+                
             # Add the assistant's computer call
             messages.extend(self.tool_call_inputs[call.id])
             
