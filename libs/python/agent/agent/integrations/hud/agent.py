@@ -127,6 +127,7 @@ class MCPComputerAgent(MCPAgent):
         
         agent_kwargs = {
             "model": self.model,
+            "trajectory_dir": trajectory_dir,
             "tools": agent_tools,
             "custom_loop": custom_loop,
             "only_n_most_recent_images": only_n_most_recent_images,
@@ -159,6 +160,7 @@ class MCPComputerAgent(MCPAgent):
 
         Converts TextContent blocks to input_text dicts and ImageContent blocks to input_image dicts.
         """  # noqa: E501
+        print("format_blocks")
         formatted = []
         for block in blocks:
             if isinstance(block, types.TextContent):
@@ -181,41 +183,50 @@ class MCPComputerAgent(MCPAgent):
         Returns an Agent SDK-style response dict:
         { "output": [AgentMessage, ...], "usage": Usage }
         """
+        print("get_response")
         tool_calls: list[MCPToolCall] = []
         output_text: list[str] = []
-        is_done: bool = False
+        is_done: bool = True
 
         agent_result: list[dict[str, Any]] = []
 
         # Call the ComputerAgent LLM API
         async for result in self.computer_agent.run(messages):  # type: ignore[arg-type]
-            agent_result.append(result)
-            # Add messages to output text
-            if result['type'] == 'reasoning':
-                output_text.extend(
-                    f"Reasoning: {summary['text']}"
-                    for summary in result['summary']
-                )
-            elif result['type'] == 'message':
-                if isinstance(result['content'], list):
+            items = result['output']
+            if not items or tool_calls:
+                continue
+
+            for item in items:
+                if item['type'] in ['reasoning', 'message', 'computer_call', 'function_call', 'function_call_output']:
+                    agent_result.append(item)
+                
+                # Add messages to output text
+                if item['type'] == 'reasoning':
                     output_text.extend(
-                        item['text'] 
-                        for item in result['content']
-                        if item['type'] == 'output_text'
+                        f"Reasoning: {summary['text']}"
+                        for summary in item['summary']
                     )
-                elif isinstance(result['content'], str):
-                    output_text.append(result['content'])
-            # If we get a tool call, we're not done
-            if result['type'] == 'computer_call':
-                id = result["call_id"]
-                tool_calls.append(MCPToolCall(
-                    name="openai_computer",
-                    arguments=result["action"],
-                    id=id,
-                ))
-                is_done = False
-                self.tool_call_inputs[id] = agent_result
-                break
+                elif item['type'] == 'message':
+                    if isinstance(item['content'], list):
+                        output_text.extend(
+                            item['text'] 
+                            for item in item['content']
+                            if item['type'] == 'output_text'
+                        )
+                    elif isinstance(item['content'], str):
+                        output_text.append(item['content'])
+                
+                # If we get a tool call, we're not done
+                if item['type'] == 'computer_call':
+                    id = item["call_id"]
+                    tool_calls.append(MCPToolCall(
+                        name="openai_computer",
+                        arguments=result["action"],
+                        id=id,
+                    ))
+                    is_done = False
+                    self.tool_call_inputs[id] = agent_result
+                    break
 
         return AgentResponse(
             content="\n".join(output_text),
@@ -241,6 +252,7 @@ class MCPComputerAgent(MCPAgent):
         Expects results to already be in the message-format content dicts.
         Returns a list of input content dicts suitable for follow-up calls.
         """
+        print("format_tool_results")
         messages = []
 
         for call, result in zip(tool_calls, tool_results):
