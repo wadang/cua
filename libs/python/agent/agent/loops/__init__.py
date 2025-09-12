@@ -11,6 +11,7 @@ from . import gta1
 from . import composed_grounded
 from . import glm45v
 from . import opencua
+from . import internvl
 
 __all__ = [
     "anthropic", 
@@ -20,5 +21,6 @@ __all__ = [
     "gta1", 
     "composed_grounded", 
     "glm45v", 
-    "opencua"
+    "opencua",
+    "internvl"
 ]

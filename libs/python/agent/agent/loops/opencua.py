@@ -14,6 +14,7 @@ from PIL import Image
 import litellm
 import math
 
+from .composed_grounded import ComposedGroundedConfig
 from ..decorators import register_agent
 from ..types import Messages, AgentResponse, Tools, AgentCapability
 from ..loops.base import AsyncAgentConfig
@@ -32,10 +33,11 @@ def extract_coordinates_from_pyautogui(text: str) -> Optional[Tuple[int, int]]:
         return None
 
 @register_agent(models=r"(?i).*OpenCUA.*")
-class OpenCUAConfig(AsyncAgentConfig):
+class OpenCUAConfig(ComposedGroundedConfig):
     """OpenCUA agent configuration implementing AsyncAgentConfig protocol for click prediction."""
     
     def __init__(self):
+        super().__init__()
         self.current_model = None
         self.last_screenshot_b64 = None
 
@@ -53,8 +55,20 @@ class OpenCUAConfig(AsyncAgentConfig):
         _on_screenshot=None,
         **kwargs
     ) -> Dict[str, Any]:
-        """Predict step is not implemented for OpenCUA model."""
-        raise NotImplementedError("predict_step is not implemented for OpenCUA model")
+        """Fallback to a self-composed model"""
+        return await super().predict_step(
+            messages=messages,
+            model=f"{model}+{model}",
+            tools=tools,
+            max_retries=max_retries,
+            stream=stream,
+            computer_handler=computer_handler,
+            _on_api_start=_on_api_start,
+            _on_api_end=_on_api_end,
+            _on_usage=_on_usage,
+            _on_screenshot=_on_screenshot,
+            **kwargs
+        )
 
     async def predict_click(
         self,
