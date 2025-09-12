@@ -54,7 +54,7 @@ cli = [
     "yaspin>=3.1.0",
 ]
 hud = [
-    "hud-python>=0.4.12,<0.5.0",
+    "hud-python==0.4.19",
 ]
 all = [
     # uitars requirements
@@ -68,7 +68,7 @@ all = [
     # cli requirements
     "yaspin>=3.1.0",
     # hud requirements
-    "hud-python>=0.4.12,<0.5.0",
+    "hud-python==0.4.19",
 ]
 
 [tool.uv]
