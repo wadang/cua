@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "examples", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:3b3926c9b6b1f3ad7ae6fbdd662a8666edd34fcfcb9caba3db8220a82760a34b"
+content_hash = "sha256:06657752e68d859160b5a9762b94979de4ed4bb8d2fc5b12b72b0a33a10d5a28"
 
 [[metadata.targets]]
 requires_python = ">=3.12,<3.14"
@@ -1705,7 +1705,7 @@ files = [
 
 [[package]]
 name = "hud-python"
-version = "0.4.25"
+version = "0.4.26"
 requires_python = "<3.14,>=3.11"
 summary = "SDK for the HUD platform."
 groups = ["dev"]
@@ -1730,13 +1730,13 @@ dependencies = [
     "wrapt>=1.14.0",
 ]
 files = [
-    {file = "hud_python-0.4.25-py3-none-any.whl", hash = "sha256:df7f04935ec84f7966c0db036327aa158ddfa55cd145ed8fc5bc506df8ff7088"},
-    {file = "hud_python-0.4.25.tar.gz", hash = "sha256:aa7a1b84c69b467e0457185fe98a5af7cffe4a75d1d1344d5b370fef7491766c"},
+    {file = "hud_python-0.4.26-py3-none-any.whl", hash = "sha256:c1cb708a65b7dffb3432824c2267437796f502b6f1c748709d6e4d46f135ec34"},
+    {file = "hud_python-0.4.26.tar.gz", hash = "sha256:2a2eaa04b6cc7e70fb5ad2d89a38b3eba1968544160dd592c2efa907685b8a14"},
 ]
 
 [[package]]
 name = "hud-python"
-version = "0.4.25"
+version = "0.4.26"
 extras = ["agent"]
 requires_python = "<3.14,>=3.11"
 summary = "SDK for the HUD platform."
@@ -1745,7 +1745,7 @@ dependencies = [
     "anthropic",
     "datasets>=2.14.0",
     "dotenv>=0.9.9",
-    "hud-python==0.4.25",
+    "hud-python==0.4.26",
     "ipykernel",
     "ipython<9",
     "jupyter-client",
@@ -1758,8 +1758,8 @@ dependencies = [
     "pillow>=11.1.0",
 ]
 files = [
-    {file = "hud_python-0.4.25-py3-none-any.whl", hash = "sha256:df7f04935ec84f7966c0db036327aa158ddfa55cd145ed8fc5bc506df8ff7088"},
-    {file = "hud_python-0.4.25.tar.gz", hash = "sha256:aa7a1b84c69b467e0457185fe98a5af7cffe4a75d1d1344d5b370fef7491766c"},
+    {file = "hud_python-0.4.26-py3-none-any.whl", hash = "sha256:c1cb708a65b7dffb3432824c2267437796f502b6f1c748709d6e4d46f135ec34"},
+    {file = "hud_python-0.4.26.tar.gz", hash = "sha256:2a2eaa04b6cc7e70fb5ad2d89a38b3eba1968544160dd592c2efa907685b8a14"},
 ]
 
 [[package]]
