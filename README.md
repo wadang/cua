@@ -32,7 +32,7 @@ With the Agent SDK, you can:
 - run computer-use models with a [consistent schema](https://docs.trycua.com/docs/agent-sdk/message-format)
 - combine UI grounding models with any LLM using [composed agents](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents)
 - use new UI agent models and UI grounding models from the Model Zoo below with just a model string (e.g., `ComputerAgent(model="openai/computer-use-preview")`)
-- use any API or local provider by specifying a prefix (e.g., `openai/`, `openrouter/`, `ollama/`, `huggingface-local/`, `mlx/`, [etc.](https://docs.litellm.ai/docs/providers))
+- use API or local inference by specifying a prefix (e.g., `openai/`, `openrouter/`, `ollama/`, `huggingface-local/`, `mlx/`, [etc.](https://docs.litellm.ai/docs/providers))
 - benchmark on OSWorld-Verified, SheetBench-V2, and more [with a single line of code using HUD](https://docs.trycua.com/docs/agent-sdk/integrations/hud) ([Notebook](https://github.com/trycua/cua/blob/main/notebooks/eval_osworld.ipynb))
 
 ### CUA Model Zoo 🐨
@@ -40,7 +40,7 @@ With the Agent SDK, you can:
 | [All-in-one CUAs](https://docs.trycua.com/docs/agent-sdk/supported-agents/computer-use-agents) | [UI Grounding Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) | [UI Planning Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) |
 |---|---|---|
 | `anthropic/claude-opus-4-1-20250805` | `huggingface-local/xlangai/OpenCUA-{7B,32B}` | any all-in-one CUA |
-| `openai/computer-use-preview` | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B` | any VLM (using liteLLM) |
+| `openai/computer-use-preview` | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B` | any VLM (using liteLLM, requires `tools` parameter) |
 | `openrouter/z-ai/glm-4.5v` | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}` |  |
 | `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}` | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}` | |
 | `omniparser+{ui planning}` | | |
