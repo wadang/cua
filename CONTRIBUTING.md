@@ -30,7 +30,7 @@ We're always looking for suggestions to make lume better. If you have an idea:
 
 We follow strict code formatting guidelines to ensure consistency across the codebase. Before submitting any code:
 
-1. **Review Our Format Guide**: Please review our [Code Formatting Standards](docs/Developer-Guide.md#code-formatting-standards) section in the Getting Started guide.
+1. **Review Our Format Guide**: Please review our [Code Formatting Standards](Development.md#code-formatting-standards) section in the Getting Started guide.
 2. **Configure Your IDE**: We recommend using the workspace settings provided in `.vscode/` for automatic formatting.
 3. **Run Formatting Tools**: Always run the formatting tools before submitting a PR:
    ```bash
@@ -51,6 +51,6 @@ Documentation improvements are always welcome. You can:
 - Improve API documentation
 - Add tutorials or guides
 
-For detailed instructions on setting up your development environment and submitting code contributions, please see our [Developer-Guide](./docs/Developer-Guide.md).
+For detailed instructions on setting up your development environment and submitting code contributions, please see our [Developer-Guide](Development.md).
 
 Feel free to join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss ideas or get help with your contributions. 

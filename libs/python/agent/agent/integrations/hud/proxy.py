@@ -13,6 +13,10 @@ import uuid
 from typing import Any, Dict, List, Optional
 
 from agent.agent import ComputerAgent as BaseComputerAgent
+from agent.callbacks import PromptInstructionsCallback
+from hud.tools.computer.settings import computer_settings
+from PIL import Image
+from hud.agents import OperatorAgent
 
 # OpenAI Responses typed models (required)
 from openai.types.responses import (
@@ -178,6 +182,83 @@ class FakeAsyncOpenAI:
                         print(traceback.format_exc())
                         raise e
 
+
+# ---------------------------------------------------------------------------
+# Proxy OperatorAgent (moved from __init__.py)
+# ---------------------------------------------------------------------------
+
+
+class ProxyOperatorAgent(OperatorAgent):
+    """OperatorAgent that proxies model calls through our ComputerAgent.
+
+    Accepts the same config keys we pass via hud.run_dataset `agent_config`:
+    - model: str | None
+    - allowed_tools: list[str] | None
+    Additional kwargs are forwarded to OperatorAgent (if any are supported).
+    """
+
+    def __init__(
+        self,
+        *,
+        model: str | None = None,
+        allowed_tools: list[str] | None = None,
+        trajectory_dir: str | dict | None = None,
+        # === ComputerAgent kwargs ===
+        tools: list[Any] | None = None,
+        custom_loop: Any | None = None,
+        only_n_most_recent_images: int | None = None,
+        callbacks: list[Any] | None = None,
+        instructions: str | None = None,
+        verbosity: int | None = None,
+        max_retries: int | None = 3,
+        screenshot_delay: float | int = 0.5,
+        use_prompt_caching: bool | None = False,
+        max_trajectory_budget: float | dict | None = None,
+        telemetry_enabled: bool | None = True,
+        **kwargs: Any,
+    ) -> None:
+        model = model or "computer-use-preview"
+        allowed_tools = allowed_tools or ["openai_computer"]
+
+        computer_shim = {
+            'screenshot': lambda: Image.new('RGB', (computer_settings.OPENAI_COMPUTER_WIDTH, computer_settings.OPENAI_COMPUTER_HEIGHT)),
+            'environment': 'linux',
+            'dimensions': (computer_settings.OPENAI_COMPUTER_WIDTH, computer_settings.OPENAI_COMPUTER_HEIGHT)
+        }
+        # Build tools ensuring the computer_shim is included
+        agent_tools: list[Any] = [computer_shim]
+        if tools:
+            agent_tools.extend(tools)
+
+        # Build callbacks, injecting prompt instructions if provided
+        agent_callbacks = list(callbacks or [])
+        if instructions:
+            agent_callbacks.append(PromptInstructionsCallback(instructions))
+
+        computer_agent = BaseComputerAgent(
+            model=model,
+            tools=agent_tools,
+            custom_loop=custom_loop,
+            only_n_most_recent_images=only_n_most_recent_images,
+            callbacks=agent_callbacks,
+            verbosity=verbosity,
+            trajectory_dir=trajectory_dir,
+            max_retries=max_retries,
+            screenshot_delay=screenshot_delay,
+            use_prompt_caching=use_prompt_caching,
+            max_trajectory_budget=max_trajectory_budget,
+            telemetry_enabled=telemetry_enabled,
+        )
+        model_client = FakeAsyncOpenAI(computer_agent)
+
+        super().__init__(
+            model_client=model_client,  # type: ignore[arg-type]
+            model=model,
+            allowed_tools=allowed_tools,
+            **kwargs,
+        )
+
 __all__ = [
     "FakeAsyncOpenAI",
+    "ProxyOperatorAgent",
 ]

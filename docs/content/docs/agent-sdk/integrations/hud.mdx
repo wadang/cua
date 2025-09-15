@@ -3,6 +3,8 @@ title: HUD Evals
 description: Use ComputerAgent with HUD for benchmarking and evaluation
 ---
 
+<Callout>A corresponding <a href="https://github.com/trycua/cua/blob/main/notebooks/eval_osworld.ipynb" target="_blank">Jupyter Notebook</a> is available for this documentation.</Callout>
+
 The HUD integration allows an agent to be benchmarked using the [HUD framework](https://www.hud.so/). Through the HUD integration, the agent controls a computer inside HUD, where tests are run to evaluate the success of each task.
 
 ## Installation
@@ -76,7 +78,7 @@ results = await run_full_dataset(
 - `max_steps` (`int`): Default: `50`
   Safety cap on steps per task to prevent infinite loops.
 - `split` (`str`): Default: `"train"`
-  Dataset split or subset (e.g., `"train[:10]"`).
+  Dataset split or subset to run. Uses the [Hugging Face split format](https://huggingface.co/docs/datasets/v1.11.0/splits.html), e.g., `"train[:10]"` for the first 10 tasks.
 
 ## Additional Parameters
 

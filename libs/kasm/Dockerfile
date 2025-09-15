@@ -18,6 +18,12 @@ gnome-screenshot wmctrl ffmpeg socat xclip
 
 RUN pip install cua-computer-server
 
+# Install Firefox
+ENV DEBIAN_FRONTEND=noninteractive \
+    INST_DIR=$STARTUPDIR/install
+COPY ./src/ $INST_DIR
+RUN bash ${INST_DIR}/ubuntu/install/firefox/install_firefox.sh
+
 # Disable SSL requirement
 RUN sed -i 's/require_ssl: true/require_ssl: false/g' /usr/share/kasmvnc/kasmvnc_defaults.yaml
 RUN sed -i 's/-sslOnly//g' /dockerstartup/vnc_startup.sh

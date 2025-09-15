@@ -31,7 +31,8 @@ from .callbacks import (
     TrajectorySaverCallback, 
     BudgetManagerCallback,
     TelemetryCallback,
-    OperatorNormalizerCallback
+    OperatorNormalizerCallback,
+    PromptInstructionsCallback,
 )
 from .computers import (
     AsyncComputerHandler,
@@ -162,6 +163,7 @@ class ComputerAgent:
         custom_loop: Optional[Callable] = None,
         only_n_most_recent_images: Optional[int] = None,
         callbacks: Optional[List[Any]] = None,
+        instructions: Optional[str] = None,
         verbosity: Optional[int] = None,
         trajectory_dir: Optional[str | Path | dict] = None,
         max_retries: Optional[int] = 3,
@@ -181,6 +183,7 @@ class ComputerAgent:
             custom_loop: Custom agent loop function to use instead of auto-selection
             only_n_most_recent_images: If set, only keep the N most recent images in message history. Adds ImageRetentionCallback automatically.
             callbacks: List of AsyncCallbackHandler instances for preprocessing/postprocessing
+            instructions: Optional system instructions to be passed to the model
             verbosity: Logging level (logging.DEBUG, logging.INFO, etc.). If set, adds LoggingCallback automatically
             trajectory_dir: If set, saves trajectory data (screenshots, responses) to this directory. Adds TrajectorySaverCallback automatically.
             max_retries: Maximum number of retries for failed API calls
@@ -200,6 +203,7 @@ class ComputerAgent:
         self.custom_loop = custom_loop
         self.only_n_most_recent_images = only_n_most_recent_images
         self.callbacks = callbacks or []
+        self.instructions = instructions
         self.verbosity = verbosity
         self.trajectory_dir = trajectory_dir
         self.max_retries = max_retries
@@ -213,6 +217,10 @@ class ComputerAgent:
 
         # Prepend operator normalizer callback
         self.callbacks.insert(0, OperatorNormalizerCallback())
+
+        # Add prompt instructions callback if provided
+        if self.instructions:
+            self.callbacks.append(PromptInstructionsCallback(self.instructions))
 
         # Add telemetry callback if telemetry_enabled is set
         if self.telemetry_enabled:
