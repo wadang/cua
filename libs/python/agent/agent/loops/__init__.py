@@ -12,6 +12,7 @@ from . import composed_grounded
 from . import glm45v
 from . import opencua
 from . import internvl
+from . import holo
 
 __all__ = [
     "anthropic", 
@@ -22,5 +23,6 @@ __all__ = [
     "composed_grounded", 
     "glm45v", 
     "opencua",
-    "internvl"
+    "internvl",
+    "holo",
 ]
