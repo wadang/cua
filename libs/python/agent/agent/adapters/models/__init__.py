@@ -8,7 +8,7 @@ except ImportError:
 
 from .generic import GenericHFModel
 from .opencua import OpenCUAModel
-
+from .qwen2_5_vl import Qwen2_5_VLModel
 
 def load_model(model_name: str, device: str = "auto", trust_remote_code: bool = False):
     """Factory function to load and return the right model handler instance.
@@ -25,4 +25,6 @@ def load_model(model_name: str, device: str = "auto", trust_remote_code: bool = 
     # print(f"cls: {cls}")
     if "OpenCUA" in cls:
         return OpenCUAModel(model_name=model_name, device=device, trust_remote_code=trust_remote_code)
+    elif "Qwen2_5_VLConfig" in cls:
+        return Qwen2_5_VLModel(model_name=model_name, device=device, trust_remote_code=trust_remote_code)
     return GenericHFModel(model_name=model_name, device=device, trust_remote_code=trust_remote_code)
