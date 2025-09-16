@@ -11,6 +11,7 @@ Exports:
 import time
 from typing import Any, Optional
 
+from agent.computers import is_agent_computer
 from datasets import load_dataset, Dataset
 from hud.datasets import Task, run_dataset
 from hud import trace
@@ -55,6 +56,15 @@ async def run_single_task(
     sample_task = dataset[task_id]  # type: ignore[index]
     task_prompt = sample_task.get("prompt", f"Task {sample_task.get('id', 0)}")  # type: ignore[attr-defined]
 
+    # Filter any existing Computer tools
+    # The eval framework will add its own Computer tool per task
+    if tools:
+        tools = [
+            tool 
+            for tool in tools 
+            if not is_agent_computer(tool)
+        ]
+    
     with trace(name=task_prompt):
         task = Task(**sample_task)  # type: ignore[arg-type]
 
@@ -118,6 +128,15 @@ async def run_full_dataset(
         dataset_name = "custom"
         job_name = job_name or f"Evaluation {time.strftime('%H:%M %Y-%m-%d')}"
 
+    # Filter any existing Computer tools
+    # The eval framework will add its own Computer tool per task
+    if tools:
+        tools = [
+            tool 
+            for tool in tools 
+            if not is_agent_computer(tool)
+        ]
+    
     # Execute evaluation
     return await run_dataset(
         name=job_name,
