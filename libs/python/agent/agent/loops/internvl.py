@@ -26,9 +26,13 @@ from .composed_grounded import ComposedGroundedConfig
 from ..types import AgentCapability
 
 
-# Regex patterns matching ScreenSpot baseline extractors
-_POINT_PATTERN = re.compile(r"\[\[(\d+),(\d+)\]\]")
-_BBOX_PATTERN = re.compile(r"\[\[(\d+),(\d+),(\d+),(\d+)\]\]")
+# Regex patterns for extracting coordinates
+# Accept optional whitespace and optional decimal fractions
+_NUM = r"(\d+(?:\.\d+)?)"
+_POINT_PATTERN = re.compile(r"\[\[\s*" + _NUM + r"\s*,\s*" + _NUM + r"\s*\]\]")
+_BBOX_PATTERN = re.compile(
+    r"\[\[\s*" + _NUM + r"\s*,\s*" + _NUM + r"\s*,\s*" + _NUM + r"\s*,\s*" + _NUM + r"\s*\]\]"
+)
 
 
 def _extract_first_point(text: str) -> Optional[Tuple[float, float]]:
@@ -159,6 +163,8 @@ class InternVLConfig(ComposedGroundedConfig):
 
         response = await litellm.acompletion(**api_kwargs)
         output_text = (response.choices[0].message.content or "").strip()  # type: ignore
+
+        print(f"InternVL output: {output_text}")
 
         # Try to parse a point first; if absent, parse bbox and take center
         point = _extract_first_point(output_text)

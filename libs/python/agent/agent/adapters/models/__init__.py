@@ -26,8 +26,8 @@ def load_model(model_name: str, device: str = "auto", trust_remote_code: bool = 
     print(f"cls: {cls}")
     if "OpenCUA" in cls:
         return OpenCUAModel(model_name=model_name, device=device, trust_remote_code=trust_remote_code)
-    elif "Qwen2_5_VLConfig" in cls:
+    elif "Qwen2_5_VL" in cls:
         return Qwen2_5_VLModel(model_name=model_name, device=device, trust_remote_code=trust_remote_code)
-    elif "InternVLChatConfig" in cls:
+    elif "InternVL" in cls:
         return InternVLModel(model_name=model_name, device=device, trust_remote_code=trust_remote_code)
     return GenericHFModel(model_name=model_name, device=device, trust_remote_code=trust_remote_code)
