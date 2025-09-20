@@ -7,7 +7,7 @@ In our [previous post](build-your-own-operator-on-macos-1.md), we built a basic 
 In this follow-up, we'll explore our [cua-agent](https://pypi.org/project/cua-agent) framework - a high-level abstraction that handles all the complexity of VM interaction, screenshot processing, model communication, and action execution automatically.
 
 <video width="100%" controls>
-  <source src="/demo.mp4" type="video/mp4">
+  <source src="./assets/demo.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 

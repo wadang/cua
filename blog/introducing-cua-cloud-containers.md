@@ -5,7 +5,7 @@
 Welcome to the next chapter in our Computer-Use Agent journey! In [Part 1](./build-your-own-operator-on-macos-1), we showed you how to build your own Operator on macOS. In [Part 2](./build-your-own-operator-on-macos-2), we explored the cua-agent framework. Today, we're excited to introduce **Cua Cloud Containers** – the easiest way to deploy Computer-Use Agents at scale.
 
 <video width="100%" controls>
-  <source src="/launch-video-cua-cloud.mp4" type="video/mp4">
+  <source src="./assets/launch-video-cua-cloud.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 

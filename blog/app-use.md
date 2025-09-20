@@ -9,7 +9,7 @@ Today, we are excited to introduce a new experimental feature landing in the [Cu
 Check out an example of a Cua Agent automating Cua's team Taco Bell order through the iPhone Mirroring app:
 
 <video width="100%" controls>
-  <source src="/demo_app_use.mp4" type="video/mp4">
+  <source src="./assets/demo_app_use.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
