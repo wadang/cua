@@ -6,6 +6,7 @@ hud_eval_examples.py — minimal HUD evaluation runner
 - No Docker/local computer usage
 """
 
+#imports
 import asyncio
 import logging
 import os
@@ -17,7 +18,9 @@ from dotenv import load_dotenv, find_dotenv
 from agent import ComputerAgent
 from agent.integrations.hud import run_full_dataset
 
-
+"""
+Loading env
+"""
 def load_env_or_fail() -> None:
     # Walk up from CWD / file dir to find nearest .env
     env_path = find_dotenv(usecwd=False)
@@ -48,23 +51,34 @@ def build_agent_config() -> dict:
         "instruction": instruction,
     }
 
-
+"""
+Hud Eval
+"""
 async def run_hud_eval() -> None:
+    #load env and agent config
     load_env_or_fail()
     agent_config = build_agent_config()
 
     # Initialize to ensure config is valid (tools, verbosity, etc.)
     _ = ComputerAgent(**agent_config)
 
-    job_name = f"osworld-test-{str(uuid.uuid4())[:4]}"
+    job_name = f"osworld-test-{str(uuid.uuid4())[:4]}" #job name (each run of your task is a job on hud)
     print(f"🚀 Running HUD eval: {job_name}")
 
+
+    """
+    Customize your hud eval below, check the doc for additional params
+    - https://docs.trycua.com/docs/agent-sdk/integrations/hud#parameters-1
+    - recommend low max steps (5-10) for testing, then max 100 for benchmarking
+    - also select specific tasks to run by using splitting the dataset
+    """
     results = await run_full_dataset(
         dataset="ddupont/OSWorld-Tiny-Public",
         job_name=job_name,
         **agent_config,
         max_concurrent=20,
         max_steps=50,
+        # split="train[0:1]"
     )
 
     print(f"\n📊 Job: {job_name}")
