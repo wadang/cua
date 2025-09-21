@@ -29,13 +29,23 @@ def load_env_or_fail() -> None:
     if not os.getenv("HUD_API_KEY"):
         raise EnvironmentError("❌ HUD_API_KEY is missing in the loaded environment")
 
-
+"""
+Build Agent Config
+- customize agent behavior, tool integration, callbacks, resource management, and more
+- https://docs.trycua.com/docs/agent-sdk/agent-loops#parameters
+- https://docs.trycua.com/docs/agent-sdk/supported-model-providers
+"""
 def build_agent_config() -> dict:
+
+    instruction = "You are a computer-using agent graded by deterministic checkers."
+
+
     return {
         "model": "openai/computer-use-preview",
         "trajectory_dir": str(Path("trajectories")),
         "only_n_most_recent_images": 3,
         "verbosity": logging.INFO,
+        "instruction": instruction,
     }
 
 
