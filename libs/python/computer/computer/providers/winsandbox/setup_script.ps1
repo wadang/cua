@@ -79,15 +79,25 @@ try {
     $pythonVersion = & $pythonExe --version 2>&1
     Write-Host "Python version: $pythonVersion"
 
-    # Step 2: Create a dedicated virtual environment for the sandbox
+    # Step 2: Create a dedicated virtual environment in mapped Desktop folder (persistent)
     Write-Host "Step 2: Creating virtual environment (if needed)..."
-    $venvPath = "C:\Users\WDAGUtilityAccount\venv"
+    $cachePath = "C:\Users\WDAGUtilityAccount\Desktop\wsb_cache"
+    $venvPath = "C:\Users\WDAGUtilityAccount\Desktop\wsb_cache\venv"
     if (!(Test-Path $venvPath)) {
         Write-Host "Creating venv at: $venvPath"
         & $pythonExe -m venv $venvPath
     } else {
         Write-Host "Venv already exists at: $venvPath"
     }
+    # Hide the folder to keep Desktop clean
+    try {
+        $item = Get-Item $cachePath -ErrorAction SilentlyContinue
+        if ($item) {
+            if (-not ($item.Attributes -band [IO.FileAttributes]::Hidden)) {
+                $item.Attributes = $item.Attributes -bor [IO.FileAttributes]::Hidden
+            }
+        }
+    } catch { }
     $venvPython = Join-Path $venvPath "Scripts\python.exe"
     if (!(Test-Path $venvPython)) {
         throw "Virtual environment Python not found at $venvPython"

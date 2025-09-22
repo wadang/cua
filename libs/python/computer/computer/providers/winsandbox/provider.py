@@ -5,6 +5,7 @@ import asyncio
 import logging
 import time
 from typing import Dict, Any, Optional, List
+from pathlib import Path
 
 from ..base import BaseVMProvider, VMProviderType
 
@@ -242,8 +243,15 @@ class WinSandboxProvider(BaseVMProvider):
             
             networking = run_opts.get("networking", self.networking)
             
-            # Create folder mappers if shared directories are specified
+            # Create folder mappers; always map a persistent venv directory on host for caching packages
             folder_mappers = []
+            # Ensure host side persistent venv directory exists (Path.home()/wsb_venv)
+            host_wsb_env = Path.home() / ".cua" / "wsb_cache"
+            try:
+                host_wsb_env.mkdir(parents=True, exist_ok=True)
+            except Exception:
+                # If cannot create, continue without persistent mapping
+                host_wsb_env = None
             shared_directories = run_opts.get("shared_directories", [])
             for shared_dir in shared_directories:
                 if isinstance(shared_dir, dict):
@@ -255,6 +263,15 @@ class WinSandboxProvider(BaseVMProvider):
                     
                 if host_path and os.path.exists(host_path):
                     folder_mappers.append(winsandbox.FolderMapper(host_path))
+
+            # Add mapping for the persistent venv directory (read/write) so it appears in Sandbox Desktop
+            if host_wsb_env is not None and host_wsb_env.exists():
+                try:
+                    folder_mappers.append(
+                        winsandbox.FolderMapper(str(host_wsb_env), read_only=False)
+                    )
+                except Exception as e:
+                    self.logger.warning(f"Failed to map host winsandbox_venv: {e}")
             
             self.logger.info(f"Creating Windows Sandbox: {name}")
             self.logger.info(f"Memory: {memory_mb}MB, Networking: {networking}")
@@ -290,8 +307,10 @@ class WinSandboxProvider(BaseVMProvider):
             
             self.logger.info(f"Windows Sandbox {name} created successfully")
             
+            venv_exists = (host_wsb_env / "venv" / "Lib" / "site-packages" / "computer_server").exists() if host_wsb_env else False
+
             # Setup the computer server in the sandbox
-            await self._setup_computer_server(sandbox, name)
+            await self._setup_computer_server(sandbox, name, wait_for_venv=(not venv_exists))
             
             return {
                 "success": True,
@@ -423,7 +442,7 @@ class WinSandboxProvider(BaseVMProvider):
             if total_attempts % 10 == 0:
                 self.logger.info(f"Still waiting for Windows Sandbox {name} IP after {total_attempts} attempts...")
     
-    async def _setup_computer_server(self, sandbox, name: str, visible: bool = True):
+    async def _setup_computer_server(self, sandbox, name: str, visible: bool = False, wait_for_venv: bool = True):
         """Setup the computer server in the Windows Sandbox using RPyC.
         
         Args:
@@ -471,10 +490,12 @@ class WinSandboxProvider(BaseVMProvider):
                 creationflags=creation_flags,
                 shell=False
             )
-            
-            # Sleep for 30 seconds
-            await asyncio.sleep(30)
 
+            if wait_for_venv:
+                print("Waiting for venv to be created for the first time setup of Windows Sandbox...")
+                print("This may take a minute...")
+                await asyncio.sleep(120)
+            
             ip = await self.get_ip(name)
             self.logger.info(f"Sandbox IP: {ip}")
             self.logger.info(f"Setup script started in background in sandbox {name} with PID: {process.pid}")
