@@ -423,7 +423,7 @@ class WinSandboxProvider(BaseVMProvider):
             if total_attempts % 10 == 0:
                 self.logger.info(f"Still waiting for Windows Sandbox {name} IP after {total_attempts} attempts...")
     
-    async def _setup_computer_server(self, sandbox, name: str, visible: bool = False):
+    async def _setup_computer_server(self, sandbox, name: str, visible: bool = True):
         """Setup the computer server in the Windows Sandbox using RPyC.
         
         Args:
@@ -472,8 +472,8 @@ class WinSandboxProvider(BaseVMProvider):
                 shell=False
             )
             
-            # # Sleep for 30 seconds
-            # await asyncio.sleep(30)
+            # Sleep for 30 seconds
+            await asyncio.sleep(30)
 
             ip = await self.get_ip(name)
             self.logger.info(f"Sandbox IP: {ip}")

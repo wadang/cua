@@ -31,8 +31,8 @@ async def main():
         
         # Test running a command
         print("Testing command execution...")
-        stdout, stderr = await computer.interface.run_command("echo Hello from Windows Sandbox!")
-        print(f"Command output: {stdout}")
+        result = await computer.interface.run_command("echo Hello from Windows Sandbox!")
+        print(f"Command output: {result.stdout}")
 
         print("Press any key to continue...")
         input()
