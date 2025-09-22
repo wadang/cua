@@ -154,8 +154,8 @@ class Computer:
         self.interface_logger = Logger("computer.interface", verbosity)
 
         if not use_host_computer_server:
-            if ":" not in image or len(image.split(":")) != 2:
-                raise ValueError("Image must be in the format <image_name>:<tag>")
+            if ":" not in image:
+                image = f"{image}:latest"
 
             if not name:
                 # Normalize the name to be used for the VM
