@@ -1577,11 +1577,10 @@ Task: Click {instruction}. Output ONLY a click action on the target element."""
                 isinstance(item.get("action"), dict)):
                 
                 action = item["action"]
-                if action.get("type") == "click":
+                if action.get("x") and action.get("y"):
                     x = action.get("x")
                     y = action.get("y")
-                    if x is not None and y is not None:
-                        return (int(x), int(y))
+                    return (int(x), int(y))
         
         return None
     
