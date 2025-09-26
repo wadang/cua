@@ -159,7 +159,7 @@ If more hackathon tracks leaned on **public benchmarks**, weekends like this wou
 
 **P.S.** Huge thanks to the Ollama and HUD teams for co-sponsoring the track, and to our YC Partner Diana for offering a **guaranteed YC interview** as first prize.
 
-If you’re considering benchmark-first hackathon tracks, let’s talk—we’d love to sponsor a few in the Bay Area this year!
+Whether you’re a hacker who wants to participate, or a company looking to sponsor, let’s talk — we’re especially excited to support benchmark-first hackathon tracks in the Bay Area this year.
 
 ![hack-closing-ceremony](./assets/hack-closing-ceremony.jpg)
 
