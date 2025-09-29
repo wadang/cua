@@ -39,7 +39,7 @@ With the Agent SDK, you can:
 
 | [All-in-one CUAs](https://docs.trycua.com/docs/agent-sdk/supported-agents/computer-use-agents) | [UI Grounding Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) | [UI Planning Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) |
 |---|---|---|
-| `anthropic/claude-opus-4-1-20250805` | `huggingface-local/xlangai/OpenCUA-{7B,32B}` | any all-in-one CUA |
+| `anthropic/claude-sonnet-4-5-20250929` | `huggingface-local/xlangai/OpenCUA-{7B,32B}` | any all-in-one CUA |
 | `openai/computer-use-preview` | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}` | any VLM (using liteLLM, requires `tools` parameter) |
 | `openrouter/z-ai/glm-4.5v` | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}` |  |
 | `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}` | any all-in-one CUA | |
