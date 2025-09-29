@@ -219,6 +219,7 @@ python -m agent.cli openai/computer-use-preview
 <Tab value="uv">
 
 ```bash
+uv run --with "cua-agent[cli]" -m agent.cli anthropic/claude-sonnet-4-5-20250929
 uv run --with "cua-agent[cli]" -m agent.cli anthropic/claude-opus-4-20250514
 uv run --with "cua-agent[cli]" -m agent.cli anthropic/claude-opus-4-1-20250805
 uv run --with "cua-agent[cli]" -m agent.cli anthropic/claude-sonnet-4-20250514
@@ -229,6 +230,7 @@ uv run --with "cua-agent[cli]" -m agent.cli anthropic/claude-3-5-sonnet-20241022
 <Tab value="conda/pip">
 
 ```bash
+python -m agent.cli anthropic/claude-sonnet-4-5-20250929
 python -m agent.cli anthropic/claude-opus-4-1-20250805
 python -m agent.cli anthropic/claude-opus-4-20250514
 python -m agent.cli anthropic/claude-sonnet-4-20250514
