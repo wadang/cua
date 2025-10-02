@@ -90,6 +90,111 @@ def _filter_images_from_completion_messages(messages: List[Dict[str, Any]]) -> L
         filtered.append(msg_copy)
     return filtered
 
+def _annotate_detect_and_label_ui(base_img: Image.Image, model_md) -> Tuple[str, List[str]]:
+    """Detect UI elements with Moondream, caption each, draw labels with backgrounds.
+
+    Args:
+        base_img: PIL image of the screenshot (RGB or RGBA). Will be copied/converted internally.
+        model_md: Moondream model instance with .detect() and .query() methods.
+
+    Returns:
+        A tuple of (annotated_image_base64_png, detected_names)
+    """
+    # Ensure RGBA for semi-transparent fills
+    if base_img.mode != "RGBA":
+        base_img = base_img.convert("RGBA")
+    W, H = base_img.width, base_img.height
+
+    # Detect objects
+    try:
+        detect_result = model_md.detect(base_img, "all ui elements")
+        objects = detect_result.get("objects", []) if isinstance(detect_result, dict) else []
+    except Exception:
+        objects = []
+
+    draw = ImageDraw.Draw(base_img)
+    try:
+        font = ImageFont.load_default()
+    except Exception:
+        font = None
+
+    detected_names: List[str] = []
+
+    for i, obj in enumerate(objects):
+        try:
+            # Clamp normalized coords and crop
+            x_min = max(0.0, min(1.0, float(obj.get("x_min", 0.0))))
+            y_min = max(0.0, min(1.0, float(obj.get("y_min", 0.0))))
+            x_max = max(0.0, min(1.0, float(obj.get("x_max", 0.0))))
+            y_max = max(0.0, min(1.0, float(obj.get("y_max", 0.0))))
+            left, top, right, bottom = int(x_min * W), int(y_min * H), int(x_max * W), int(y_max * H)
+            left, top = max(0, left), max(0, top)
+            right, bottom = min(W - 1, right), min(H - 1, bottom)
+            crop = base_img.crop((left, top, right, bottom))
+
+            # Prompted short caption
+            try:
+                result = model_md.query(crop, "Caption this UI element in few words.")
+                caption_text = (result or {}).get("answer", "")
+            except Exception:
+                caption_text = ""
+
+            name = (caption_text or "").strip() or f"element_{i+1}"
+            detected_names.append(name)
+
+            # Draw bbox
+            draw.rectangle([left, top, right, bottom], outline=(255, 215, 0, 255), width=2)
+
+            # Label background with padding and rounded corners
+            label = f"{i+1}. {name}"
+            padding = 3
+            if font:
+                text_bbox = draw.textbbox((0, 0), label, font=font)
+            else:
+                text_bbox = draw.textbbox((0, 0), label)
+            text_w = text_bbox[2] - text_bbox[0]
+            text_h = text_bbox[3] - text_bbox[1]
+
+            tx = left + 3
+            ty = top - (text_h + 2 * padding + 4)
+            if ty < 0:
+                ty = top + 3
+
+            bg_left = tx - padding
+            bg_top = ty - padding
+            bg_right = tx + text_w + padding
+            bg_bottom = ty + text_h + padding
+            try:
+                draw.rounded_rectangle(
+                    [bg_left, bg_top, bg_right, bg_bottom],
+                    radius=4,
+                    fill=(0, 0, 0, 160),
+                    outline=(255, 215, 0, 200),
+                    width=1,
+                )
+            except Exception:
+                draw.rectangle(
+                    [bg_left, bg_top, bg_right, bg_bottom],
+                    fill=(0, 0, 0, 160),
+                    outline=(255, 215, 0, 200),
+                    width=1,
+                )
+
+            text_fill = (255, 255, 255, 255)
+            if font:
+                draw.text((tx, ty), label, fill=text_fill, font=font)
+            else:
+                draw.text((tx, ty), label, fill=text_fill)
+        except Exception:
+            continue
+
+    # Encode PNG base64
+    annotated = base_img
+    if annotated.mode not in ("RGBA", "RGB"):
+        annotated = annotated.convert("RGBA")
+    annotated_b64 = _image_to_b64(annotated)
+    return annotated_b64, detected_names
+
 GROUNDED_COMPUTER_TOOL_SCHEMA = {
     "type": "function",
     "function": {
@@ -229,64 +334,8 @@ class Moondream3PlusConfig(AsyncAgentConfig):
         detected_names: List[str] = []
         if last_image_b64 is not None:
             base_img = _decode_image_b64(last_image_b64)
-            W, H = base_img.width, base_img.height
             model_md = get_moondream_model()
-
-            try:
-                detect_result = model_md.detect(base_img, "all ui elements")
-                objects = detect_result.get("objects", []) if isinstance(detect_result, dict) else []
-            except Exception:
-                objects = []
-
-            draw = ImageDraw.Draw(base_img)
-            try:
-                font = ImageFont.load_default()
-            except Exception:
-                font = None
-
-            # For each object, crop and caption
-            for i, obj in enumerate(objects):
-                try:
-                    x_min = max(0.0, min(1.0, float(obj.get("x_min", 0.0))))
-                    y_min = max(0.0, min(1.0, float(obj.get("y_min", 0.0))))
-                    x_max = max(0.0, min(1.0, float(obj.get("x_max", 0.0))))
-                    y_max = max(0.0, min(1.0, float(obj.get("y_max", 0.0))))
-                    left, top, right, bottom = int(x_min * W), int(y_min * H), int(x_max * W), int(y_max * H)
-                    left, top = max(0, left), max(0, top)
-                    right, bottom = min(W - 1, right), min(H - 1, bottom)
-                    crop = base_img.crop((left, top, right, bottom))
-
-                    # # Streaming caption
-                    # caption_text = ""
-                    # try:
-                    #     cap_result = model_md.caption(crop, length="short", stream=True, settings={"temperature": 0.3})
-                    #     for chunk in cap_result.get("caption", []):
-                    #         caption_text += str(chunk)
-                    # except Exception:
-                    #     caption_text = ""
-
-                    # Prompted captionn
-                    result = model_md.query(
-                        crop, "Caption this UI element in few words."
-                    )
-                    caption_text = result["answer"]
-
-                    name = caption_text.strip() or f"element_{i+1}"
-                    detected_names.append(name)
-
-                    # Draw bbox and label
-                    draw.rectangle([left, top, right, bottom], outline=(255, 215, 0), width=2)
-                    label = f"{i+1}. {name}"
-                    text_xy = (left + 3, max(0, top - 12))
-                    if font:
-                        draw.text(text_xy, label, fill=(255, 215, 0), font=font)
-                    else:
-                        draw.text(text_xy, label, fill=(255, 215, 0))
-                except Exception:
-                    continue
-
-            # Emit annotated screenshot
-            annotated_b64 = _image_to_b64(base_img)
+            annotated_b64, detected_names = _annotate_detect_and_label_ui(base_img, model_md)
             if _on_screenshot:
                 await _on_screenshot(annotated_b64, "annotated_form_ui")
 
