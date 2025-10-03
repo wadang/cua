@@ -794,19 +794,33 @@ class Computer:
             Tuple of (stdout, stderr) from the installation command
         """
         requirements = requirements or []
-
-        # Create virtual environment if it doesn't exist
-        venv_path = f"~/.venvs/{venv_name}"
-        create_cmd = f"mkdir -p ~/.venvs && python3 -m venv {venv_path}"
-        
-        # Check if venv exists, if not create it
-        check_cmd = f"test -d {venv_path} || ({create_cmd})"
-        _ = await self.interface.run_command(check_cmd)
-        
-        # Install packages
-        requirements_str = " ".join(requirements)
-        install_cmd = f". {venv_path}/bin/activate && pip install {requirements_str}"
-        return await self.interface.run_command(install_cmd)
+        # Windows vs POSIX handling
+        if self.os_type == "windows":
+            # Use %USERPROFILE% for home directory and cmd.exe semantics
+            venv_path = f"%USERPROFILE%\\.venvs\\{venv_name}"
+            ensure_dir_cmd = "if not exist \"%USERPROFILE%\\.venvs\" mkdir \"%USERPROFILE%\\.venvs\""
+            create_cmd = f"if not exist \"{venv_path}\" python -m venv \"{venv_path}\""
+            requirements_str = " ".join(requirements)
+            # Activate via activate.bat and install
+            install_cmd = f"call \"{venv_path}\\Scripts\\activate.bat\" && pip install {requirements_str}" if requirements_str else f"echo No requirements to install"
+            await self.interface.run_command(ensure_dir_cmd)
+            await self.interface.run_command(create_cmd)
+            return await self.interface.run_command(install_cmd)
+        else:
+            # POSIX (macOS/Linux)
+            venv_path = f"$HOME/.venvs/{venv_name}"
+            create_cmd = f"mkdir -p \"$HOME/.venvs\" && python3 -m venv \"{venv_path}\""
+            # Check if venv exists, if not create it
+            check_cmd = f"test -d \"{venv_path}\" || ({create_cmd})"
+            _ = await self.interface.run_command(check_cmd)
+            # Install packages
+            requirements_str = " ".join(requirements)
+            install_cmd = (
+                f". \"{venv_path}/bin/activate\" && pip install {requirements_str}"
+                if requirements_str
+                else "echo No requirements to install"
+            )
+            return await self.interface.run_command(install_cmd)
     
     async def venv_cmd(self, venv_name: str, command: str):
         """Execute a shell command in a virtual environment.
@@ -818,18 +832,30 @@ class Computer:
         Returns:
             Tuple of (stdout, stderr) from the command execution
         """
-        venv_path = f"~/.venvs/{venv_name}"
-        
-        # Check if virtual environment exists
-        check_cmd = f"test -d {venv_path}"
-        result = await self.interface.run_command(check_cmd)
-        
-        if result.stderr or "test:" in result.stdout:  # venv doesn't exist
-            return "", f"Virtual environment '{venv_name}' does not exist. Create it first using venv_install."
-        
-        # Activate virtual environment and run command
-        full_command = f". {venv_path}/bin/activate && {command}"
-        return await self.interface.run_command(full_command)
+        if self.os_type == "windows":
+            # Windows (cmd.exe)
+            venv_path = f"%USERPROFILE%\\.venvs\\{venv_name}"
+            # Check existence and signal if missing
+            check_cmd = f"if not exist \"{venv_path}\" (echo VENV_NOT_FOUND) else (echo VENV_FOUND)"
+            result = await self.interface.run_command(check_cmd)
+            if "VENV_NOT_FOUND" in getattr(result, "stdout", ""):
+                # Auto-create the venv with no requirements
+                await self.venv_install(venv_name, [])
+            # Activate and run the command
+            full_command = f"call \"{venv_path}\\Scripts\\activate.bat\" && {command}"
+            return await self.interface.run_command(full_command)
+        else:
+            # POSIX (macOS/Linux)
+            venv_path = f"$HOME/.venvs/{venv_name}"
+            # Check if virtual environment exists
+            check_cmd = f"test -d \"{venv_path}\""
+            result = await self.interface.run_command(check_cmd)
+            if result.stderr or "test:" in result.stdout:  # venv doesn't exist
+                # Auto-create the venv with no requirements
+                await self.venv_install(venv_name, [])
+            # Activate virtual environment and run command
+            full_command = f". \"{venv_path}/bin/activate\" && {command}"
+            return await self.interface.run_command(full_command)
     
     async def venv_exec(self, venv_name: str, python_func, *args, **kwargs):
         """Execute Python function in a virtual environment using source code extraction.
