@@ -72,7 +72,7 @@ def main() -> None:
 
     # Check if watchdog should be enabled
     container_name = os.environ.get("CONTAINER_NAME")
-    enable_watchdog = args.watchdog or bool(container_name)
+    enable_watchdog = (args.watchdog or bool(container_name)) and not sys.platform.startswith("win")
     
     if container_name:
         logger.info(f"Container environment detected (CONTAINER_NAME={container_name}), enabling watchdog")
