@@ -36,7 +36,7 @@ async def main():
         computer = Computer(
             os_type="windows",
             api_key=os.getenv("CUA_API_KEY"),
-            name="s-windows-x4snp46ebf", # os.getenv("CONTAINER_NAME") or "",
+            name=os.getenv("CONTAINER_NAME") or "",
             provider_type=VMProviderType.CLOUD,
         )
         
