@@ -31,7 +31,7 @@ async def main():
         computer = Computer(
             os_type="windows",
             api_key=os.getenv("CUA_API_KEY"),
-            name=os.getenv("CONTAINER_NAME") or "",
+            name="s-windows-x4snp46ebf", # os.getenv("CONTAINER_NAME") or "",
             provider_type=VMProviderType.CLOUD,
         )
         
@@ -74,7 +74,8 @@ async def main():
 
         finally:
             # Important to clean up resources
-            await computer.stop()
+            # await computer.stop()
+            pass
     except Exception as e:
         print(f"Error in main: {e}")
         traceback.print_exc()
