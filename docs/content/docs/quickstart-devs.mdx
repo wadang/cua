@@ -7,7 +7,7 @@ icon: Rocket
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-This quickstart guides you through setting up your environment, programmatic control with Cua Computer, and task automation with Cua Agent:
+This quickstart guides you through setting up your [computer environment](#set-up-your-computer-environment), programmatic control with a [Cua computer](#using-computer), and task automation with a [Cua agent](#using-agent):
 
 <Steps>
 
@@ -173,9 +173,6 @@ Connect to your Cua computer and perform basic interactions, such as taking scre
     finally:
         await computer.close()
     ```
-
-    You can automate these actions using an agent.
-
   </Tab>
   <Tab value="TypeScript">
     Install the Cua computer TypeScript SDK:
@@ -263,11 +260,10 @@ Connect to your Cua computer and perform basic interactions, such as taking scre
       await computer.close();
     }
     ```
-
-    You can automate these actions using an agent.
-
   </Tab>
 </Tabs>
+
+Learn more about computers in the [Cua computers documentation](/computer-sdk/computers). You will see how to automate computers with agents in the next step.
 
 </Step>
 
@@ -275,7 +271,7 @@ Connect to your Cua computer and perform basic interactions, such as taking scre
 
 ## Using Agent
 
-Utilize an `Agent` to automate complex tasks by providing it with a goal and allowing it to interact with the computer environment.
+Utilize an Agent to automate complex tasks by providing it with a goal and allowing it to interact with the computer environment.
 
 Install the Cua agent Python SDK:
 ```bash
@@ -300,10 +296,13 @@ async for result in agent.run(messages):
             print(item["content"][0]["text"])
 ```
 
+Learn more about agents in [Agent Loops](/agent-sdk/agent-loops) and available models in [Supported Models](/agent-sdk/supported-model-providers/).
+
 </Step>
 </Steps>
 
 ## Next Steps
 
-- Learn about [trajectory tracking](/agent-sdk/callbacks/trajectories) and [callbacks](/agent-sdk/callbacks/agent-lifecycle)
-- Join our [Discord community](https://discord.com/invite/mVnXXpdE85) for support
+- Learn more about [Cua computers](/computer-sdk/computers) and [computer commands](/computer-sdk/commands)
+- Read about [Agent loops](/agent-sdk/agent-loops), [tools](/agent-sdk/custom-tools), and [supported model providers](/agent-sdk/supported-model-providers/)
+- Join our [Discord community](https://discord.com/invite/mVnXXpdE85) for help
