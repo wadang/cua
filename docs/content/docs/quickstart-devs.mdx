@@ -21,15 +21,15 @@ You can run your Cua computer in the cloud (recommended for easiest setup), loca
 
 <Tabs items={['☁️ Cloud', '🐳 Docker', '🍎 Lume', '🪟 Windows Sandbox']}>
   <Tab value="☁️ Cloud">
-    
-    Cua cloud containers are virtual machines that run Ubuntu.
+
+    Cua Cloud Sandbox provides virtual machines that run Ubuntu.
 
     1. Go to [trycua.com/signin](https://www.trycua.com/signin)
     2. Navigate to **Dashboard > Containers > Create Instance**
-    3. Create a **Medium, Ubuntu 22** container
-    4. Note your container name and API key
+    3. Create a **Medium, Ubuntu 22** sandbox
+    4. Note your sandbox name and API key
 
-    Your cloud container will be automatically configured and ready to use.
+    Your Cloud Sandbox will be automatically configured and ready to use.
 
   </Tab>
   <Tab value="🍎 Lume">
@@ -42,7 +42,7 @@ You can run your Cua computer in the cloud (recommended for easiest setup), loca
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh)"
     ```
 
-    2. Start a local Cua container:
+    2. Start a local Cua sandbox:
 
     ```bash
     lume run macos-sequoia-cua:latest
@@ -69,7 +69,7 @@ You can run your Cua computer in the cloud (recommended for easiest setup), loca
     
     1. Install Docker Desktop or Docker Engine:
 
-    2. Pull the CUA Ubuntu container:
+    2. Pull the CUA Ubuntu sandbox:
 
     ```bash
     docker pull --platform=linux/amd64 trycua/cua-ubuntu:latest
@@ -106,7 +106,7 @@ Connect to your Cua computer and perform basic interactions, such as taking scre
             name="your-container-name",
             api_key="your-api-key"
         )
-        await computer.run() # Connect to the container
+        await computer.run() # Connect to the sandbox
         ```
       </Tab>
       <Tab value="🍎 Lume">
@@ -192,7 +192,7 @@ Connect to your Cua computer and perform basic interactions, such as taking scre
           name: "your-container-name",
           apiKey: "your-api-key"
         });
-        await computer.run(); // Connect to the container
+        await computer.run(); // Connect to the sandbox
         ```
       </Tab>
       <Tab value="🍎 Lume">

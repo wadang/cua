@@ -2,7 +2,7 @@
 
 *Published on June 10, 2025 by Francesco Bonacci*
 
-Yesterday, Apple announced their new [Containerization framework](https://github.com/apple/containerization) at WWDC. Since then, our Discord and X users have been asking what this means for Cua virtualization capabilities on Apple Silicon. We've been working in this space for months - from [Lume](https://github.com/trycua/cua/tree/main/libs/lume) to [Lumier](https://github.com/trycua/cua/tree/main/libs/lumier) to [Cua Cloud Containers](./introducing-cua-cloud-containers). Here's our take on Apple's announcement.
+Yesterday, Apple announced their new [Containerization framework](https://github.com/apple/containerization) at WWDC. Since then, our Discord and X users have been asking what this means for Cua virtualization capabilities on Apple Silicon. We've been working in this space for months - from [Lume](https://github.com/trycua/cua/tree/main/libs/lume) to [Lumier](https://github.com/trycua/cua/tree/main/libs/lumier) to [Cua Cloud Sandbox](./introducing-cua-cloud-containers). Here's our take on Apple's announcement.
 
 ## Our Story
 
@@ -168,7 +168,7 @@ Apple's announcement confirms we're on the right path. Here's what we're looking
 - [Apple Containerization Framework](https://github.com/apple/containerization)
 - [Lume - Direct VM Management](https://github.com/trycua/cua/tree/main/libs/lume)
 - [Lumier - Docker Interface for VMs](https://github.com/trycua/cua/tree/main/libs/lumier)
-- [Cua Cloud Containers](https://trycua.com)
+- [Cua Cloud Sandbox](https://trycua.com)
 - [Join our Discord](https://discord.gg/cua-ai)
 
 ---
