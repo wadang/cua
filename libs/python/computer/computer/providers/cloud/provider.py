@@ -12,6 +12,7 @@ import logging
 from typing import Dict, List, Optional, Any
 
 from ..base import BaseVMProvider, VMProviderType
+from ..types import ListVMsResponse, MinimalVM
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -106,7 +107,7 @@ class CloudProvider(BaseVMProvider):
                 # Host does not resolve → not found
                 return {"name": name, "status": "not_found", "hostname": hostname}
 
-    async def list_vms(self) -> List[Dict[str, Any]]:
+    async def list_vms(self) -> ListVMsResponse:
         url = f"{self.api_base}/v1/vms"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -122,7 +123,24 @@ class CloudProvider(BaseVMProvider):
                         logger.error(f"Failed to parse list_vms JSON: {text}")
                         return []
                     if isinstance(data, list):
-                        return data
+                        # Enrich with convenience URLs when possible.
+                        enriched: List[Dict[str, Any]] = []
+                        for item in data:
+                            vm = dict(item) if isinstance(item, dict) else {}
+                            name = vm.get("name")
+                            password = vm.get("password")
+                            if isinstance(name, str) and name:
+                                host = f"https://{name}.containers.cloud.trycua.com:8443"
+                                # api_url: always set if missing
+                                if not vm.get("api_url"):
+                                    vm["api_url"] = host
+                                # vnc_url: only when password available
+                                if not vm.get("vnc_url") and isinstance(password, str) and password:
+                                    vm[
+                                        "vnc_url"
+                                    ] = f"https://{host}/vnc.html?autoconnect=true&password={password}"
+                            enriched.append(vm)
+                        return enriched  # type: ignore[return-value]
                     logger.warning("Unexpected response for list_vms; expected list")
                     return []
                 elif resp.status == 401:
