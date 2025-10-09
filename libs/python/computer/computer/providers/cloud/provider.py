@@ -78,8 +78,7 @@ class CloudProvider(BaseVMProvider):
                         try:
                             data = await resp.json(content_type=None)
                             vm_status = str(data.get("status", "ok"))
-                            if isinstance(data, dict) and "os_type" in data:
-                                vm_os_type = str(data.get("os_type"))
+                            vm_os_type = str(data.get("os_type"))
                         except Exception:
                             vm_status = "unknown"
                     elif status_code < 500:
@@ -89,23 +88,11 @@ class CloudProvider(BaseVMProvider):
                     return {
                         "name": name,
                         "status": "running" if vm_status == "ok" else vm_status,
-                        "hostname": hostname,
+                        "api_url": f"https://{hostname}:8443",
                         "os_type": vm_os_type,
                     }
         except Exception:
-            # Fall back to a DNS resolve check
-            try:
-                loop = asyncio.get_event_loop()
-                await loop.getaddrinfo(hostname, 443)
-                # Host resolves, but HTTPS probe failed → treat as unknown
-                return {
-                    "name": name,
-                    "status": "unknown",
-                    "hostname": hostname,
-                }
-            except Exception:
-                # Host does not resolve → not found
-                return {"name": name, "status": "not_found", "hostname": hostname}
+            return {"name": name, "status": "not_found", "api_url": f"https://{hostname}:8443"}
 
     async def list_vms(self) -> ListVMsResponse:
         url = f"{self.api_base}/v1/vms"
@@ -130,10 +117,10 @@ class CloudProvider(BaseVMProvider):
                             name = vm.get("name")
                             password = vm.get("password")
                             if isinstance(name, str) and name:
-                                host = f"https://{name}.containers.cloud.trycua.com:8443"
+                                host = f"{name}.containers.cloud.trycua.com"
                                 # api_url: always set if missing
                                 if not vm.get("api_url"):
-                                    vm["api_url"] = host
+                                    vm["api_url"] = f"https://{host}:8443"
                                 # vnc_url: only when password available
                                 if not vm.get("vnc_url") and isinstance(password, str) and password:
                                     vm[
@@ -151,7 +138,7 @@ class CloudProvider(BaseVMProvider):
                     logger.error(f"list_vms failed: HTTP {resp.status} - {text}")
                     return []
 
-    async def run_vm(self, image: str, name: str, run_opts: Dict[str, Any], storage: Optional[str] = None) -> Dict[str, Any]:
+    async def run_vm(self, name: str, image: Optional[str] = None, run_opts: Optional[Dict[str, Any]] = None, storage: Optional[str] = None) -> Dict[str, Any]:
         """Start a VM via public API. Returns a minimal status."""
         url = f"{self.api_base}/v1/vms/{name}/start"
         headers = {
