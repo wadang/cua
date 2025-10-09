@@ -16,6 +16,7 @@ VMStatus = Literal[
     "failed",       # VM deployment or operation failed
 ]
 
+OSType = Literal["macos", "linux", "windows"]
 
 class MinimalVM(TypedDict):
     """Minimal VM object shape returned by list calls.

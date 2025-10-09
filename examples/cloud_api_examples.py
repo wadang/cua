@@ -14,7 +14,6 @@ async def main() -> None:
     if api_base:
         print(f"Using API base: {api_base}")
     
-    # List VMs
     provider = CloudProvider(api_key=api_key, verbose=True)
     async with provider:
 
