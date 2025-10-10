@@ -1,12 +1,9 @@
 #!/bin/bash
 set -e
 
-# Wait for VNC server to be ready
+# Give VNC a moment to start (supervisor starts it with priority 10, this is priority 20)
 echo "Waiting for VNC server to start..."
-while ! nc -z localhost ${VNC_PORT:-5901}; do
-    sleep 1
-done
-echo "VNC server is ready"
+sleep 5
 
 # Start noVNC
 cd /opt/noVNC

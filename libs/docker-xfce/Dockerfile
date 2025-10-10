@@ -36,6 +36,7 @@ RUN apt-get update && apt-get install -y \
     python3-numpy \
     git \
     net-tools \
+    netcat \
     supervisor \
     # Computer-server dependencies
     python3-tk \
