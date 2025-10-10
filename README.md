@@ -268,7 +268,7 @@ make bump-all-patch           # Bumps patch version for ALL packages
 After running any bump command, push your changes:
 
 ```bash
-git push origin main
+git push origin main && git push origin --tags
 ```
 
 For more details, run `make help` or see the [Makefile](./Makefile).
