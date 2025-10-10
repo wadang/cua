@@ -10,13 +10,14 @@ vncserver :1 \
     -depth ${VNC_COL_DEPTH:-24} \
     -rfbport ${VNC_PORT:-5901} \
     -localhost no \
-    -SecurityTypes None \
+    -SecurityTypes VncAuth \
     -AlwaysShared \
     -AcceptPointerEvents \
     -AcceptKeyEvents \
     -AcceptCutText \
     -SendCutText \
-    -xstartup /usr/local/bin/xstartup.sh
+    -xstartup /usr/local/bin/xstartup.sh \
+    --I-KNOW-THIS-IS-INSECURE
 
 # Keep the process running
 tail -f /home/cua/.vnc/*.log

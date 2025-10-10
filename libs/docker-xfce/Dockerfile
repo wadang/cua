@@ -38,7 +38,6 @@ RUN apt-get update && apt-get install -y \
     net-tools \
     supervisor \
     # Computer-server dependencies
-    python3.11 \
     python3-tk \
     python3-dev \
     gnome-screenshot \
@@ -62,12 +61,6 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python 3.11
-RUN add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y python3.11 python3.11-distutils && \
-    rm -rf /var/lib/apt/lists/*
-
 # Install noVNC
 RUN git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
     git clone https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
@@ -84,8 +77,8 @@ RUN add-apt-repository -y ppa:mozillateam/ppa && \
     rm -rf /var/lib/apt/lists/*
 
 # Configure Firefox defaults
-RUN mkdir -p /etc/firefox/syspref.js && \
-    echo 'pref("datareporting.policy.firstRunURL", "");' >> /etc/firefox/syspref.js && \
+RUN mkdir -p /etc/firefox && \
+    echo 'pref("datareporting.policy.firstRunURL", "");' > /etc/firefox/syspref.js && \
     echo 'pref("datareporting.policy.dataSubmissionEnabled", false);' >> /etc/firefox/syspref.js && \
     echo 'pref("datareporting.healthreport.service.enabled", false);' >> /etc/firefox/syspref.js && \
     echo 'pref("datareporting.healthreport.uploadEnabled", false);' >> /etc/firefox/syspref.js && \

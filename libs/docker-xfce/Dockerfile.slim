@@ -1,0 +1,53 @@
+# CUA Docker XFCE Container - Slim Version
+# Uses existing VNC base to reduce build time
+
+FROM dorowu/ubuntu-desktop-lxde-vnc:focal
+
+# Switch to root
+USER root
+
+# Set environment variables
+ENV HOME=/home/cua
+ENV DISPLAY=:1
+ENV API_PORT=8000
+
+# Create cua user
+RUN useradd -m -s /bin/bash -G sudo cua && \
+    echo "cua:password" | chpasswd && \
+    echo "cua ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Install Python 3.11 and computer-server dependencies
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    gnome-screenshot \
+    wmctrl \
+    ffmpeg \
+    socat \
+    xclip \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install -y python3.11 python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install computer-server
+RUN pip3 install cua-computer-server
+
+# Copy startup scripts
+COPY src/scripts/start-computer-server.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/start-computer-server.sh
+
+# Create storage directories
+RUN mkdir -p /home/cua/storage /home/cua/shared && \
+    chown -R cua:cua /home/cua
+
+# Expose ports (VNC on 6080, computer-server on 8000)
+EXPOSE 6080 8000
+
+# Create startup wrapper
+RUN echo '#!/bin/bash\n\
+/startup.sh &\n\
+sleep 5\n\
+su - cua -c "/usr/local/bin/start-computer-server.sh"' > /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
