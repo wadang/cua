@@ -210,6 +210,16 @@ When you choose to install and use such optional extras, your use, modification,
 
 Cua uses `bump2version` to manage package versions across all Python modules. A Makefile is provided to simplify the release process.
 
+### Prerequisites 
+
+#### install `bump2version`
+
+using brew
+```
+brew install bumpversion
+```
+
+
 ### View Current Versions
 
 ```bash
