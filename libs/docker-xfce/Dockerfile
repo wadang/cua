@@ -47,6 +47,7 @@ RUN apt-get update && apt-get install -y \
     socat \
     xclip \
     # Browser
+    firefox \
     wget \
     software-properties-common \
     # Build tools
