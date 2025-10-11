@@ -62,6 +62,9 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Remove power manager to avoid popup in container
+RUN apt-get remove -y xfce4-power-manager xfce4-power-manager-data || true
+
 # Install noVNC
 RUN git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
     git clone https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
