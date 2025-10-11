@@ -73,20 +73,8 @@ RUN git clone https://github.com/novnc/noVNC.git /opt/noVNC && \
 # Install computer-server
 RUN pip3 install cua-computer-server
 
-# Install Firefox
-RUN add-apt-repository -y ppa:mozillateam/ppa && \
-    echo 'Package: *\nPin: release o=LP-PPA-mozillateam\nPin-Priority: 1001' > /etc/apt/preferences.d/mozilla-firefox && \
-    apt-get update && \
-    apt-get install -y firefox && \
-    rm -rf /var/lib/apt/lists/*
-
-# Configure Firefox defaults
-RUN mkdir -p /etc/firefox && \
-    echo 'pref("datareporting.policy.firstRunURL", "");' > /etc/firefox/syspref.js && \
-    echo 'pref("datareporting.policy.dataSubmissionEnabled", false);' >> /etc/firefox/syspref.js && \
-    echo 'pref("datareporting.healthreport.service.enabled", false);' >> /etc/firefox/syspref.js && \
-    echo 'pref("datareporting.healthreport.uploadEnabled", false);' >> /etc/firefox/syspref.js && \
-    echo 'pref("browser.aboutwelcome.enabled", false);' >> /etc/firefox/syspref.js
+# Firefox installation removed to speed up build
+# Can be added back later if needed
 
 # Copy startup scripts
 COPY src/supervisor/ /etc/supervisor/conf.d/
