@@ -99,7 +99,7 @@ docker run --rm -it \
 
 ## Using with CUA Docker Provider
 
-This container is designed to work with the CUA Docker provider:
+This container is designed to work with the CUA Docker provider. Simply specify the docker-xfce image:
 
 ```python
 from computer import Computer
@@ -108,8 +108,8 @@ from computer import Computer
 computer = Computer(
     os_type="linux",
     provider_type="docker",
-    image="trycua/cua-docker-xfce:latest",
-    display="1920x1080",
+    image="trycua/cua-docker-xfce:latest",  # Use docker-xfce instead of Kasm
+    display="1024x768",
     memory="4GB",
     cpu="2"
 )
@@ -128,11 +128,33 @@ async with computer:
     print(result.stdout)
 ```
 
+### Switching between Kasm and docker-xfce
+
+The Docker provider automatically detects which image you're using:
+
+```python
+# Use Kasm-based container (default for Linux)
+computer_kasm = Computer(
+    os_type="linux",
+    provider_type="docker",
+    image="trycua/cua-ubuntu:latest",  # Kasm image
+)
+
+# Use docker-xfce container (vanilla XFCE)
+computer_xfce = Computer(
+    os_type="linux",
+    provider_type="docker",
+    image="trycua/cua-docker-xfce:latest",  # docker-xfce image
+)
+```
+
+Both provide the same API and functionality - the provider automatically configures the correct paths and settings based on the image.
+
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `VNC_RESOLUTION` | `1920x1080` | Screen resolution |
+| `VNC_RESOLUTION` | `1024x768` | Screen resolution |
 | `VNC_COL_DEPTH` | `24` | Color depth |
 | `VNC_PORT` | `5901` | VNC server port |
 | `NOVNC_PORT` | `6901` | noVNC web interface port |
