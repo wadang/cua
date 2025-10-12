@@ -93,8 +93,8 @@ docker run --rm -it \
 
 ## Accessing the Container
 
-- **noVNC Web Interface**: Open `http://localhost:6901` in your browser
-- **VNC Client**: Connect to `localhost:5901` (password: `password`)
+- **noVNC Web Interface**: Open `http://localhost:6901` in your browser (no password required)
+- **VNC Client**: Connect to `localhost:5901` (no password required)
 - **Computer Server API**: Available at `http://localhost:8000`
 
 ## Using with CUA Docker Provider
@@ -175,8 +175,9 @@ Both provide the same API and functionality - the provider automatically configu
 ## User Credentials
 
 - **Username**: `cua`
-- **Password**: `password`
+- **Password**: `password` (for shell login only)
 - **Sudo access**: Enabled without password
+- **VNC access**: No password required
 
 ## Creating Snapshots
 

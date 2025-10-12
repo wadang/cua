@@ -1,2 +1,2 @@
-# XFCE preferred applications - disable browser to prevent error popups
-WebBrowser=
+# XFCE preferred applications - set Firefox as default browser
+WebBrowser=firefox

@@ -15,13 +15,10 @@ ENV API_PORT=8000
 ENV VNC_RESOLUTION=1024x768
 ENV VNC_COL_DEPTH=24
 
-# Create user
-RUN useradd -m -s /bin/bash -G sudo cua && \
-    echo "cua:password" | chpasswd && \
-    echo "cua ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-# Install system dependencies
+# Install system dependencies first (including sudo)
 RUN apt-get update && apt-get install -y \
+    # System utilities
+    sudo \
     # Desktop environment
     xfce4 \
     xfce4-terminal \
@@ -65,6 +62,11 @@ RUN apt-get update && apt-get install -y \
 # Remove power manager to avoid popup in container
 RUN apt-get remove -y xfce4-power-manager xfce4-power-manager-data || true
 
+# Create user after sudo is installed
+RUN useradd -m -s /bin/bash -G sudo cua && \
+    echo "cua:password" | chpasswd && \
+    echo "cua ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
 # Install Firefox from Mozilla PPA (snap-free) - inline to avoid script issues
 RUN apt-get update && \
     add-apt-repository -y ppa:mozillateam/ppa && \
@@ -102,10 +104,8 @@ RUN chmod +x /usr/local/bin/*.sh
 USER cua
 WORKDIR /home/cua
 
-# Create VNC password file
-RUN mkdir -p $HOME/.vnc && \
-    echo "password" | vncpasswd -f > $HOME/.vnc/passwd && \
-    chmod 600 $HOME/.vnc/passwd
+# Create VNC directory (no password needed with SecurityTypes None)
+RUN mkdir -p $HOME/.vnc
 
 # Configure XFCE for first start
 RUN mkdir -p $HOME/.config/xfce4/xfconf/xfce-perchannel-xml $HOME/.config/xfce4 $HOME/.config/autostart
