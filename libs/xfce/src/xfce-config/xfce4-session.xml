@@ -48,4 +48,8 @@
     <property name="ShowHybridSleep" type="bool" value="false"/>
     <property name="ShowSwitchUser" type="bool" value="false"/>
   </property>
+  <property name="screensaver" type="empty">
+    <property name="enabled" type="bool" value="false"/>
+    <property name="lock-enabled" type="bool" value="false"/>
+  </property>
 </channel>
