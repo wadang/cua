@@ -22,7 +22,6 @@ RUN apt-get update && apt-get install -y \
     # Desktop environment
     xfce4 \
     xfce4-terminal \
-    xfce4-goodies \
     dbus-x11 \
     # VNC server
     tigervnc-standalone-server \
@@ -59,12 +58,19 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Remove power manager to avoid popup in container
-RUN apt-get remove -y xfce4-power-manager xfce4-power-manager-data || true
+# Remove screensavers and power manager to avoid popups and lock screens
+RUN apt-get remove -y \
+    xfce4-power-manager \
+    xfce4-power-manager-data \
+    xfce4-power-manager-plugins \
+    xfce4-screensaver \
+    light-locker \
+    xscreensaver \
+    xscreensaver-data || true
 
 # Create user after sudo is installed
 RUN useradd -m -s /bin/bash -G sudo cua && \
-    echo "cua:password" | chpasswd && \
+    echo "cua:cua" | chpasswd && \
     echo "cua ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Install Firefox from Mozilla PPA (snap-free) - inline to avoid script issues
@@ -113,9 +119,13 @@ RUN mkdir -p $HOME/.config/xfce4/xfconf/xfce-perchannel-xml $HOME/.config/xfce4 
 # Copy XFCE config to disable browser launching and welcome screens
 COPY --chown=cua:cua src/xfce-config/helpers.rc $HOME/.config/xfce4/helpers.rc
 COPY --chown=cua:cua src/xfce-config/xfce4-session.xml $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml
+COPY --chown=cua:cua src/xfce-config/xfce4-power-manager.xml $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-power-manager.xml
 
-# Disable panel plugins that might try to open browsers
+# Disable autostart for screensaver, lock screen, and power manager
 RUN echo "[Desktop Entry]\nHidden=true" > $HOME/.config/autostart/xfce4-tips-autostart.desktop && \
+    echo "[Desktop Entry]\nHidden=true" > $HOME/.config/autostart/xfce4-screensaver.desktop && \
+    echo "[Desktop Entry]\nHidden=true" > $HOME/.config/autostart/light-locker.desktop && \
+    echo "[Desktop Entry]\nHidden=true" > $HOME/.config/autostart/xfce4-power-manager.desktop && \
     chown -R cua:cua $HOME/.config
 
 # Create storage and shared directories, and Firefox cache directory
