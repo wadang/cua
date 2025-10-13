@@ -23,39 +23,45 @@ cua combines Computer (interface) + Agent (AI) for automating desktop apps. The 
 
 ## Set Up Your Computer Environment
 
-Choose how you want to run your cua computer. **Cloud containers are recommended** for the easiest setup:
+Choose how you want to run your cua computer. **Cloud Sandbox is recommended** for the easiest setup:
 
-<Tabs items={['☁️ Cloud (Recommended)', 'Lume (macOS Only)', 'Windows Sandbox (Windows Only)', 'Docker (Cross-Platform)']}>
-  <Tab value="☁️ Cloud (Recommended)">
-    
-    **Easiest & safest way to get started**
-    
+<Tabs items={['☁️ Cloud Sandbox (Recommended)', 'Linux on Docker', 'Windows Sandbox', 'macOS VM']}>
+  <Tab value="☁️ Cloud Sandbox (Recommended)">
+
+    **Easiest & safest way to get started - works on any host OS**
+
     1. Go to [trycua.com/signin](https://www.trycua.com/signin)
     2. Navigate to **Dashboard > Containers > Create Instance**
     3. Create a **Medium, Ubuntu 22** container
     4. Note your container name and API key
-    
+
     Your cloud container will be automatically configured and ready to use.
 
   </Tab>
-  <Tab value="Lume (macOS Only)">
-    
-    1. Install lume cli
+  <Tab value="Linux on Docker">
+
+    **Run Linux desktop locally on macOS, Windows, or Linux hosts**
+
+    1. Install Docker Desktop or Docker Engine
+
+    2. Pull the CUA XFCE container (lightweight desktop)
 
     ```bash
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh)"
+    docker pull --platform=linux/amd64 trycua/cua-xfce:latest
     ```
 
-    2. Start a local cua container
+    Or use KASM for a full-featured desktop:
 
     ```bash
-    lume run macos-sequoia-cua:latest
+    docker pull --platform=linux/amd64 trycua/cua-ubuntu:latest
     ```
 
   </Tab>
-  <Tab value="Windows Sandbox (Windows Only)">
-    
-    1. Enable Windows Sandbox (requires Windows 10 Pro/Enterprise or Windows 11)
+  <Tab value="Windows Sandbox">
+
+    **Windows hosts only - requires Windows 10 Pro/Enterprise or Windows 11**
+
+    1. Enable Windows Sandbox
     2. Install pywinsandbox dependency
 
     ```bash
@@ -65,14 +71,20 @@ Choose how you want to run your cua computer. **Cloud containers are recommended
     3. Windows Sandbox will be automatically configured when you run the CLI
 
   </Tab>
-  <Tab value="Docker (Cross-Platform)">
-    
-    1. Install Docker Desktop or Docker Engine
+  <Tab value="macOS VM">
 
-    2. Pull the CUA Ubuntu container
+    **macOS hosts only - requires Lume CLI**
+
+    1. Install lume cli
 
     ```bash
-    docker pull --platform=linux/amd64 trycua/cua-ubuntu:latest
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh)"
+    ```
+
+    2. Start a local cua macOS VM
+
+    ```bash
+    lume run macos-sequoia-cua:latest
     ```
 
   </Tab>

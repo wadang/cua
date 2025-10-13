@@ -9,9 +9,11 @@ Before we can automate apps using AI, we need to first connect to a Computer Ser
 
 Cua Computers are preconfigured virtual machines running the Computer Server. They can be either macOS, Linux, or Windows. They're found in either a cloud-native container, or on your host desktop.
 
-## Cua Cloud Sandbox
+## Cloud Sandbox
 
-This is a Cloud Sandbox running the Computer Server. This is the easiest & safest way to get a cua computer, and can be done by going on the trycua.com website.
+**Easiest & safest way to get started - works on any host OS**
+
+This is a Cloud Sandbox running the Computer Server. Get a container at [trycua.com](https://www.trycua.com/).
 
 <Tabs items={['Python', 'TypeScript']}>
   <Tab value="Python">
@@ -45,16 +47,48 @@ This is a Cloud Sandbox running the Computer Server. This is the easiest & safes
   </Tab>
 </Tabs>
 
-## Cua Local Sandbox
+## Linux on Docker
 
-Cua provides local sandboxes using different providers depending on your host operating system:
+**Run Linux desktop locally on macOS, Windows, or Linux hosts**
 
-<Tabs items={['KASM on Docker (macOS, Windows, Linux)', 'Windows Sandbox (Windows Only)', 'macOS VM (with Lume CLI)']}>
-  <Tab value="KASM on Docker (macOS, Windows, Linux)">
+Cua provides two Docker images for running Linux desktops:
+
+<Tabs items={['XFCE (Lightweight)', 'KASM (Full-Featured)']}>
+  <Tab value="XFCE (Lightweight)">
+
+    **Recommended for most use cases** - lightweight XFCE desktop with Firefox
 
     1. Install Docker Desktop or Docker Engine
 
-    2. Build or pull the CUA Ubuntu sandbox
+    2. Pull the CUA XFCE image
+
+    ```bash
+    docker pull --platform=linux/amd64 trycua/cua-xfce:latest
+    ```
+
+    3. Connect with Computer
+
+    ```python
+    from computer import Computer
+
+    computer = Computer(
+        os_type="linux",
+        provider_type="docker",
+        image="trycua/cua-xfce:latest",
+        name="my-xfce-container"
+    )
+
+    await computer.run() # Launch & connect to Docker sandbox
+    ```
+
+  </Tab>
+  <Tab value="KASM (Full-Featured)">
+
+    **Full-featured Ubuntu desktop** with additional applications
+
+    1. Install Docker Desktop or Docker Engine
+
+    2. Build or pull the CUA KASM image
 
     ```bash
     # Option 1: Pull from Docker Hub
@@ -74,67 +108,69 @@ Cua provides local sandboxes using different providers depending on your host op
         os_type="linux",
         provider_type="docker",
         image="trycua/cua-ubuntu:latest",
-        name="my-cua-container"
+        name="my-kasm-container"
     )
 
     await computer.run() # Launch & connect to Docker sandbox
     ```
 
   </Tab>
-  <Tab value="Windows Sandbox (Windows Only)">
-
-    1. Enable Windows Sandbox (requires Windows 10 Pro/Enterprise or Windows 11)
-    2. Install pywinsandbox dependency
-
-    ```bash
-    pip install -U git+git://github.com/karkason/pywinsandbox.git
-    ```
-
-    3. Windows Sandbox will be automatically configured when you run the CLI
-
-    ```python
-    from computer import Computer
-
-    computer = Computer(
-        os_type="windows",
-        provider_type="winsandbox",
-        ephemeral=True # Windows Sandbox is always ephemeral
-    )
-
-    await computer.run() # Launch & connect to Windows Sandbox
-    ```
-
-  </Tab>
-  <Tab value="macOS VM (with Lume CLI)">
-
-    1. Install lume cli
-
-    ```bash
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh)"
-    ```
-
-    2. Start a local cua sandbox
-
-    ```bash
-    lume run macos-sequoia-cua:latest
-    ```
-
-    3. Connect with Computer
-
-    ```python
-    from computer import Computer
-
-    computer = Computer(
-        os_type="macos",
-        provider_type="lume",
-        name="macos-sequoia-cua:latest"
-    )
-
-    await computer.run() # Launch & connect to the sandbox
-    ```
-
-  </Tab>
 </Tabs>
+
+## Windows Sandbox
+
+**Windows hosts only - requires Windows 10 Pro/Enterprise or Windows 11**
+
+1. Enable Windows Sandbox
+2. Install pywinsandbox dependency
+
+```bash
+pip install -U git+git://github.com/karkason/pywinsandbox.git
+```
+
+3. Connect with Computer
+
+```python
+from computer import Computer
+
+computer = Computer(
+    os_type="windows",
+    provider_type="winsandbox",
+    ephemeral=True # Windows Sandbox is always ephemeral
+)
+
+await computer.run() # Launch & connect to Windows Sandbox
+```
+
+## macOS VM
+
+**macOS hosts only - requires Lume CLI**
+
+1. Install lume cli
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh)"
+```
+
+2. Start a local cua macOS VM
+
+```bash
+lume run macos-sequoia-cua:latest
+```
+
+3. Connect with Computer
+
+```python
+from computer import Computer
+
+computer = Computer(
+    os_type="macos",
+    provider_type="lume",
+    name="macos-sequoia-cua:latest"
+)
+
+await computer.run() # Launch & connect to the sandbox
+```
 
 ## Your host desktop
 
