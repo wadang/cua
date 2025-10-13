@@ -153,7 +153,7 @@ from computer import Computer
 async with Computer(
     os_type="linux",
     provider_type="cloud",
-    name="your-container-name",
+    name="your-sandbox-name",
     api_key="your-api-key"
 ) as computer:
     # Take screenshot
