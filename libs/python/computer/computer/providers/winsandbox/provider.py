@@ -390,6 +390,9 @@ class WinSandboxProvider(BaseVMProvider):
             "error": "Windows Sandbox does not support runtime configuration updates. "
                     "Please stop and restart the sandbox with new configuration."
         }
+
+    async def restart_vm(self, name: str, storage: Optional[str] = None) -> Dict[str, Any]:
+        raise NotImplementedError("WinSandboxProvider does not support restarting VMs.")
         
     async def get_ip(self, name: str, storage: Optional[str] = None, retry_delay: int = 2) -> str:
         """Get the IP address of a VM, waiting indefinitely until it's available.

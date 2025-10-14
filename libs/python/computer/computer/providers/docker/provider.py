@@ -405,6 +405,9 @@ class DockerProvider(BaseVMProvider):
                 "provider": "docker"
             }
     
+    async def restart_vm(self, name: str, storage: Optional[str] = None) -> Dict[str, Any]:
+        raise NotImplementedError("DockerProvider does not support restarting VMs.")
+
     async def update_vm(self, name: str, update_opts: Dict[str, Any], storage: Optional[str] = None) -> Dict[str, Any]:
         """Update VM configuration.
         

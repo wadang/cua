@@ -57,14 +57,14 @@ async def main() -> None:
         # )
 
         # # To probe a VM's status via its public hostname (if you know the name):
-        name = "m-linux-96lcxd2c2k"
-        info = await provider.get_vm(name)
-        print("get_vm info:\n", 
-            f"name: {info['name']}\n",
-            f"status: {info['status']}\n", # running
-            f"api_url: {info.get('api_url')}\n",
-            f"os_type: {info.get('os_type')}\n",
-        )
+        # name = "m-linux-96lcxd2c2k"
+        # info = await provider.get_vm(name)
+        # print("get_vm info:\n", 
+        #     f"name: {info['name']}\n",
+        #     f"status: {info['status']}\n", # running
+        #     f"api_url: {info.get('api_url')}\n",
+        #     f"os_type: {info.get('os_type')}\n",
+        # )
 
 if __name__ == "__main__":
     asyncio.run(main())
