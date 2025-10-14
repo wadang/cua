@@ -41,17 +41,20 @@ Vanilla XFCE desktop container for Computer-Using Agents (CUA) with noVNC and co
 docker build -t cua-docker-xfce:latest .
 ```
 
-## Pushing to Registry
+### Build and Push (multi-arch)
+
+Use Docker Buildx to build and push a multi-architecture image for both `linux/amd64` and `linux/arm64` in a single command. Replace `trycua` with your Docker Hub username or your registry namespace as needed.
 
 ```bash
-# Tag for Docker Hub (replace 'trycua' with your Docker Hub username)
-docker tag cua-docker-xfce:latest trycua/cua-docker-xfce:latest
-
-# Login to Docker Hub
+# Login to your registry first (Docker Hub shown here)
 docker login
 
-# Push to Docker Hub
-docker push trycua/cua-docker-xfce:latest
+# Build and push for amd64 and arm64 in one step
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t trycua/cua-docker-xfce:latest \
+  --push \
+  .
 ```
 
 ## Running the Container Manually
