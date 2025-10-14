@@ -68,7 +68,7 @@ cli = [
     "yaspin>=3.1.0",
 ]
 hud = [
-    "hud-python==0.4.26",
+    "hud-python==0.4.52",
 ]
 gemini = [
     "google-genai>=1.41.0",
@@ -91,7 +91,7 @@ all = [
     # cli requirements
     "yaspin>=3.1.0",
     # hud requirements
-    "hud-python==0.4.26",
+    "hud-python==0.4.52",
     # gemini requirements
     "google-genai>=1.41.0",
 ]

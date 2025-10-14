@@ -153,7 +153,7 @@ from computer import Computer
 async with Computer(
     os_type="linux",
     provider_type="cloud",
-    name="your-container-name",
+    name="your-sandbox-name",
     api_key="your-api-key"
 ) as computer:
     # Take screenshot
@@ -192,7 +192,7 @@ Join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss i
 
 ## License
 
-Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE) file for details.  
+Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE.md) file for details.  
 
 Portions of this project, specifically components adapted from Kasm Technologies Inc., are also licensed under the MIT License. See [libs/kasm/LICENSE](libs/kasm/LICENSE) for details.
 
@@ -223,3 +223,9 @@ This project is not affiliated with, endorsed by, or sponsored by Apple Inc., Ca
 Thank you to all our supporters!
 
 [![Stargazers over time](https://starchart.cc/trycua/cua.svg?variant=adaptive)](https://starchart.cc/trycua/cua)
+
+## Sponsors
+
+Thank you to all our [GitHub Sponsors](https://github.com/sponsors/trycua)!
+
+<img width="300" alt="coderabbit-cli" src="https://github.com/user-attachments/assets/23a98e38-7897-4043-8ef7-eb990520dccc" />

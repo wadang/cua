@@ -5,9 +5,8 @@
 	"defaultOpen": true,
 	"pages": [
 		"index",
-		"quickstart-ui",
-		"quickstart-cli",
 		"quickstart-devs",
+		"quickstart-cli",
 		"telemetry",
         "---[BookCopy]Computer Playbook---",
         "...computer-sdk",

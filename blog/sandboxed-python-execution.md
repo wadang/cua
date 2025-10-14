@@ -235,7 +235,7 @@ print(f"Security audit: {audit_result}")
 
 ### Desktop automation in the cloud
 
-Here's where things get really interesting. Cua cloud containers come with full desktop environments, so you can automate GUIs:
+Here's where things get really interesting. Cua Cloud Sandbox comes with full desktop environments, so you can automate GUIs:
 
 ```python
 @sandboxed("desktop_env")

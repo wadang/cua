@@ -15,20 +15,34 @@ To run an agent loop simply do:
 
 ```python
 from agent import ComputerAgent
+import asyncio
 from computer import Computer
 
-computer = Computer() # Connect to a cua container
 
-agent = ComputerAgent(
-    model="anthropic/claude-3-5-sonnet-20241022",
-    tools=[computer]
-)
+async def take_screenshot():
+    async with Computer(
+        os_type="linux",
+        provider_type="cloud",
+        name="your-sandbox-name",
+        api_key="your-api-key"
+    ) as computer:
 
-prompt = "Take a screenshot and tell me what you see"
+        agent = ComputerAgent(
+            model="anthropic/claude-3-5-sonnet-20241022",
+            tools=[computer],
+            max_trajectory_budget=5.0
+        )
 
-async for result in agent.run(prompt):
-    if result["output"][-1]["type"] == "message":
-        print("Agent:", result["output"][-1]["content"][0]["text"])
+        messages = [{"role": "user", "content": "Take a screenshot and tell me what you see"}]
+
+        async for result in agent.run(messages):
+            for item in result["output"]:
+                if item["type"] == "message":
+                    print(item["content"][0]["text"])
+
+
+if __name__ == "__main__":
+    asyncio.run(take_screenshot())
 ```
 
 For a list of supported models and configurations, see the [Supported Agents](./supported-agents/computer-use-agents) page.
