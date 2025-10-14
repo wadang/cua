@@ -5,16 +5,10 @@ description: Manage your Cua Cloud sandboxes (VMs) via Python SDK or HTTP API
 
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-Use these concise examples to manage your cloud sandboxes. Pick either the Python SDK or plain HTTP (curl) for each action.
 
-> You need a CUA Database API key. Set it as an environment variable `CUA_API_KEY`.
+Using the Cua Cloud API, you can manage your Cua Cloud sandboxes (VMs) with Python or HTTP (curl).
 
-## Status values
-- `pending` – VM deployment in progress
-- `running` – VM is active and accessible
-- `stopped` – VM is stopped but not terminated
-- `terminated` – VM has been permanently destroyed
-- `failed` – VM deployment or operation failed
+All examples require a CUA API key. You can obtain one from the [Dashboard](https://www.cua.ai/dashboard/keys).
 
 ---
 
@@ -56,15 +50,27 @@ Use these concise examples to manage your cloud sandboxes. Pick either the Pytho
        "https://api.cua.ai/v1/vms"
   ```
 
-  Example response:
+  Responses:
+  - 200: Array of minimal VM objects with fields `{ name, password, status }`
+  - 401: Unauthorized (missing/invalid API key)
+
   ```json
   [
     {
       "name": "s-windows-x4snp46ebf",
+      "password": "49b8daa3",
       "status": "running"
     }
   ]
   ```
+
+  Status values:
+
+  - `pending`: VM deployment in progress
+  - `running`: VM is active and accessible
+  - `stopped`: VM is stopped but not terminated
+  - `terminated`: VM has been permanently destroyed
+  - `failed`: VM deployment or operation failed
 
   </Tab>
 </Tabs>
@@ -104,7 +110,11 @@ Provide the VM name you want to start.
        "https://api.cua.ai/v1/vms/my-vm-name/start" -i
   ```
 
-  Example response headers (no body):
+  Responses:
+  - 204: No Content (start accepted)
+  - 401: Unauthorized (missing/invalid API key)
+  - 404: VM not found or not owned by the user
+
   ```text
   HTTP/1.1 204 No Content
   ```
@@ -147,7 +157,11 @@ Stops the VM asynchronously.
        "https://api.cua.ai/v1/vms/my-vm-name/stop"
   ```
 
-  Example response:
+  Responses:
+  - 202: Accepted with `{ "status": "stopping" }`
+  - 401: Unauthorized (missing/invalid API key)
+  - 404: VM not found or not owned by the user
+
   ```json
   { "status": "stopping" }
   ```
@@ -190,7 +204,11 @@ Restarts the VM asynchronously.
        "https://api.cua.ai/v1/vms/my-vm-name/restart"
   ```
 
-  Example response:
+  Responses:
+  - 202: Accepted with `{ "status": "restarting" }`
+  - 401: Unauthorized (missing/invalid API key)
+  - 404: VM not found or not owned by the user
+
   ```json
   { "status": "restarting" }
   ```
@@ -231,7 +249,9 @@ Query the computer-server running on the VM. Useful for checking details like st
   curl "https://my-vm-name.containers.cloud.cua.ai:8443/status"
   ```
 
-  Example response:
+  Responses:
+  - 200: Server available
+
   ```json
   { "status": "ok", "os_type": "linux", "features": ["agent"] }
   ```
