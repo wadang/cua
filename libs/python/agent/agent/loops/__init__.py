@@ -14,6 +14,7 @@ from . import opencua
 from . import internvl
 from . import holo
 from . import moondream3
+from . import gemini
 
 __all__ = [
     "anthropic", 
@@ -27,4 +28,5 @@ __all__ = [
     "internvl",
     "holo",
     "moondream3",
+    "gemini"
 ]
