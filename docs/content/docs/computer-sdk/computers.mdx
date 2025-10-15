@@ -63,7 +63,7 @@ Cua provides two Docker images for running Linux desktops:
     2. Pull the CUA XFCE image
 
     ```bash
-    docker pull --platform=linux/amd64 trycua/cua-docker-xfce:latest
+    docker pull --platform=linux/amd64 trycua/cua-xfce:latest
     ```
 
     3. Connect with Computer
@@ -74,7 +74,7 @@ Cua provides two Docker images for running Linux desktops:
     computer = Computer(
         os_type="linux",
         provider_type="docker",
-        image="trycua/cua-docker-xfce:latest",
+        image="trycua/cua-xfce:latest",
         name="my-xfce-container"
     )
 
