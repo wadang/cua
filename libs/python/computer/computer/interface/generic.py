@@ -117,15 +117,7 @@ class GenericComputerInterface(BaseComputerInterface):
         await self._handle_delay(delay)
     
     async def type_text(self, text: str, delay: Optional[float] = None) -> None:
-        # Temporary fix for https://github.com/trycua/cua/issues/165
-        # Check if text contains Unicode characters
-        if any(ord(char) > 127 for char in text):
-            # For Unicode text, use clipboard and paste
-            await self.set_clipboard(text)
-            await self.hotkey(Key.COMMAND, 'v')
-        else:
-            # For ASCII text, use the regular typing method
-            await self._send_command("type_text", {"text": text})
+        await self._send_command("type_text", {"text": text})
         await self._handle_delay(delay)
 
     async def press(self, key: "KeyType", delay: Optional[float] = None) -> None:

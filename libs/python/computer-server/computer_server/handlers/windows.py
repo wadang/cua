@@ -169,6 +169,7 @@ class WindowsAutomationHandler(BaseAutomationHandler):
     """Windows implementation of automation handler using pyautogui and Windows APIs."""
     
     mouse = MouseController()
+    keyboard = KeyboardController()
 
     # Mouse Actions
     async def mouse_down(self, x: Optional[int] = None, y: Optional[int] = None, button: str = "left") -> Dict[str, Any]:
@@ -393,11 +394,9 @@ class WindowsAutomationHandler(BaseAutomationHandler):
         Returns:
             Dict[str, Any]: A dictionary with success status and optional error message.
         """
-        if not pyautogui:
-            return {"success": False, "error": "pyautogui not available"}
-        
         try:
-            pyautogui.write(text)
+            # use pynput for Unicode support
+            self.keyboard.type(text)
             return {"success": True}
         except Exception as e:
             return {"success": False, "error": str(e)}
