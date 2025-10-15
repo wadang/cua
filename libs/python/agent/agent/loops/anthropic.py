@@ -33,7 +33,7 @@ from ..responses import (
 MODEL_TOOL_MAPPING = [
     # Claude 4 models
     {
-        "pattern": r"claude-4|claude-opus-4|claude-sonnet-4",
+        "pattern": r"claude-4|claude-opus-4|claude-sonnet-4|claude-haiku-4",
         "tool_version": "computer_20250124",
         "beta_flag": "computer-use-2025-01-24"
     },
