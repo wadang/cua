@@ -49,13 +49,16 @@ class DockerProvider(BaseVMProvider):
         vnc_port: Optional[int] = 6901,
     ):
         """Initialize the Docker VM Provider.
-        
+
         Args:
             port: Host port for the computer-server API (default: DEFAULT_API_PORT)
             host: Hostname for the API server (default: localhost)
             storage: Path for persistent VM storage
             shared_path: Path for shared folder between host and container
             image: Docker image to use (default: "trycua/cua-ubuntu:latest")
+                   Supported images:
+                   - "trycua/cua-ubuntu:latest" (Kasm-based)
+                   - "trycua/cua-docker-xfce:latest" (vanilla XFCE)
             verbose: Enable verbose logging
             ephemeral: Use ephemeral (temporary) storage
             vnc_port: Port for VNC interface (default: 6901)
@@ -64,19 +67,35 @@ class DockerProvider(BaseVMProvider):
         self.api_port = DEFAULT_API_PORT if port is None else port
         self.vnc_port = vnc_port
         self.ephemeral = ephemeral
-        
+
         # Handle ephemeral storage (temporary directory)
         if ephemeral:
             self.storage = "ephemeral"
         else:
             self.storage = storage
-            
+
         self.shared_path = shared_path
         self.image = image
         self.verbose = verbose
         self._container_id = None
         self._running_containers = {}  # Track running containers by name
+
+        # Detect image type and configure user directory accordingly
+        self._detect_image_config()
         
+    def _detect_image_config(self):
+        """Detect image type and configure paths accordingly."""
+        # Detect if this is a docker-xfce image or Kasm image
+        if "docker-xfce" in self.image.lower() or "xfce" in self.image.lower():
+            self._home_dir = "/home/cua"
+            self._image_type = "docker-xfce"
+            logger.info(f"Detected docker-xfce image: using {self._home_dir}")
+        else:
+            # Default to Kasm configuration
+            self._home_dir = "/home/kasm-user"
+            self._image_type = "kasm"
+            logger.info(f"Detected Kasm image: using {self._home_dir}")
+
     @property
     def provider_type(self) -> VMProviderType:
         """Return the provider type."""
@@ -279,12 +298,13 @@ class DockerProvider(BaseVMProvider):
             # Add volume mounts if storage is specified
             storage_path = storage or self.storage
             if storage_path and storage_path != "ephemeral":
-                # Mount storage directory
-                cmd.extend(["-v", f"{storage_path}:/home/kasm-user/storage"])
-            
+                # Mount storage directory using detected home directory
+                cmd.extend(["-v", f"{storage_path}:{self._home_dir}/storage"])
+
             # Add shared path if specified
             if self.shared_path:
-                cmd.extend(["-v", f"{self.shared_path}:/home/kasm-user/shared"])
+                # Mount shared directory using detected home directory
+                cmd.extend(["-v", f"{self.shared_path}:{self._home_dir}/shared"])
             
             # Add environment variables
             cmd.extend(["-e", "VNC_PW=password"])  # Set VNC password
@@ -407,6 +427,9 @@ class DockerProvider(BaseVMProvider):
                 "provider": "docker"
             }
     
+    async def restart_vm(self, name: str, storage: Optional[str] = None) -> Dict[str, Any]:
+        raise NotImplementedError("DockerProvider does not support restarting VMs.")
+
     async def update_vm(self, name: str, update_opts: Dict[str, Any], storage: Optional[str] = None) -> Dict[str, Any]:
         """Update VM configuration.
         

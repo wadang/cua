@@ -836,6 +836,9 @@ class LumierProvider(BaseVMProvider):
                 logger.error(error_msg)
                 return error_msg
     
+    async def restart_vm(self, name: str, storage: Optional[str] = None) -> Dict[str, Any]:
+        raise NotImplementedError("LumierProvider does not support restarting VMs.")
+
     async def get_ip(self, name: str, storage: Optional[str] = None, retry_delay: int = 2) -> str:
         """Get the IP address of a VM, waiting indefinitely until it's available.
         

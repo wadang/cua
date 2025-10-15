@@ -42,7 +42,8 @@ With the Agent SDK, you can:
 | `anthropic/claude-sonnet-4-5-20250929` | `huggingface-local/xlangai/OpenCUA-{7B,32B}` | any all-in-one CUA |
 | `openai/computer-use-preview` | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}` | any VLM (using liteLLM, requires `tools` parameter) |
 | `openrouter/z-ai/glm-4.5v` | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}` | any LLM (using liteLLM, requires `moondream3+` prefix ) |
-| `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}` | any all-in-one CUA | |
+| `gemini-2.5-computer-use-preview-10-2025` | any-all-in-one CUA | |
+| `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}` | | |
 | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B` | |
 | `moondream3+{ui planning}` (supports text-only models) | |
 | `omniparser+{ui planning}` | | |
@@ -153,7 +154,7 @@ from computer import Computer
 async with Computer(
     os_type="linux",
     provider_type="cloud",
-    name="your-container-name",
+    name="your-sandbox-name",
     api_key="your-api-key"
 ) as computer:
     # Take screenshot
@@ -192,7 +193,7 @@ Join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss i
 
 ## License
 
-Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE) file for details.  
+Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE.md) file for details.  
 
 Portions of this project, specifically components adapted from Kasm Technologies Inc., are also licensed under the MIT License. See [libs/kasm/LICENSE](libs/kasm/LICENSE) for details.
 
@@ -205,6 +206,73 @@ Some optional extras for this project depend on third-party packages that are li
 - The optional "omni" extra (installed via `pip install "cua-agent[omni]"`) installs the `cua-som` module, which includes `ultralytics` and is licensed under the AGPL-3.0.
 
 When you choose to install and use such optional extras, your use, modification, and distribution of those third-party components are governed by their respective licenses (e.g., AGPL-3.0 for `ultralytics`).
+
+## Releasing Packages
+
+Cua uses `bump2version` to manage package versions across all Python modules. A Makefile is provided to simplify the release process.
+
+### Prerequisites 
+
+#### install `bump2version`
+
+using brew
+```
+brew install bumpversion
+```
+
+
+### View Current Versions
+
+```bash
+make show-versions
+```
+
+### Bump Package Versions
+
+To bump a specific package version:
+
+```bash
+# Patch version bump (e.g., 0.1.8 → 0.1.9)
+make bump-patch-core          # cua-core
+make bump-patch-pylume        # pylume
+make bump-patch-computer      # cua-computer
+make bump-patch-som           # cua-som
+make bump-patch-agent         # cua-agent
+make bump-patch-computer-server  # cua-computer-server
+make bump-patch-mcp-server    # cua-mcp-server
+
+# Minor version bump (e.g., 0.1.8 → 0.2.0)
+make bump-minor-core          # Replace 'core' with any package name
+
+# Major version bump (e.g., 0.1.8 → 1.0.0)
+make bump-major-core          # Replace 'core' with any package name
+```
+
+### Dry Run (Test Before Bumping)
+
+To preview changes without modifying files:
+
+```bash
+make dry-run-patch-core       # Test patch bump for cua-core
+make dry-run-minor-pylume     # Test minor bump for pylume
+make dry-run-major-agent      # Test major bump for cua-agent
+```
+
+### Bump All Packages (Use with Caution)
+
+```bash
+make bump-all-patch           # Bumps patch version for ALL packages
+```
+
+### After Bumping
+
+After running any bump command, push your changes:
+
+```bash
+git push origin main && git push origin --tags
+```
+
+For more details, run `make help` or see the [Makefile](./Makefile).
 
 ## Contributing
 
@@ -223,3 +291,9 @@ This project is not affiliated with, endorsed by, or sponsored by Apple Inc., Ca
 Thank you to all our supporters!
 
 [![Stargazers over time](https://starchart.cc/trycua/cua.svg?variant=adaptive)](https://starchart.cc/trycua/cua)
+
+## Sponsors
+
+Thank you to all our [GitHub Sponsors](https://github.com/sponsors/trycua)!
+
+<img width="300" alt="coderabbit-cli" src="https://github.com/user-attachments/assets/23a98e38-7897-4043-8ef7-eb990520dccc" />
