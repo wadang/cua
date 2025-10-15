@@ -157,16 +157,16 @@ install_package "libs/python/pylume" "pylume"
 install_package "libs/python/computer" "computer" "all"
 
 # Install omniparser
-install_package "libs/python/som" "som"
+# install_package "libs/python/som" "som"
 
 # Install agent with all its dependencies and extras
-install_package "libs/python/agent" "agent" "all"
+# install_package "libs/python/agent" "agent" "all"
 
 # Install computer-server
 install_package "libs/python/computer-server" "computer-server"
 
 # Install mcp-server
-install_package "libs/python/mcp-server" "mcp-server"
+# install_package "libs/python/mcp-server" "mcp-server"
 
 # Install development tools from root project
 print_step "Installing development dependencies with UV..."

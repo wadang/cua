@@ -1,9 +1,11 @@
-FROM kasmweb/core-ubuntu-jammy:1.17.0
+FROM kasmweb/ubuntu-jammy-desktop:1.17.0
 USER root
 
 ENV HOME=/home/kasm-default-profile
 ENV STARTUPDIR=/dockerstartup
 ENV INST_SCRIPTS=$STARTUPDIR/install
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Shanghai
 WORKDIR $HOME
 
 ######### Customize Container Here ###########
@@ -11,7 +13,8 @@ WORKDIR $HOME
 # Installing python, pip, and libraries
 RUN apt-get update
 RUN apt install -y wget build-essential libncursesw5-dev libssl-dev \
-libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
+libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev tzdata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt install -y python3.11 python3-pip python3-tk python3-dev \
 gnome-screenshot wmctrl ffmpeg socat xclip
@@ -19,8 +22,7 @@ gnome-screenshot wmctrl ffmpeg socat xclip
 RUN pip install cua-computer-server
 
 # Install Firefox
-ENV DEBIAN_FRONTEND=noninteractive \
-    INST_DIR=$STARTUPDIR/install
+ENV INST_DIR=$STARTUPDIR/install
 COPY ./src/ $INST_DIR
 RUN bash ${INST_DIR}/ubuntu/install/firefox/install_firefox.sh
 
