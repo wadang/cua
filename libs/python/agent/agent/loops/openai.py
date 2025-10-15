@@ -53,8 +53,7 @@ async def _prepare_tools_for_openai(tool_schemas: List[Dict[str, Any]]) -> Tools
     
     return openai_tools
 
-
-@register_agent(models=r".*computer-use-preview.*")
+@register_agent(models=r".*(^|/)computer-use-preview")
 class OpenAIComputerUseConfig:
     """
     OpenAI computer-use-preview agent configuration using liteLLM responses.
