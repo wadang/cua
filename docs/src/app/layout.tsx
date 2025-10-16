@@ -2,6 +2,8 @@ import './global.css';
 import { RootProvider } from 'fumadocs-ui/provider';
 import { Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { PHProvider, PostHogPageView } from '@/providers/posthog-provider';
+import { Suspense } from 'react';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,9 +16,14 @@ export default function Layout({ children }: { children: ReactNode }) {
         <link rel="icon" href="/docs/favicon.ico" sizes="any" />
       </head>
       <body className="flex min-h-screen flex-col">
-        <RootProvider search={{ options: { api: '/docs/api/search' } }}>
-          {children}
-        </RootProvider>
+        <PHProvider>
+          <Suspense fallback={null}>
+            <PostHogPageView />
+          </Suspense>
+          <RootProvider search={{ options: { api: '/docs/api/search' } }}>
+            {children}
+          </RootProvider>
+        </PHProvider>
       </body>
     </html>
   );
