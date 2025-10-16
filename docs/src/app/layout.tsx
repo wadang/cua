@@ -3,6 +3,9 @@ import { RootProvider } from 'fumadocs-ui/provider';
 import { Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { PHProvider, PostHogPageView } from '@/providers/posthog-provider';
+import { AnalyticsTracker } from '@/components/analytics-tracker';
+import { CookieConsent } from '@/components/cookie-consent';
+import { Footer } from '@/components/footer';
 import { Suspense } from 'react';
 
 const inter = Inter({
@@ -20,9 +23,12 @@ export default function Layout({ children }: { children: ReactNode }) {
           <Suspense fallback={null}>
             <PostHogPageView />
           </Suspense>
+          <AnalyticsTracker />
           <RootProvider search={{ options: { api: '/docs/api/search' } }}>
             {children}
           </RootProvider>
+          <Footer />
+          <CookieConsent />
         </PHProvider>
       </body>
     </html>

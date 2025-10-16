@@ -30,7 +30,6 @@ export function PostHogPageView(): null {
         url = url + `?${searchParams.toString()}`;
       }
 
-      console.log('[PostHog] Capturing pageview:', url);
       posthog.capture('$pageview', {
         $current_url: url,
       });
