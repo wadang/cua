@@ -18,6 +18,7 @@ import { ChevronDown, CodeXml, ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
+import { PageFeedback } from '@/components/page-feedback';
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -270,6 +271,7 @@ export default async function Page(props: {
             a: createRelativeLink(source, page),
           })}
         />
+        <PageFeedback />
       </DocsBody>
     </DocsPage>
   );
