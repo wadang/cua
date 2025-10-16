@@ -61,7 +61,7 @@ export function EditableCodeBlock({
   return (
     <EditableCodeContext.Provider value={{ values, updateValue }}>
       <Base.CodeBlock title={title} className={cn('my-4', className)}>
-        <Base.Pre className={cn(`language-${lang}`)}>
+        <Base.Pre className={cn(`language-${lang}`, "px-3")}>
           <code className={cn(`language-${lang}`)} style={{ display: 'block', whiteSpace: 'pre-wrap' }}>
             {children}
           </code>

@@ -1,0 +1,96 @@
+---
+title: Job Application Filling
+description: Automate job applications with CUA
+---
+
+import { EditableCodeBlock, EditableValue, S } from '@/components/editable-code-block';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+# Job Application Automation
+
+Fill out the form below to see how CUA can automate your job application process. Click on the underlined values in the code to edit them directly!
+
+<Tabs items={["Python", "curl"]}>
+  <Tab value="Python">
+
+<EditableCodeBlock
+  lang="python"
+  defaultValues={{
+    "api_key": "your-api-key",
+    "api_base": "https://api.cua.ai"
+  }}
+>
+{`import os
+import asyncio
+from computer.providers.cloud.provider import CloudProvider
+
+async def main():
+    api_key = "`}<EditableValue placeholder="api_key" />{`"
+    # Optional: point to a different API base
+    os.environ["CUA_API_BASE"] = "`}<EditableValue placeholder="api_base" />{`"
+
+    provider = CloudProvider(api_key=api_key, verbose=False)
+    async with provider:
+        vms = await provider.list_vms()
+        for vm in vms:
+            print({
+                "name": vm["name"],
+                "status": vm["status"],
+                "api_url": vm.get("api_url"),
+                "vnc_url": vm.get("vnc_url"),
+            })
+
+if __name__ == "__main__":
+    asyncio.run(main())`}
+</EditableCodeBlock>
+
+  </Tab>
+  <Tab value="curl">
+
+<EditableCodeBlock
+  lang="bash"
+  defaultValues={{
+    "api_key": "your-api-key",
+    "api_base": "https://api.cua.ai"
+  }}
+>
+{`curl -H "Authorization: Bearer `}<EditableValue placeholder="api_key" />{`" \\
+     "`}<EditableValue placeholder="api_base" />{`/v1/vms"`}
+</EditableCodeBlock>
+
+  Responses:
+  - 200: Array of minimal VM objects with fields `{ name, password, status }`
+  - 401: Unauthorized (missing/invalid API key)
+
+  ```json
+  [
+    {
+      "name": "s-windows-x4snp46ebf",
+      "password": "49b8daa3",
+      "status": "running"
+    }
+  ]
+  ```
+
+  Status values:
+
+  - `pending`: VM deployment in progress
+  - `running`: VM is active and accessible
+  - `stopped`: VM is stopped but not terminated
+  - `terminated`: VM has been permanently destroyed
+  - `failed`: VM deployment or operation failed
+
+  </Tab>
+</Tabs>
+
+## How It Works
+
+1. Click on the underlined values in the code above to edit them
+2. The code updates in real-time as you type
+3. Copy the customized code to use with CUA
+
+## Features
+
+- **Dynamic Form Filling**: Automatically fills out all required fields
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Customizable**: Easily modify the code to match any job application form
