@@ -99,29 +99,68 @@ export function EditableValue({
   const value = values[placeholder] ?? defaultValue;
   const spanRef = React.useRef<HTMLSpanElement>(null);
   const placeholderSpanRef = React.useRef<HTMLSpanElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [measuredWidth, setMeasuredWidth] = React.useState(0);
   const [placeholderWidth, setPlaceholderWidth] = React.useState(0);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [tooltipPosition, setTooltipPosition] = React.useState({ top: 0, left: 0 });
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  // Observe visibility changes to trigger remeasurement
+  React.useEffect(() => {
+    if (!inputRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsVisible(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.01 }
+    );
+
+    observer.observe(inputRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Measure the actual text width using a hidden span
   React.useEffect(() => {
-    if (spanRef.current) {
+    if (spanRef.current && isVisible) {
       setMeasuredWidth(spanRef.current.offsetWidth);
     }
-  }, [value]);
+  }, [value, isVisible]);
 
-  // Measure placeholder width once on mount
+  // Measure placeholder width when visible
   React.useEffect(() => {
-    if (placeholderSpanRef.current) {
+    if (placeholderSpanRef.current && isVisible) {
       setPlaceholderWidth(placeholderSpanRef.current.offsetWidth);
     }
-  }, [placeholder]);
+  }, [placeholder, isVisible]);
+
+  // Update tooltip position when hovered
+  React.useEffect(() => {
+    if (isHovered && inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setTooltipPosition({
+        top: rect.top - 28,
+        left: rect.left + rect.width / 2,
+      });
+    }
+  }, [isHovered]);
 
   const inputWidth = explicitWidth
     ? `${explicitWidth}ch`
-    : `${Math.max(placeholderWidth, measuredWidth, 50)}px`;
+    : `${Math.max(placeholderWidth, measuredWidth, 80)}px`;
 
   return (
-    <span style={{ display: 'inline', whiteSpace: 'nowrap', position: 'relative' }}>
+    <span
+      style={{ display: 'inline', whiteSpace: 'nowrap', position: 'relative' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Hidden span to measure current value width */}
       <span
         ref={spanRef}
@@ -152,7 +191,30 @@ export function EditableValue({
         {placeholder}
       </span>
 
+      {/* Tooltip */}
+      <span
+        style={{
+          position: 'fixed',
+          top: tooltipPosition.top,
+          left: tooltipPosition.left,
+          transform: 'translateX(-50%)',
+          padding: '4px 8px',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          color: 'white',
+          fontSize: '12px',
+          borderRadius: '4px',
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+          opacity: isHovered ? 1 : 0,
+          transition: 'opacity 0.2s ease-in-out',
+          zIndex: 9999,
+        }}
+      >
+        Edit me!
+      </span>
+
       <input
+        ref={inputRef}
         type={type}
         value={value}
         onChange={(e) => updateValue(placeholder, e.target.value)}
@@ -172,9 +234,10 @@ export function EditableValue({
           margin: 0,
           background: 'transparent',
           border: 'none',
-          borderBottom: '1px dashed rgba(96, 165, 250, 0.5)',
+          borderBottom: '2px dashed rgba(96, 165, 250, 0.5)',
           outline: 'none',
           color: 'inherit',
+          transition: 'border-bottom-color 0.2s ease-in-out',
         }}
       />
     </span>
