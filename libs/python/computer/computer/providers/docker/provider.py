@@ -56,7 +56,7 @@ class DockerProvider(BaseVMProvider):
             image: Docker image to use (default: "trycua/cua-ubuntu:latest")
                    Supported images:
                    - "trycua/cua-ubuntu:latest" (Kasm-based)
-                   - "trycua/cua-docker-xfce:latest" (vanilla XFCE)
+                   - "trycua/cua-xfce:latest" (vanilla XFCE)
             verbose: Enable verbose logging
             ephemeral: Use ephemeral (temporary) storage
             vnc_port: Port for VNC interface (default: 6901)
