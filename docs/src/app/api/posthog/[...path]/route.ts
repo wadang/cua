@@ -17,6 +17,11 @@ export async function GET(
       },
     });
 
+    // Handle 204 No Content responses
+    if (response.status === 204) {
+      return new NextResponse(null, { status: 204 });
+    }
+
     const data = await response.arrayBuffer();
     return new NextResponse(data, {
       status: response.status,
@@ -50,6 +55,11 @@ export async function POST(
       },
       body,
     });
+
+    // Handle 204 No Content responses
+    if (response.status === 204) {
+      return new NextResponse(null, { status: 204 });
+    }
 
     const data = await response.arrayBuffer();
     return new NextResponse(data, {
