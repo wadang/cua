@@ -4,7 +4,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "cua-agent"
-version = "0.4.33"
+version = "0.4.34"
 description = "CUA (Computer Use) Agent for AI-driven computer interaction"
 readme = "README.md"
 authors = [
@@ -59,6 +59,11 @@ internvl-hf = [
     "transformers>=4.55.0",
     "einops",
     "timm"
+]
+moondream3 = [
+    "accelerate",
+    "torch",
+    "transformers>=4.55.0"
 ]
 ui = [
     "gradio>=5.23.3",
