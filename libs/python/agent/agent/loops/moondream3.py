@@ -20,8 +20,6 @@ import io
 from typing import Dict, List, Any, Optional, Tuple, Any
 
 from PIL import Image, ImageDraw, ImageFont
-import torch
-from transformers import AutoModelForCausalLM
 import litellm
 
 from ..decorators import register_agent
@@ -41,12 +39,19 @@ def get_moondream_model() -> Any:
     """Get a singleton instance of the Moondream3 preview model."""
     global _MOONDREAM_SINGLETON
     if _MOONDREAM_SINGLETON is None:
-        _MOONDREAM_SINGLETON = AutoModelForCausalLM.from_pretrained(
-            "moondream/moondream3-preview",
-            trust_remote_code=True,
-            torch_dtype=torch.bfloat16,
-            device_map="cuda",
-        )
+        try:
+            import torch
+            from transformers import AutoModelForCausalLM
+            _MOONDREAM_SINGLETON = AutoModelForCausalLM.from_pretrained(
+                "moondream/moondream3-preview",
+                trust_remote_code=True,
+                torch_dtype=torch.bfloat16,
+                device_map="cuda",
+            )
+        except ImportError as e:
+            raise RuntimeError(
+                "moondream3 requires torch and transformers. Install with: pip install cua-agent[moondream3]"
+            ) from e
     return _MOONDREAM_SINGLETON
 
 

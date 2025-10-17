@@ -60,6 +60,11 @@ internvl-hf = [
     "einops",
     "timm"
 ]
+moondream3 = [
+    "accelerate",
+    "torch",
+    "transformers>=4.55.0"
+]
 ui = [
     "gradio>=5.23.3",
     "python-dotenv>=1.0.1",
