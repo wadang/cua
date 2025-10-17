@@ -533,7 +533,7 @@ class ComputerAgent:
                 # Perform function call
                 function = self._get_tool(item.get("name"))
                 if not function:
-                    raise ToolError(f"Function {item.get("name")} not found")
+                    raise ToolError(f"Function {item.get('name')} not found")
             
                 args = json.loads(item.get("arguments"))
 
