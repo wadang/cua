@@ -175,14 +175,14 @@ export default async function Page(props: {
                 </PopoverContent>
               </Popover>
             ))}
-          {slug.includes('libraries') && (
+          {/*slug.includes('libraries') && (
             <a
               className="inline-flex gap-2 w-fit items-center justify-center rounded-md text-sm font-medium transition-colors duration-100 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none hover:bg-fd-accent hover:text-fd-accent-foreground p-1.5 [&amp;_svg]:size-5 text-fd-muted-foreground md:[&amp;_svg]:size-4.5"
               href={`/api/${page.data.title.toLowerCase()}`}>
               <CodeXml size={12} />
               Reference
             </a>
-          )}
+          )*/}
         </div>
         <hr className="my-2 border-t border-fd-border" />
       </div>
