@@ -86,15 +86,6 @@ if ! check_uv; then
     install_uv
 fi
 
-# Clean up existing environments and cache
-print_step "Cleaning up existing environments..."
-find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
-find . -type d -name "dist" -exec rm -rf {} + 2>/dev/null || true
-find . -type d -name ".venv" -exec rm -rf {} + 2>/dev/null || true
-find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
-print_success "Environment cleanup complete"
-
 # Install Python 3.12 using UV
 print_step "Installing Python 3.12 using UV..."
 uv python install 3.12
@@ -102,6 +93,7 @@ print_success "Python 3.12 installed"
 
 # Create virtual environment using UV
 print_step "Creating virtual environment with UV..."
+rm -rf .venv
 uv venv .venv --python 3.12
 print_success "Virtual environment created"
 
