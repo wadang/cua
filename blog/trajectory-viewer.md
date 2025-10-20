@@ -40,10 +40,6 @@ The viewer allows you to see exactly what your agent observed and how it interac
 
 ## Recording a Trajectory
 
-### Using the Gradio UI
-
-The simplest way to create agent trajectories is through the [Cua Agent Gradio UI](https://www.trycua.com/docs/quickstart-ui) by checking the "Save Trajectory" option.
-
 ### Using the ComputerAgent API
 
 Trajectories are saved by default when using the ComputerAgent API:
