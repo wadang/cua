@@ -57,6 +57,7 @@ Missing a model? [Raise a feature request](https://github.com/trycua/cua/issues/
 
 # Quick Start 
 
+- [Clone a starter template and run the code in <1 min](https://github.com/trycua/agent-template) (⭐️ Recommended!)
 - [Get started with a Computer-Use Agent UI](https://docs.trycua.com/docs/quickstart-ui)
 - [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
 - [Get started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
