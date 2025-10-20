@@ -107,52 +107,6 @@ The workspace also includes compound launch configurations:
 
 - "Run Computer Examples + Server" - Runs both the Computer Examples and Server simultaneously
 
-## Docker Development Environment
-
-As an alternative to installing directly on your host machine, you can use Docker for development. This approach has several advantages:
-
-### Prerequisites
-
-- Docker installed on your machine
-- Lume server running on your host (port 7777): `lume serve`
-
-### Setup and Usage
-
-1. Build the development Docker image:
-
-    ```bash
-    ./scripts/run-docker-dev.sh build
-    ```
-
-2. Run an example in the container:
-
-    ```bash
-    ./scripts/run-docker-dev.sh run computer_examples.py
-    ```
-
-3. Get an interactive shell in the container:
-
-    ```bash
-    ./scripts/run-docker-dev.sh run --interactive
-    ```
-
-4. Stop any running containers:
-
-    ```bash
-    ./scripts/run-docker-dev.sh stop
-    ```
-
-### How it Works
-
-The Docker development environment:
-
-- Installs all required Python dependencies in the container
-- Mounts your source code from the host at runtime
-- Automatically configures the connection to use host.docker.internal:7777 for accessing the Lume server on your host machine
-- Preserves your code changes without requiring rebuilds (source code is mounted as a volume)
-
-> **Note**: The Docker container doesn't include the macOS-specific Lume executable. Instead, it connects to the Lume server running on your host machine via host.docker.internal:7777. Make sure to start the Lume server on your host before running examples in the container.
-
 ## Code Formatting Standards
 
 The Cua project follows strict code formatting standards to ensure consistency across all packages.
