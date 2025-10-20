@@ -35,12 +35,12 @@ We follow strict code formatting guidelines to ensure consistency across the cod
 3. **Run Formatting Tools**: Always run the formatting tools before submitting a PR:
    ```bash
    # For Python code
-   pdm run black .
-   pdm run ruff check --fix .
+   uv run black .
+   uv run ruff check --fix .
    ```
 4. **Validate Your Code**: Ensure your code passes all checks:
    ```bash
-   pdm run mypy .
+   uv run mypy .
    ```
 
 ## Documentation
