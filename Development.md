@@ -10,9 +10,8 @@ The project is organized as a monorepo with these main packages:
 - `libs/som/` - Set-of-Mark parser
 - `libs/computer-server/` - Server component for VM
 - `libs/lume/` - Lume CLI
-- `libs/pylume/` - Python bindings for Lume
 
-Each package has its own virtual environment and dependencies, managed through PDM.
+These packages are part of a uv workspace which manages a shared virtual environment and dependencies.
 
 ## Local Development Setup
 
@@ -62,39 +61,33 @@ Refer to the [Lume README](./libs/lume/Development.md) for instructions on how t
 
 ## Python Development
 
-There are two ways to install Lume:
+### Setup
 
-### Run the build script
-
-Run the build script to set up all packages:
+Install all of workspace dependencies with a single command:
 
 ```bash
-./scripts/build.sh
+uv sync
 ```
 
-The build script creates a shared virtual environment for all packages. The workspace configuration automatically handles import paths with the correct Python path settings.
+This installs all dependencies in the virtual environment `.venv`.
 
-This will:
+Each Cua package is installed in editable mode, which means changes to the source code are immediately reflected in the installed package.
 
-- Create a virtual environment for the project
-- Install all packages in development mode
-- Set up the correct Python path
-- Install development tools
+The `.venv` environment is also configured as the default VS Code Python interpreter in `.vscode/settings.json`.
 
-### Install with PDM
+### Running Python Scripts
 
-If PDM is not already installed, you can follow the installation instructions [here](https://pdm-project.org/en/latest/#installation).
+To run Python scripts in the workspace, use the `uv run` command:
 
-To install with PDM, simply run:
-
-```console
-pdm install -G:all
+```bash
+uv run python examples/agent_examples.py
 ```
 
-This installs all the dependencies for development, testing, and building the docs. If you'd only like development dependencies, you can run:
+Or activate the virtual environment manually:
 
-```console
-pdm install -d
+```bash
+source .venv/bin/activate
+python examples/agent_examples.py
 ```
 
 ## Running Examples
@@ -113,68 +106,6 @@ To run examples from VSCode / Cursor:
 The workspace also includes compound launch configurations:
 
 - "Run Computer Examples + Server" - Runs both the Computer Examples and Server simultaneously
-
-## Docker Development Environment
-
-As an alternative to installing directly on your host machine, you can use Docker for development. This approach has several advantages:
-
-### Prerequisites
-
-- Docker installed on your machine
-- Lume server running on your host (port 7777): `lume serve`
-
-### Setup and Usage
-
-1. Build the development Docker image:
-
-    ```bash
-    ./scripts/run-docker-dev.sh build
-    ```
-
-2. Run an example in the container:
-
-    ```bash
-    ./scripts/run-docker-dev.sh run computer_examples.py
-    ```
-
-3. Get an interactive shell in the container:
-
-    ```bash
-    ./scripts/run-docker-dev.sh run --interactive
-    ```
-
-4. Stop any running containers:
-
-    ```bash
-    ./scripts/run-docker-dev.sh stop
-    ```
-
-### How it Works
-
-The Docker development environment:
-
-- Installs all required Python dependencies in the container
-- Mounts your source code from the host at runtime
-- Automatically configures the connection to use host.docker.internal:7777 for accessing the Lume server on your host machine
-- Preserves your code changes without requiring rebuilds (source code is mounted as a volume)
-
-> **Note**: The Docker container doesn't include the macOS-specific Lume executable. Instead, it connects to the Lume server running on your host machine via host.docker.internal:7777. Make sure to start the Lume server on your host before running examples in the container.
-
-## Cleanup and Reset
-
-If you need to clean up the environment (non-docker) and start fresh:
-
-```bash
-./scripts/cleanup.sh
-```
-
-This will:
-
-- Remove all virtual environments
-- Clean Python cache files and directories
-- Remove build artifacts
-- Clean PDM-related files
-- Reset environment configurations
 
 ## Code Formatting Standards
 
@@ -256,13 +187,13 @@ To manually format code:
 
 ```bash
 # Format all Python files using Black
-pdm run black .
+uv run black .
 
 # Run Ruff linter with auto-fix
-pdm run ruff check --fix .
+uv run ruff check --fix .
 
 # Run type checking with MyPy
-pdm run mypy .
+uv run mypy .
 ```
 
 #### Pre-commit Validation
@@ -271,9 +202,9 @@ Before submitting a pull request, ensure your code passes all formatting checks:
 
 ```bash
 # Run all checks
-pdm run black --check .
-pdm run ruff check .
-pdm run mypy .
+uv run black --check .
+uv run ruff check .
+uv run mypy .
 ```
 
 ### Swift Code (Lume)
