@@ -86,11 +86,6 @@ if ! check_uv; then
     install_uv
 fi
 
-# Install Python 3.12 using UV
-print_step "Installing Python 3.12 using UV..."
-uv python install 3.12
-print_success "Python 3.12 installed"
-
 # Create virtual environment using UV
 print_step "Creating virtual environment with UV..."
 rm -rf .venv
