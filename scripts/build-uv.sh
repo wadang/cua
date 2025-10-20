@@ -86,18 +86,6 @@ if ! check_uv; then
     install_uv
 fi
 
-# Load environment variables from .env.local
-if [ -f .env.local ]; then
-    print_step "Loading environment variables from .env.local..."
-    set -a
-    source .env.local
-    set +a
-    print_success "Environment variables loaded"
-else
-    print_error ".env.local file not found"
-    exit 1
-fi
-
 # Clean up existing environments and cache
 print_step "Cleaning up existing environments..."
 find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
