@@ -153,22 +153,6 @@ The Docker development environment:
 
 > **Note**: The Docker container doesn't include the macOS-specific Lume executable. Instead, it connects to the Lume server running on your host machine via host.docker.internal:7777. Make sure to start the Lume server on your host before running examples in the container.
 
-## Cleanup and Reset
-
-If you need to clean up the environment (non-docker) and start fresh:
-
-```bash
-./scripts/cleanup.sh
-```
-
-This will:
-
-- Remove all virtual environments
-- Clean Python cache files and directories
-- Remove build artifacts
-- Clean uv-related files
-- Reset environment configurations
-
 ## Code Formatting Standards
 
 The Cua project follows strict code formatting standards to ensure consistency across all packages.
