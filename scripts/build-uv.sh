@@ -160,10 +160,6 @@ install_package "libs/python/mcp-server" "mcp-server"
 print_step "Installing development dependencies with UV..."
 uv pip install -e ".[dev,test,docs]"
 
-# Create a .env file for VS Code to use the virtual environment
-print_step "Creating .env file for VS Code..."
-echo "PYTHONPATH=${PROJECT_ROOT}/libs/python/core:${PROJECT_ROOT}/libs/python/computer:${PROJECT_ROOT}/libs/python/agent:${PROJECT_ROOT}/libs/python/som:${PROJECT_ROOT}/libs/python/pylume:${PROJECT_ROOT}/libs/python/computer-server:${PROJECT_ROOT}/libs/python/mcp-server" > .env
-
 print_success "All packages installed successfully with UV!"
 print_step "Your virtual environment is ready. To activate it:"
 echo "  source .venv/bin/activate"
