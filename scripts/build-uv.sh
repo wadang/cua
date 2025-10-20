@@ -89,7 +89,7 @@ fi
 # Create virtual environment using UV
 print_step "Creating virtual environment with UV..."
 rm -rf .venv
-uv venv .venv --python 3.12
+uv venv .venv --python 3.13
 print_success "Virtual environment created"
 
 # Install packages
