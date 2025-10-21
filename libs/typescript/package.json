@@ -14,11 +14,14 @@
     "test:core": "pnpm --filter @trycua/core test",
     "test:computer": "pnpm --filter @trycua/computer test",
     "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "packageManager": "pnpm@10.12.3",
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4"
+    "@biomejs/biome": "^1.9.4",
+    "prettier": "^3.6.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
