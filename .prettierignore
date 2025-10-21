@@ -3,6 +3,7 @@ node_modules/
 dist/
 build/
 out/
+.next/
 *.min.js
 
 # Python
@@ -27,3 +28,5 @@ venv/
 *.lock
 *.db
 *.sqlite
+pnpm-lock.yaml
+uv.lock
