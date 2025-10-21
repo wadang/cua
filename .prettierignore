@@ -1,0 +1,29 @@
+# Node / JS
+node_modules/
+dist/
+build/
+out/
+*.min.js
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+.env.local
+
+# Logs
+*.log
+*.tmp
+
+# VSCode / editor files
+.vscode/
+.idea/
+
+# Other generated files
+*.lock
+*.db
+*.sqlite
