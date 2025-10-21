@@ -38,7 +38,27 @@ These packages are part of a uv workspace which manages a shared virtual environ
    OPENAI_API_KEY=your_openai_key_here
    ```
 
-4. Open the workspace in VSCode or Cursor:
+4. Install Node.js dependencies for Prettier and other scripts:
+
+   ```bash
+   # Install pnpm if you don't have it
+   npm install -g pnpm
+
+   # Install all JS/TS dependencies
+   pnpm install
+   ```
+
+5. Install Python dependencies and workspace packages:
+
+   ```bash
+   # First install uv if you don't have it
+   pip install uv
+
+    # Then install all Python dependencies
+   uv sync
+   ```
+
+6. Open the workspace in VSCode or Cursor:
 
    ```bash
    # For Cua Python development
@@ -48,7 +68,13 @@ These packages are part of a uv workspace which manages a shared virtual environ
    code .vscode/lume.code-workspace
    ```
 
-5. Install Pre-commit hooks ([see below](#pre-commit-hook)):
+7. Install Pre-commit hooks:
+
+   This ensures code formatting and validation run automatically on each commit.
+
+   ```bash
+   uv run pre-commit install
+   ```
 
 Using the workspace file is strongly recommended as it:
 
@@ -56,19 +82,6 @@ Using the workspace file is strongly recommended as it:
 - Configures proper import paths
 - Enables debugging configurations
 - Maintains consistent settings across packages
-
-### Pre-commit Hook Installation
-
-Pre-commit hooks are scripts that run automatically before each commit to ensure code quality and consistency.
-To install the hooks:
-
-```bash
-# First, ensure dependencies are installed (only needed once)
-uv sync
-
-# Then install the pre-commit hooks
-uv run pre-commit install
-```
 
 ## Lume Development
 
@@ -149,23 +162,34 @@ line-length = 100
 target-version = ["py311"]
 
 [tool.ruff]
+fix = true
 line-length = 100
 target-version = "py311"
+
+[tool.ruff.lint]
 select = ["E", "F", "B", "I"]
+ignore = [
+    "E501", "E402", "I001", "I002", "B007", "B023", "B024", "B027", "B028",
+    "B904", "B905", "E711", "E712", "E722", "E731", "F401", "F403", "F405",
+    "F811", "F821", "F841"
+]
 fix = true
 
 [tool.ruff.format]
 docstring-code-format = true
 
 [tool.mypy]
-strict = true
-python_version = "3.11"
-ignore_missing_imports = true
-disallow_untyped_defs = true
 check_untyped_defs = true
-warn_return_any = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+python_version = "3.11"
 show_error_codes = true
+strict = true
+warn_return_any = true
 warn_unused_ignores = false
+
+[tool.isort]
+profile = "black"
 ```
 
 #### Key Formatting Rules
@@ -268,6 +292,52 @@ uv run prettier --check "**/*.{ts,tsx,js,jsx,json,md,yaml,yml}"
 # TypeScript typecheck
 node ./scripts/typescript-typecheck.js
 ```
+
+### JavaScript / TypeScript Formatting (Prettier)
+
+The project uses **Prettier** to ensure consistent formatting across all JS/TS/JSON/Markdown/YAML files.
+
+#### Installation
+
+All Node.js dependencies are managed via `pnpm`. Make sure you have run:
+
+```bash
+# Install pnpm if you don't have it
+npm install -g pnpm
+
+# Install project dependencies
+pnpm install
+```
+
+This installs Prettier and other JS/TS dependencies defined in `package.json`.
+
+#### Usage
+
+- **Check formatting** (without making changes):
+
+```bash
+pnpm prettier:check
+```
+
+- **Automatically format files**:
+
+```bash
+pnpm prettier:format
+```
+
+#### Type Checking (TypeScript)
+
+- Run the TypeScript type checker:
+
+```bash
+node ./scripts/typescript-typecheck.js
+```
+
+#### VSCode Integration
+
+- The workspace config ensures Prettier is used automatically for JS/TS/JSON/Markdown/YAML files.
+- Recommended extension: Prettier – Code Formatter
+- Ensure `editor.formatOnSave` is enabled in VSCode for automatic formatting.
 
 ### Swift Code (Lume)
 

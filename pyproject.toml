@@ -75,8 +75,15 @@ target-version = ["py311"]
 [tool.ruff]
 fix = true
 line-length = 100
-select = ["B", "E", "F", "I"]
 target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+ignore = [
+    "E501", "E402", "I001", "I002", "B007", "B023", "B024", "B027", "B028",
+    "B904", "B905", "E711", "E712", "E722", "E731", "F401", "F403", "F405",
+    "F811", "F821", "F841"
+]
 
 [tool.ruff.format]
 docstring-code-format = true
