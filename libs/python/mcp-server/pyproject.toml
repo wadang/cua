@@ -28,13 +28,3 @@ dev = [
     "black>=23.9.1",
     "ruff>=0.0.292",
 ]
-
-[tool.black]
-line-length = 100
-target-version = ["py311"]
-
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-select = ["E", "F", "B", "I"]
-fix = true
