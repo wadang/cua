@@ -17,36 +17,38 @@ These packages are part of a uv workspace which manages a shared virtual environ
 
 1. Install Lume CLI:
 
-    ```bash
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh)"
-    ```
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh)"
+   ```
 
 2. Clone the repository:
 
-    ```bash
-    git clone https://github.com/trycua/cua.git
-    cd cua
-    ```
+   ```bash
+   git clone https://github.com/trycua/cua.git
+   cd cua
+   ```
 
 3. Create a `.env.local` file in the root directory with your API keys:
 
-    ```bash
-    # Required for Anthropic provider
-    ANTHROPIC_API_KEY=your_anthropic_key_here
+   ```bash
+   # Required for Anthropic provider
+   ANTHROPIC_API_KEY=your_anthropic_key_here
 
-    # Required for OpenAI provider
-    OPENAI_API_KEY=your_openai_key_here
-    ```
+   # Required for OpenAI provider
+   OPENAI_API_KEY=your_openai_key_here
+   ```
 
 4. Open the workspace in VSCode or Cursor:
 
-    ```bash
-    # For Cua Python development
-    code .vscode/py.code-workspace
+   ```bash
+   # For Cua Python development
+   code .vscode/py.code-workspace
 
-    # For Lume (Swift) development
-    code .vscode/lume.code-workspace
-    ```
+   # For Lume (Swift) development
+   code .vscode/lume.code-workspace
+   ```
+
+5. Install Pre-commit hooks ([see below](#pre-commit-hook)):
 
 Using the workspace file is strongly recommended as it:
 
@@ -54,6 +56,19 @@ Using the workspace file is strongly recommended as it:
 - Configures proper import paths
 - Enables debugging configurations
 - Maintains consistent settings across packages
+
+### Pre-commit Hook Installation
+
+Pre-commit hooks are scripts that run automatically before each commit to ensure code quality and consistency.
+To install the hooks:
+
+```bash
+# First, ensure dependencies are installed (only needed once)
+uv sync
+
+# Then install the pre-commit hooks
+uv run pre-commit install
+```
 
 ## Lume Development
 
@@ -118,10 +133,11 @@ The Cua project follows strict code formatting standards to ensure consistency a
 The project uses the following tools for code formatting and linting:
 
 - **[Black](https://black.readthedocs.io/)**: Code formatter
+- **[isort](https://pycqa.github.io/isort/)**: Import sorter
 - **[Ruff](https://beta.ruff.rs/docs/)**: Fast linter and formatter
 - **[MyPy](https://mypy.readthedocs.io/)**: Static type checker
 
-These tools are automatically installed when you set up the development environment using the `./scripts/build.sh` script.
+These tools are automatically installed when you set up the development environment.
 
 #### Configuration
 
@@ -163,23 +179,48 @@ warn_unused_ignores = false
 
 The repository includes VSCode workspace configurations that enable automatic formatting. When you open the workspace files (as recommended in the setup instructions), the correct formatting settings are automatically applied.
 
-Python-specific settings in the workspace files:
+##### Python-specific settings
+
+These are configured in `.vscode/settings.json`:
 
 ```json
-"[python]": {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit"
-    }
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.formatting.provider": "black",
+  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
+  "mypy-type-checker.args": ["--config-file", "${workspaceFolder}/pyproject.toml"],
+  "mypy-type-checker.path": ["${workspaceFolder}"]
 }
 ```
 
-Recommended VS Code extensions:
+##### **JS/TS-specific settings**
 
-- Black Formatter (ms-python.black-formatter)
-- Ruff (charliermarsh.ruff)
-- Pylance (ms-python.vscode-pylance)
+```json
+"[javascript][typescript][typescriptreact][javascriptreact]": {
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+```
+
+- Ensures Prettier is used for all JS/TS files for consistent formatting.
+
+Recommended VS Code Extensions
+
+- **Black Formatter** – `ms-python.black-formatter`
+- **Ruff** – `charliermarsh.ruff`
+- **Pylance** – `ms-python.vscode-pylance`
+- **isort** – `ms-python.isort`
+- **Prettier** – `esbenp.prettier-vscode`
+- **Mypy Type Checker** – `ms-python.mypy-type-checker`
+
+> VSCode will automatically suggest installing the recommended extensions when you open the workspace.
 
 #### Manual Formatting
 
@@ -189,8 +230,11 @@ To manually format code:
 # Format all Python files using Black
 uv run black .
 
+# Sort imports using isort
+uv run isort .
+
 # Run Ruff linter with auto-fix
-uv run ruff check --fix .
+uv run ruff check --ignore E501,E402,I001,I002 .
 
 # Run type checking with MyPy
 uv run mypy .
@@ -200,11 +244,29 @@ uv run mypy .
 
 Before submitting a pull request, ensure your code passes all formatting checks:
 
+**Option 1: Run all hooks via pre-commit (all in a single command)**
+
 ```bash
-# Run all checks
+# Run hooks on staged files (recommended for quick checks)
+uv run pre-commit run
+```
+
+- Automatically runs Black, Ruff, isort, Mypy, Prettier, and any other configured hooks.
+
+**Option 2: Run individual tools manually**
+
+```bash
+# Python checks
 uv run black --check .
-uv run ruff check .
+uv run isort --check .
+uv run ruff check --ignore E501,E402,I001,I002 .
 uv run mypy .
+
+# JavaScript/TypeScript checks
+uv run prettier --check "**/*.{ts,tsx,js,jsx,json,md,yaml,yml}"
+
+# TypeScript typecheck
+node ./scripts/typescript-typecheck.js
 ```
 
 ### Swift Code (Lume)
