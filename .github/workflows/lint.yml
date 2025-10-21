@@ -27,14 +27,23 @@ jobs:
         with:
           python-version: 3.11
 
-      - run: pip install uv
-      - run: uv sync
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv sync
 
       # Python checks (isort, black, ruff, mypy)
-      - run: uv run isort --check-only .
-      - run: uv run black --check .
-      - run: uv run ruff check --ignore E501,E402 .
-      - run: uv run mypy .
+      - name: Python lint & typecheck
+        run: |
+          uv run isort --check-only .
+          uv run black --check .
+          uv run ruff check --ignore E501,E402,I001,I002 .
+          uv run mypy .
+
+      # TypeScript type check
+      - name: TypeScript typecheck
+        run: node ./scripts/typescript-typecheck.js
 
       # JS/TS/Markdown/YAML checks
-      - run: uv run prettier --check "**/*.{ts,tsx,js,jsx,json,md,yaml,yml}"
+      - name: Prettier check
+        run: uv run prettier --check "**/*.{ts,tsx,js,jsx,json,md,yaml,yml}"
