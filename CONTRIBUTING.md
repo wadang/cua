@@ -37,7 +37,7 @@ We follow strict code formatting guidelines to ensure consistency across the cod
    # For Python code
    uv run black .
    uv run isort .
-   uv run ruff check --ignore E501,E402,I001,I002 --fix .
+   uv run ruff check --fix .
    ```
 4. **Validate Your Code**: Ensure your code passes all checks:
    ```bash
