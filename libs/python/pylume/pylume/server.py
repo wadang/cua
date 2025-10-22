@@ -1,18 +1,19 @@
-import os
-import time
 import asyncio
-import subprocess
-import tempfile
-import logging
-import socket
-from typing import Optional
-import sys
-from .exceptions import LumeConnectionError
-import signal
 import json
-import shlex
+import logging
+import os
 import random
+import shlex
+import signal
+import socket
+import subprocess
+import sys
+import tempfile
+import time
 from logging import getLogger
+from typing import Optional
+
+from .exceptions import LumeConnectionError
 
 
 class LumeServer:

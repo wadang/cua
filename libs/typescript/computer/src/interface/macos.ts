@@ -15,11 +15,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
    * @param {MouseButton} [button='left'] - Mouse button to press down
    * @returns {Promise<void>}
    */
-  async mouseDown(
-    x?: number,
-    y?: number,
-    button: MouseButton = 'left'
-  ): Promise<void> {
+  async mouseDown(x?: number, y?: number, button: MouseButton = 'left'): Promise<void> {
     await this.sendCommand('mouse_down', { x, y, button });
   }
 
@@ -30,11 +26,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
    * @param {MouseButton} [button='left'] - Mouse button to release
    * @returns {Promise<void>}
    */
-  async mouseUp(
-    x?: number,
-    y?: number,
-    button: MouseButton = 'left'
-  ): Promise<void> {
+  async mouseUp(x?: number, y?: number, button: MouseButton = 'left'): Promise<void> {
     await this.sendCommand('mouse_up', { x, y, button });
   }
 
@@ -86,12 +78,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
    * @param {number} [duration=0.5] - Duration of the drag operation in seconds
    * @returns {Promise<void>}
    */
-  async dragTo(
-    x: number,
-    y: number,
-    button: MouseButton = 'left',
-    duration = 0.5
-  ): Promise<void> {
+  async dragTo(x: number, y: number, button: MouseButton = 'left', duration = 0.5): Promise<void> {
     await this.sendCommand('drag_to', { x, y, button, duration });
   }
 
@@ -326,9 +313,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
       });
 
       if (!response.success) {
-        throw new Error(
-          (response.error as string) || 'Failed to read file chunk'
-        );
+        throw new Error((response.error as string) || 'Failed to read file chunk');
       }
 
       const chunkData = Buffer.from(response.content_b64 as string, 'base64');
@@ -374,9 +359,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
       });
 
       if (!response.success) {
-        throw new Error(
-          (response.error as string) || 'Failed to write file chunk'
-        );
+        throw new Error((response.error as string) || 'Failed to write file chunk');
       }
 
       currentOffset = chunkEnd;
@@ -491,9 +474,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
   async createDir(path: string): Promise<void> {
     const response = await this.sendCommand('create_dir', { path });
     if (!response.success) {
-      throw new Error(
-        (response.error as string) || 'Failed to create directory'
-      );
+      throw new Error((response.error as string) || 'Failed to create directory');
     }
   }
 
@@ -506,9 +487,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
   async deleteDir(path: string): Promise<void> {
     const response = await this.sendCommand('delete_dir', { path });
     if (!response.success) {
-      throw new Error(
-        (response.error as string) || 'Failed to delete directory'
-      );
+      throw new Error((response.error as string) || 'Failed to delete directory');
     }
   }
 
@@ -523,10 +502,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
     if (!response.success) {
       throw new Error((response.error as string) || 'Failed to run command');
     }
-    return [
-      (response.stdout as string) || '',
-      (response.stderr as string) || '',
-    ];
+    return [(response.stdout as string) || '', (response.stderr as string) || ''];
   }
 
   // Accessibility Actions
@@ -538,9 +514,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
   async getAccessibilityTree(): Promise<AccessibilityNode> {
     const response = await this.sendCommand('get_accessibility_tree');
     if (!response.success) {
-      throw new Error(
-        (response.error as string) || 'Failed to get accessibility tree'
-      );
+      throw new Error((response.error as string) || 'Failed to get accessibility tree');
     }
     return response as unknown as AccessibilityNode;
   }
@@ -567,10 +541,7 @@ export class MacOSComputerInterface extends BaseComputerInterface {
    * @returns {Promise<[number, number]>} Converted screenshot coordinates as [x, y]
    * @throws {Error} If coordinate conversion fails
    */
-  async toScreenshotCoordinates(
-    x: number,
-    y: number
-  ): Promise<[number, number]> {
+  async toScreenshotCoordinates(x: number, y: number): Promise<[number, number]> {
     const response = await this.sendCommand('to_screenshot_coordinates', {
       x,
       y,
