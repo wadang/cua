@@ -6,6 +6,7 @@ repos:
         name: Prettier (TS/JS/JSON/Markdown/YAML)
         entry: prettier --write
         language: node
+        additional_dependencies: ["prettier@3.6.2"]
         files: \.(ts|tsx|js|jsx|json|md|yaml|yml)$
 
   - repo: local
