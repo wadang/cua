@@ -16,6 +16,7 @@ from . import (
     openai,
     opencua,
     uitars,
+    qwen,
 )
 
 __all__ = [
@@ -31,4 +32,5 @@ __all__ = [
     "holo",
     "moondream3",
     "gemini",
+    "qwen",
 ]
