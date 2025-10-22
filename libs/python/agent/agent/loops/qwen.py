@@ -3,12 +3,13 @@ Qwen3-VL agent loop implementation using litellm with function/tool calling.
 - Passes a ComputerUse tool schema to acompletion
 - Converts between Responses items and completion messages using helpers
 """
-from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from __future__ import annotations
 
 import json
 import re
+from typing import Any, Dict, List, Optional, Tuple
+
 import litellm
 from litellm.responses.litellm_completion_transformation.transformation import (
     LiteLLMCompletionResponsesConfig,
@@ -16,12 +17,11 @@ from litellm.responses.litellm_completion_transformation.transformation import (
 
 from ..decorators import register_agent
 from ..loops.base import AsyncAgentConfig
-from ..types import AgentCapability
 from ..responses import (
-    convert_responses_items_to_completion_messages,
     convert_completion_messages_to_responses_items,
+    convert_responses_items_to_completion_messages,
 )
-
+from ..types import AgentCapability
 
 # ComputerUse tool schema (OpenAI function tool format)
 QWEN3_COMPUTER_TOOL: Dict[str, Any] = {
@@ -96,18 +96,29 @@ QWEN3_COMPUTER_TOOL: Dict[str, Any] = {
     },
 }
 
+
 def _build_nous_system(functions: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     """Use qwen-agent NousFnCallPrompt to generate a system message embedding tool schema."""
     try:
         from qwen_agent.llm.fncall_prompts.nous_fncall_prompt import (
-            NousFnCallPrompt,
-            Message as NousMessage,
             ContentItem as NousContentItem,
         )
+        from qwen_agent.llm.fncall_prompts.nous_fncall_prompt import (
+            Message as NousMessage,
+        )
+        from qwen_agent.llm.fncall_prompts.nous_fncall_prompt import (
+            NousFnCallPrompt,
+        )
     except ImportError:
-        raise ImportError("qwen-agent not installed. Please install it with `pip install cua-agent[qwen]`.")
+        raise ImportError(
+            "qwen-agent not installed. Please install it with `pip install cua-agent[qwen]`."
+        )
     msgs = NousFnCallPrompt().preprocess_fncall_messages(
-        messages=[NousMessage(role="system", content=[NousContentItem(text="You are a helpful assistant.")])],
+        messages=[
+            NousMessage(
+                role="system", content=[NousContentItem(text="You are a helpful assistant.")]
+            )
+        ],
         functions=functions,
         lang="en",
     )
@@ -115,6 +126,7 @@ def _build_nous_system(functions: List[Dict[str, Any]]) -> Optional[Dict[str, An
     # Convert qwen-agent structured content to OpenAI-style content list
     content = [{"type": "text", "text": c["text"]} for c in sys.get("content", [])]
     return {"role": "system", "content": content}
+
 
 def _parse_tool_call_from_text(text: str) -> Optional[Dict[str, Any]]:
     """Extract JSON object within <tool_call>...</tool_call> from model text."""
@@ -125,6 +137,7 @@ def _parse_tool_call_from_text(text: str) -> Optional[Dict[str, Any]]:
         return json.loads(m.group(1))
     except Exception:
         return None
+
 
 async def _unnormalize_coordinate(args: Dict[str, Any], dims: Tuple[int, int]) -> Dict[str, Any]:
     """Coordinates appear in 0..1000 space, scale to actual screen size using dims if provided."""
@@ -262,7 +275,9 @@ class Qwen3VlConfig(AsyncAgentConfig):
         pre_output_items: List[Dict[str, Any]] = []
         if not _has_any_image(completion_messages):
             if computer_handler is None or not hasattr(computer_handler, "screenshot"):
-                raise RuntimeError("No screenshots present and computer_handler.screenshot is not available.")
+                raise RuntimeError(
+                    "No screenshots present and computer_handler.screenshot is not available."
+                )
             screenshot_b64 = await computer_handler.screenshot()
             if not screenshot_b64:
                 raise RuntimeError("Failed to capture screenshot from computer_handler.")
@@ -271,7 +286,10 @@ class Qwen3VlConfig(AsyncAgentConfig):
                 {
                     "role": "user",
                     "content": [
-                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{screenshot_b64}"}},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/png;base64,{screenshot_b64}"},
+                        },
                         {"type": "text", "text": "Current screen"},
                     ],
                 }
@@ -282,7 +300,10 @@ class Qwen3VlConfig(AsyncAgentConfig):
                     "type": "message",
                     "role": "assistant",
                     "content": [
-                        {"type": "text", "text": "Taking a screenshot to see the current computer screen."}
+                        {
+                            "type": "text",
+                            "text": "Taking a screenshot to see the current computer screen.",
+                        }
                     ],
                 }
             )
@@ -294,11 +315,15 @@ class Qwen3VlConfig(AsyncAgentConfig):
         MIN_PIXELS = 3136
         MAX_PIXELS = 12845056
         try:
-            from qwen_vl_utils import smart_resize  # type: ignore
+            import base64
+            import io
+
             from PIL import Image  # type: ignore
-            import base64, io
+            from qwen_vl_utils import smart_resize  # type: ignore
         except Exception:
-            raise ImportError("qwen-vl-utils not installed. Please install it with `pip install cua-agent[qwen]`.")
+            raise ImportError(
+                "qwen-vl-utils not installed. Please install it with `pip install cua-agent[qwen]`."
+            )
 
         for msg in completion_messages:
             content = msg.get("content")
@@ -306,14 +331,16 @@ class Qwen3VlConfig(AsyncAgentConfig):
                 continue
             for part in content:
                 if isinstance(part, dict) and part.get("type") == "image_url":
-                    url = (((part.get("image_url") or {}).get("url")) or "")
+                    url = ((part.get("image_url") or {}).get("url")) or ""
                     # Expect data URL like data:image/png;base64,<b64>
                     if url.startswith("data:") and "," in url:
                         b64 = url.split(",", 1)[1]
                         img_bytes = base64.b64decode(b64)
                         im = Image.open(io.BytesIO(img_bytes))
                         h, w = im.height, im.width
-                        rh, rw = smart_resize(h, w, factor=32, min_pixels=MIN_PIXELS, max_pixels=MAX_PIXELS)
+                        rh, rw = smart_resize(
+                            h, w, factor=32, min_pixels=MIN_PIXELS, max_pixels=MAX_PIXELS
+                        )
                         # Attach hints on this image block
                         part["min_pixels"] = MIN_PIXELS
                         part["max_pixels"] = MAX_PIXELS
@@ -349,7 +376,7 @@ class Qwen3VlConfig(AsyncAgentConfig):
         # Parse tool call from text; then convert to responses items via fake tool_calls
         resp_dict = response.model_dump()  # type: ignore
         choice = (resp_dict.get("choices") or [{}])[0]
-        content_text = (((choice.get("message") or {}).get("content")) or "")
+        content_text = ((choice.get("message") or {}).get("content")) or ""
         tool_call = _parse_tool_call_from_text(content_text)
 
         output_items: List[Dict[str, Any]] = []
@@ -358,7 +385,9 @@ class Qwen3VlConfig(AsyncAgentConfig):
             raw_args = tool_call.get("arguments") or {}
             # Unnormalize coordinates to actual screen size using last resized dims
             if last_rw is None or last_rh is None:
-                raise RuntimeError("No screenshots found to derive dimensions for coordinate unnormalization.")
+                raise RuntimeError(
+                    "No screenshots found to derive dimensions for coordinate unnormalization."
+                )
             args = await _unnormalize_coordinate(raw_args, (last_rw, last_rh))
 
             # Build an OpenAI-style tool call so we can reuse the converter
@@ -426,10 +455,12 @@ class Qwen3VlConfig(AsyncAgentConfig):
         max_pixels = 12845056
         try:
             # Lazy import to avoid hard dependency
-            from qwen_vl_utils import smart_resize  # type: ignore
+            import base64
+            import io
+
             # If PIL is available, estimate size from image to derive smart bounds
             from PIL import Image
-            import io, base64
+            from qwen_vl_utils import smart_resize  # type: ignore
 
             img_bytes = base64.b64decode(image_b64)
             im = Image.open(io.BytesIO(img_bytes))
@@ -437,16 +468,16 @@ class Qwen3VlConfig(AsyncAgentConfig):
             # Qwen notebook suggests factor=32 and a wide min/max range
             rh, rw = smart_resize(h, w, factor=32, min_pixels=min_pixels, max_pixels=max_pixels)
         except Exception:
-            raise ImportError("qwen-vl-utils not installed. Please install it with `pip install cua-agent[qwen]`.")
+            raise ImportError(
+                "qwen-vl-utils not installed. Please install it with `pip install cua-agent[qwen]`."
+            )
 
         messages = []
         if nous_system:
             messages.append(nous_system)
         image_block: Dict[str, Any] = {
-            "type": "image_url", 
-            "image_url": {
-                "url": f"data:image/png;base64,{image_b64}"
-            },
+            "type": "image_url",
+            "image_url": {"url": f"data:image/png;base64,{image_b64}"},
             "min_pixels": min_pixels,
             "max_pixels": max_pixels,
         }
@@ -461,11 +492,15 @@ class Qwen3VlConfig(AsyncAgentConfig):
             }
         )
 
-        api_kwargs: Dict[str, Any] = {"model": model, "messages": messages, **{k: v for k, v in kwargs.items()}}
+        api_kwargs: Dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            **{k: v for k, v in kwargs.items()},
+        }
         response = await litellm.acompletion(**api_kwargs)
         resp = response.model_dump()  # type: ignore
         choice = (resp.get("choices") or [{}])[0]
-        content_text = (((choice.get("message") or {}).get("content")) or "")
+        content_text = ((choice.get("message") or {}).get("content")) or ""
         tool_call = _parse_tool_call_from_text(content_text) or {}
         args = tool_call.get("arguments") or {}
         args = await _unnormalize_coordinate(args, (rh, rw))

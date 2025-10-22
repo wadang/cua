@@ -15,8 +15,8 @@ from . import (
     omniparser,
     openai,
     opencua,
-    uitars,
     qwen,
+    uitars,
 )
 
 __all__ = [
