@@ -77,7 +77,6 @@ Before running any code examples, let's set up a proper environment:
    ```
 
    **Option B: Using Anaconda Navigator UI**
-
    - Open Anaconda Navigator
    - Click on "Environments" in the left sidebar
    - Click the "Create" button at the bottom
@@ -119,7 +118,6 @@ Before running any code examples, let's set up a proper environment:
    ```
 
    **Option B: Use VS Code notebooks**
-
    - Open VS Code
    - Install the Python extension if you haven't already
    - Create a new file with a `.ipynb` extension (e.g., `cua_agent_tutorial.ipynb`)
@@ -345,7 +343,6 @@ One of the most powerful features of the framework is the ability to use local m
 **How to run this example:**
 
 1. First, you'll need to install Ollama for running local models:
-
    - Visit [ollama.com](https://ollama.com) and download the installer for your OS
    - Follow the installation instructions
    - Pull the Gemma 3 model:
