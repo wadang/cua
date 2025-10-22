@@ -30,6 +30,8 @@ dev = [
     "ruff>=0.9.2",
     "types-requests>=2.31.0",
     "hud-python[agent]==0.4.52",
+    "pre-commit>=4.3.0",
+    "isort>=7.0.0",
 ]
 docs = [
     "mkdocs-material>=9.2.0",
@@ -68,13 +70,20 @@ cua-mcp-server = { workspace = true }
 
 [tool.black]
 line-length = 100
-target-version = ["py311"]
+target-version = ["py312"]
 
 [tool.ruff]
 fix = true
 line-length = 100
-select = ["B", "E", "F", "I"]
-target-version = "py311"
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+ignore = [
+    "E501", "E402", "I001", "I002", "B007", "B023", "B024", "B027", "B028",
+    "B904", "B905", "E711", "E712", "E722", "E731", "F401", "F403", "F405",
+    "F811", "F821", "F841"
+]
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -83,11 +92,15 @@ docstring-code-format = true
 check_untyped_defs = true
 disallow_untyped_defs = true
 ignore_missing_imports = true
-python_version = "3.11"
+python_version = "3.12"
 show_error_codes = true
 strict = true
 warn_return_any = true
 warn_unused_ignores = false
+
+[tool.isort]
+profile = "black"
+py_version = 312
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
