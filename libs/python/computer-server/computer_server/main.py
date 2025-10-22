@@ -183,7 +183,7 @@ class AuthenticationManager:
                 headers = {"Authorization": f"Bearer {api_key}"}
 
                 async with session.get(
-                    f"https://www.trycua.com/api/vm/auth?container_name={container_name}",
+                    f"https://www.cua.ai/api/vm/auth?container_name={container_name}",
                     headers=headers,
                 ) as resp:
                     is_valid = resp.status == 200 and bool((await resp.text()).strip())
