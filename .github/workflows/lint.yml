@@ -38,7 +38,9 @@ jobs:
           uv sync
 
       - name: Install Node dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm -C libs/typescript install --frozen-lockfile
 
       # Python checks (isort, black, ruff, mypy)
       - name: Python lint & typecheck
@@ -55,4 +57,4 @@ jobs:
 
       # JS/TS/Markdown/YAML checks
       - name: Prettier check
-        run: uv run prettier --check "**/*.{ts,tsx,js,jsx,json,md,yaml,yml}"
+        run: pnpm prettier --check "**/*.{ts,tsx,js,jsx,json,md,yaml,yml}"
