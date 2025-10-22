@@ -5,18 +5,21 @@
     <img alt="Cua logo" height="150" src="img/logo_black.png">
   </picture>
 
-  [![Python](https://img.shields.io/badge/Python-333333?logo=python&logoColor=white&labelColor=333333)](#)
-  [![Swift](https://img.shields.io/badge/Swift-F05138?logo=swift&logoColor=white)](#)
-  [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)](#)
-  [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://discord.com/invite/mVnXXpdE85)
-  <br>
-  <a href="https://trendshift.io/repositories/13685" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13685" alt="trycua%2Fcua | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+[![Python](https://img.shields.io/badge/Python-333333?logo=python&logoColor=white&labelColor=333333)](#)
+[![Swift](https://img.shields.io/badge/Swift-F05138?logo=swift&logoColor=white)](#)
+[![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)](#)
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://discord.com/invite/mVnXXpdE85)
+<br>
+<a href="https://trendshift.io/repositories/13685" target="_blank"><img src="https://trendshift.io/api/badge/repositories/13685" alt="trycua%2Fcua | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+
 </div>
 
-> We're hosting **The Computer-Use Agents SOTA Challenge concluded** at [Hack the North](https://hackthenorth.com) and online!  
->> **Track A (On-site @ UWaterloo)**: 🏆 ~~Prize: **YC interview guaranteed**.~~ **Concluded**  
->> **Track B (Remote)**: 🏆 ~~Prize: **Cash award**.~~ **Concluded - Winners will be announced soon**    
->>> ~~👉 Sign up here: [trycua.com/hackathon](https://www.trycua.com/hackathon)~~
+> We're hosting **The Computer-Use Agents SOTA Challenge concluded** at [Hack the North](https://hackthenorth.com) and online!
+>
+> > **Track A (On-site @ UWaterloo)**: 🏆 ~~Prize: **YC interview guaranteed**.~~ **Concluded**  
+> > **Track B (Remote)**: 🏆 ~~Prize: **Cash award**.~~ **Concluded - Winners will be announced soon**
+> >
+> > > ~~👉 Sign up here: [trycua.com/hackathon](https://www.trycua.com/hackathon)~~
 
 **Cua** ("koo-ah") is Docker for [Computer-Use Agents](https://www.oneusefulthing.org/p/when-you-give-a-claude-a-mouse) - it enables AI agents to control full operating systems in virtual containers and deploy them locally or to the cloud.
 
@@ -25,10 +28,12 @@
 </div>
 
 With the Computer SDK, you can:
+
 - automate Windows, Linux, and macOS VMs with a consistent, [pyautogui-like API](https://docs.trycua.com/docs/libraries/computer#interface-actions)
 - create & manage VMs [locally](https://docs.trycua.com/docs/computer-sdk/computers#cua-local-containers) or using [Cua cloud](https://www.trycua.com/)
 
 With the Agent SDK, you can:
+
 - run computer-use models with a [consistent schema](https://docs.trycua.com/docs/agent-sdk/message-format)
 - benchmark on OSWorld-Verified, SheetBench-V2, and more [with a single line of code using HUD](https://docs.trycua.com/docs/agent-sdk/integrations/hud) ([Notebook](https://github.com/trycua/cua/blob/main/notebooks/eval_osworld.ipynb))
 - combine UI grounding models with any LLM using [composed agents](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents)
@@ -38,16 +43,16 @@ With the Agent SDK, you can:
 ### CUA Model Zoo 🐨
 
 | [All-in-one CUAs](https://docs.trycua.com/docs/agent-sdk/supported-agents/computer-use-agents) | [UI Grounding Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) | [UI Planning Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) |
-|---|---|---|
-| `anthropic/claude-sonnet-4-5-20250929`, `anthropic/claude-haiku-4-5-20251001` | `huggingface-local/xlangai/OpenCUA-{7B,32B}` | any all-in-one CUA |
-| `openai/computer-use-preview` | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}` | any VLM (using liteLLM, requires `tools` parameter) |
-| `openrouter/z-ai/glm-4.5v` | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}` | any LLM (using liteLLM, requires `moondream3+` prefix ) |
-| `gemini-2.5-computer-use-preview-10-2025` | any-all-in-one CUA | |
-| `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}` | | |
-| `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B` | |
-| `moondream3+{ui planning}` (supports text-only models) | |
-| `omniparser+{ui planning}` | | |
-| `{ui grounding}+{ui planning}` | | |
+| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `anthropic/claude-sonnet-4-5-20250929`, `anthropic/claude-haiku-4-5-20251001`                  | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                                                   | any all-in-one CUA                                                                            |
+| `openai/computer-use-preview`                                                                  | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                                                | any VLM (using liteLLM, requires `tools` parameter)                                           |
+| `openrouter/z-ai/glm-4.5v`                                                                     | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                                               | any LLM (using liteLLM, requires `moondream3+` prefix )                                       |
+| `gemini-2.5-computer-use-preview-10-2025`                                                      | any-all-in-one CUA                                                                             |                                                                                               |
+| `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`                                    |                                                                                                |                                                                                               |
+| `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                                              |                                                                                                |
+| `moondream3+{ui planning}` (supports text-only models)                                         |                                                                                                |
+| `omniparser+{ui planning}`                                                                     |                                                                                                |                                                                                               |
+| `{ui grounding}+{ui planning}`                                                                 |                                                                                                |                                                                                               |
 
 - `human/human` → [Human-in-the-Loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop)
 
@@ -55,7 +60,7 @@ Missing a model? [Raise a feature request](https://github.com/trycua/cua/issues/
 
 <br/>
 
-# Quick Start 
+# Quick Start
 
 - [Clone a starter template and run the code in <1 min](https://github.com/trycua/agent-template) (⭐️ Recommended!)
 - [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
@@ -68,6 +73,7 @@ Missing a model? [Raise a feature request](https://github.com/trycua/cua/issues/
 ```bash
 pip install cua-agent[all]
 ```
+
 ```python
 from agent import ComputerAgent
 
@@ -86,8 +92,9 @@ async for result in agent.run(messages):
 ```
 
 ### Output format (OpenAI Agent Responses Format):
+
 ```json
-{ 
+{
   "output": [
     # user input
     {
@@ -133,7 +140,7 @@ async for result in agent.run(messages):
           }
         ]
     }
-  ], 
+  ],
   "usage": {
       "prompt_tokens": 150,
       "completion_tokens": 75,
@@ -148,6 +155,7 @@ async for result in agent.run(messages):
 ```bash
 pip install cua-computer[all]
 ```
+
 ```python
 from computer import Computer
 
@@ -174,18 +182,18 @@ async with Computer(
 
 ## Modules
 
-| Module | Description | Installation |
-|--------|-------------|---------------|
-| [**Lume**](./libs/lume/README.md) | VM management for macOS/Linux using Apple's Virtualization.Framework | `curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh \| bash` |
-| [**Lumier**](./libs/lumier/README.md) | Docker interface for macOS and Linux VMs | `docker pull trycua/lumier:latest` |
-| [**Computer (Python)**](./libs/python/computer/README.md) | Python Interface for controlling virtual machines | `pip install "cua-computer[all]"` |
-| [**Computer (Typescript)**](./libs/typescript/computer/README.md) | Typescript Interface for controlling virtual machines | `npm install @trycua/computer` |
-| [**Agent**](./libs/python/agent/README.md) | AI agent framework for automating tasks | `pip install "cua-agent[all]"` |
-| [**MCP Server**](./libs/python/mcp-server/README.md) | MCP server for using CUA with Claude Desktop | `pip install cua-mcp-server` |
-| [**SOM**](./libs/python/som/README.md) | Self-of-Mark library for Agent | `pip install cua-som` |
-| [**Computer Server**](./libs/python/computer-server/README.md) | Server component for Computer | `pip install cua-computer-server` |
-| [**Core (Python)**](./libs/python/core/README.md) | Python Core utilities | `pip install cua-core` |
-| [**Core (Typescript)**](./libs/typescript/core/README.md) | Typescript Core utilities | `npm install @trycua/core` |
+| Module                                                            | Description                                                          | Installation                                                                                        |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [**Lume**](./libs/lume/README.md)                                 | VM management for macOS/Linux using Apple's Virtualization.Framework | `curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh \| bash` |
+| [**Lumier**](./libs/lumier/README.md)                             | Docker interface for macOS and Linux VMs                             | `docker pull trycua/lumier:latest`                                                                  |
+| [**Computer (Python)**](./libs/python/computer/README.md)         | Python Interface for controlling virtual machines                    | `pip install "cua-computer[all]"`                                                                   |
+| [**Computer (Typescript)**](./libs/typescript/computer/README.md) | Typescript Interface for controlling virtual machines                | `npm install @trycua/computer`                                                                      |
+| [**Agent**](./libs/python/agent/README.md)                        | AI agent framework for automating tasks                              | `pip install "cua-agent[all]"`                                                                      |
+| [**MCP Server**](./libs/python/mcp-server/README.md)              | MCP server for using CUA with Claude Desktop                         | `pip install cua-mcp-server`                                                                        |
+| [**SOM**](./libs/python/som/README.md)                            | Self-of-Mark library for Agent                                       | `pip install cua-som`                                                                               |
+| [**Computer Server**](./libs/python/computer-server/README.md)    | Server component for Computer                                        | `pip install cua-computer-server`                                                                   |
+| [**Core (Python)**](./libs/python/core/README.md)                 | Python Core utilities                                                | `pip install cua-core`                                                                              |
+| [**Core (Typescript)**](./libs/typescript/core/README.md)         | Typescript Core utilities                                            | `npm install @trycua/core`                                                                          |
 
 ## Community
 
@@ -193,7 +201,7 @@ Join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss i
 
 ## License
 
-Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE.md) file for details.  
+Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE.md) file for details.
 
 Portions of this project, specifically components adapted from Kasm Technologies Inc., are also licensed under the MIT License. See [libs/kasm/LICENSE](libs/kasm/LICENSE) for details.
 
@@ -211,15 +219,15 @@ When you choose to install and use such optional extras, your use, modification,
 
 Cua uses `bump2version` to manage package versions across all Python modules. A Makefile is provided to simplify the release process.
 
-### Prerequisites 
+### Prerequisites
 
 #### install `bump2version`
 
 using brew
+
 ```
 brew install bumpversion
 ```
-
 
 ### View Current Versions
 
@@ -282,7 +290,7 @@ We welcome contributions to Cua! Please refer to our [Contributing Guidelines](C
 
 Apple, macOS, and Apple Silicon are trademarks of Apple Inc.  
 Ubuntu and Canonical are registered trademarks of Canonical Ltd.  
-Microsoft is a registered trademark of Microsoft Corporation.  
+Microsoft is a registered trademark of Microsoft Corporation.
 
 This project is not affiliated with, endorsed by, or sponsored by Apple Inc., Canonical Ltd., Microsoft Corporation, or Kasm Technologies.
 

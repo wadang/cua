@@ -19,6 +19,7 @@ This example demonstrates how to control a Cua Cloud Sandbox using the OpenAI `c
 
 2. **Set up environment variables:**
    Create a `.env` file with the following variables:
+
    - `OPENAI_API_KEY` — your OpenAI API key
    - `CUA_API_KEY` — your Cua Cloud API key
    - `CUA_CONTAINER_NAME` — the name of your provisioned sandbox

@@ -8,10 +8,11 @@
     </picture>
   </div>
 
-  [![Python](https://img.shields.io/badge/Python-333333?logo=python&logoColor=white&labelColor=333333)](#)
-  [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)](#)
-  [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://discord.com/invite/mVnXXpdE85)
-  [![PyPI](https://img.shields.io/pypi/v/cua-computer?color=333333)](https://pypi.org/project/cua-computer/)
+[![Python](https://img.shields.io/badge/Python-333333?logo=python&logoColor=white&labelColor=333333)](#)
+[![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)](#)
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](https://discord.com/invite/mVnXXpdE85)
+[![PyPI](https://img.shields.io/pypi/v/cua-computer?color=333333)](https://pypi.org/project/cua-computer/)
+
 </h1>
 </div>
 
@@ -41,7 +42,8 @@ Add this to your MCP client configuration:
     "cua-agent": {
       "command": "/usr/bin/env",
       "args": [
-        "bash", "-lc",
+        "bash",
+        "-lc",
         "export CUA_MODEL_NAME='anthropic/claude-3-5-sonnet-20241022'; ~/.cua/start_mcp_server.sh"
       ]
     }
@@ -59,7 +61,8 @@ Use an absolute path to the repository root in the arguments below.
     "cua-agent": {
       "command": "/usr/bin/env",
       "args": [
-        "bash", "-lc",
+        "bash",
+        "-lc",
         "export CUA_MODEL_NAME='huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B'; /Users/your-username/Documents/GitHub/cua/libs/python/mcp-server/scripts/start_mcp_server.sh"
       ]
     }
@@ -68,6 +71,7 @@ Use an absolute path to the repository root in the arguments below.
 ```
 
 Notes:
+
 - Replace `/Users/your-username/Documents/GitHub/cua` with the absolute path to your clone.
 - The script sets `PYTHONPATH` for local libs and runs the server module.
 
@@ -94,6 +98,7 @@ After configuring your MCP client, restart it and invoke one of these tools:
 ```
 
 Expected results:
+
 - Assistant messages streamed during execution
 - A final screenshot image
 
@@ -109,6 +114,7 @@ Expected results:
 ## Troubleshooting
 
 Server reports disconnected in MCP client:
+
 - Use an absolute path in the `args` command.
 - Launch via `/usr/bin/env bash -lc` so the shell initializes and expands paths.
 - Run the script manually to verify:
@@ -117,12 +123,14 @@ Server reports disconnected in MCP client:
   ```
 
 pip not found in venv:
+
 ```bash
 python3 -m ensurepip --upgrade
 python3 -m pip install -U pip setuptools wheel
 ```
 
 Pydantic schema error related to Image:
+
 ```bash
 python3 -m pip install -U "mcp>=1.2.0" "fastmcp>=0.4.7" "pydantic>=2.7,<2.12"
 ```

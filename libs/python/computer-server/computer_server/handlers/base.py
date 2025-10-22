@@ -1,24 +1,26 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+
 
 class BaseAccessibilityHandler(ABC):
     """Abstract base class for OS-specific accessibility handlers."""
-    
+
     @abstractmethod
     async def get_accessibility_tree(self) -> Dict[str, Any]:
         """Get the accessibility tree of the current window."""
         pass
 
     @abstractmethod
-    async def find_element(self, role: Optional[str] = None,
-                          title: Optional[str] = None,
-                          value: Optional[str] = None) -> Dict[str, Any]:
+    async def find_element(
+        self, role: Optional[str] = None, title: Optional[str] = None, value: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Find an element in the accessibility tree by criteria."""
         pass
 
+
 class BaseFileHandler(ABC):
     """Abstract base class for OS-specific file handlers."""
-    
+
     @abstractmethod
     async def file_exists(self, path: str) -> Dict[str, Any]:
         """Check if a file exists at the specified path."""
@@ -43,7 +45,7 @@ class BaseFileHandler(ABC):
     async def write_text(self, path: str, content: str) -> Dict[str, Any]:
         """Write text content to a file."""
         pass
-    
+
     @abstractmethod
     async def write_bytes(self, path: str, content_b64: str) -> Dict[str, Any]:
         """Write binary content to a file. Sent over the websocket as a base64 string."""
@@ -65,9 +67,11 @@ class BaseFileHandler(ABC):
         pass
 
     @abstractmethod
-    async def read_bytes(self, path: str, offset: int = 0, length: Optional[int] = None) -> Dict[str, Any]:
+    async def read_bytes(
+        self, path: str, offset: int = 0, length: Optional[int] = None
+    ) -> Dict[str, Any]:
         """Read the binary contents of a file. Sent over the websocket as a base64 string.
-        
+
         Args:
             path: Path to the file
             offset: Byte offset to start reading from (default: 0)
@@ -80,9 +84,10 @@ class BaseFileHandler(ABC):
         """Get the size of a file in bytes."""
         pass
 
+
 class BaseAutomationHandler(ABC):
     """Abstract base class for OS-specific automation handlers.
-    
+
     Categories:
     - Mouse Actions: Methods for mouse control
     - Keyboard Actions: Methods for keyboard input
@@ -90,18 +95,22 @@ class BaseAutomationHandler(ABC):
     - Screen Actions: Methods for screen interaction
     - Clipboard Actions: Methods for clipboard operations
     """
-    
+
     # Mouse Actions
     @abstractmethod
-    async def mouse_down(self, x: Optional[int] = None, y: Optional[int] = None, button: str = "left") -> Dict[str, Any]:
+    async def mouse_down(
+        self, x: Optional[int] = None, y: Optional[int] = None, button: str = "left"
+    ) -> Dict[str, Any]:
         """Perform a mouse down at the current or specified position."""
         pass
-    
+
     @abstractmethod
-    async def mouse_up(self, x: Optional[int] = None, y: Optional[int] = None, button: str = "left") -> Dict[str, Any]:
+    async def mouse_up(
+        self, x: Optional[int] = None, y: Optional[int] = None, button: str = "left"
+    ) -> Dict[str, Any]:
         """Perform a mouse up at the current or specified position."""
         pass
-    
+
     @abstractmethod
     async def left_click(self, x: Optional[int] = None, y: Optional[int] = None) -> Dict[str, Any]:
         """Perform a left click at the current or specified position."""
@@ -113,7 +122,9 @@ class BaseAutomationHandler(ABC):
         pass
 
     @abstractmethod
-    async def double_click(self, x: Optional[int] = None, y: Optional[int] = None) -> Dict[str, Any]:
+    async def double_click(
+        self, x: Optional[int] = None, y: Optional[int] = None
+    ) -> Dict[str, Any]:
         """Perform a double click at the current or specified position."""
         pass
 
@@ -123,9 +134,11 @@ class BaseAutomationHandler(ABC):
         pass
 
     @abstractmethod
-    async def drag_to(self, x: int, y: int, button: str = "left", duration: float = 0.5) -> Dict[str, Any]:
+    async def drag_to(
+        self, x: int, y: int, button: str = "left", duration: float = 0.5
+    ) -> Dict[str, Any]:
         """Drag the cursor from current position to specified coordinates.
-        
+
         Args:
             x: The x coordinate to drag to
             y: The y coordinate to drag to
@@ -133,11 +146,13 @@ class BaseAutomationHandler(ABC):
             duration: How long the drag should take in seconds
         """
         pass
-    
+
     @abstractmethod
-    async def drag(self, path: List[Tuple[int, int]], button: str = "left", duration: float = 0.5) -> Dict[str, Any]:
+    async def drag(
+        self, path: List[Tuple[int, int]], button: str = "left", duration: float = 0.5
+    ) -> Dict[str, Any]:
         """Drag the cursor from current position to specified coordinates.
-        
+
         Args:
             path: A list of tuples of x and y coordinates to drag to
             button: The mouse button to use ('left', 'middle', 'right')
@@ -150,12 +165,12 @@ class BaseAutomationHandler(ABC):
     async def key_down(self, key: str) -> Dict[str, Any]:
         """Press and hold the specified key."""
         pass
-    
+
     @abstractmethod
     async def key_up(self, key: str) -> Dict[str, Any]:
         """Release the specified key."""
         pass
-    
+
     @abstractmethod
     async def type_text(self, text: str) -> Dict[str, Any]:
         """Type the specified text."""
@@ -176,7 +191,7 @@ class BaseAutomationHandler(ABC):
     async def scroll(self, x: int, y: int) -> Dict[str, Any]:
         """Scroll the specified amount."""
         pass
-    
+
     @abstractmethod
     async def scroll_down(self, clicks: int = 1) -> Dict[str, Any]:
         """Scroll down by the specified number of clicks."""
@@ -212,7 +227,7 @@ class BaseAutomationHandler(ABC):
     @abstractmethod
     async def set_clipboard(self, text: str) -> Dict[str, Any]:
         """Set the clipboard content."""
-        pass 
+        pass
 
     @abstractmethod
     async def run_command(self, command: str) -> Dict[str, Any]:
