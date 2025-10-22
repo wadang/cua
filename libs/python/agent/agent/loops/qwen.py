@@ -54,6 +54,7 @@ QWEN3_COMPUTER_TOOL: Dict[str, Any] = {
                         "triple_click",
                         "scroll",
                         "hscroll",
+                        "screenshot",
                         "wait",
                         # "terminate",
                         # "answer",
@@ -125,23 +126,16 @@ def _parse_tool_call_from_text(text: str) -> Optional[Dict[str, Any]]:
     except Exception:
         return None
 
-async def _unnormalize_coordinate(args: Dict[str, Any], computer_handler) -> Dict[str, Any]:
-    """If coordinate appears in 0..1000 space, scale to actual screen size using computer_handler if provided."""
+async def _unnormalize_coordinate(args: Dict[str, Any], dims: Tuple[int, int]) -> Dict[str, Any]:
+    """Coordinates appear in 0..1000 space, scale to actual screen size using dims if provided."""
     coord = args.get("coordinate")
     if not coord or not isinstance(coord, (list, tuple)) or len(coord) < 2:
         return args
     x, y = float(coord[0]), float(coord[1])
-    # Heuristic: treat <= 1000 as normalized
-    if x <= 1000.0 and y <= 1000.0 and computer_handler is not None and hasattr(computer_handler, "get_dimensions"):
-        try:
-            dims = await computer_handler.get_dimensions()
-            if isinstance(dims, (list, tuple)) and len(dims) >= 2:
-                width, height = float(dims[0]), float(dims[1])
-                x_abs = max(0.0, min(width, (x / 1000.0) * width))
-                y_abs = max(0.0, min(height, (y / 1000.0) * height))
-                args = {**args, "coordinate": [round(x_abs), round(y_abs)]}
-        except Exception:
-            pass
+    width, height = float(dims[0]), float(dims[1])
+    x_abs = max(0.0, min(width, (x / 1000.0) * width))
+    y_abs = max(0.0, min(height, (y / 1000.0) * height))
+    args = {**args, "coordinate": [round(x_abs), round(y_abs)]}
     return args
 
 
@@ -254,6 +248,77 @@ class Qwen3VlConfig(AsyncAgentConfig):
         nous_system = _build_nous_system([QWEN3_COMPUTER_TOOL["function"]])
         completion_messages = ([nous_system] if nous_system else []) + converted_msgs
 
+        # If there is no screenshot in the conversation, take one now and inject it.
+        # Also record a pre_output_items assistant message to reflect action.
+        def _has_any_image(msgs: List[Dict[str, Any]]) -> bool:
+            for m in msgs:
+                content = m.get("content")
+                if isinstance(content, list):
+                    for p in content:
+                        if isinstance(p, dict) and p.get("type") == "image_url":
+                            return True
+            return False
+
+        pre_output_items: List[Dict[str, Any]] = []
+        if not _has_any_image(completion_messages):
+            if computer_handler is None or not hasattr(computer_handler, "screenshot"):
+                raise RuntimeError("No screenshots present and computer_handler.screenshot is not available.")
+            screenshot_b64 = await computer_handler.screenshot()
+            if not screenshot_b64:
+                raise RuntimeError("Failed to capture screenshot from computer_handler.")
+            # Inject a user message with the screenshot so the model can see current context
+            completion_messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{screenshot_b64}"}},
+                        {"type": "text", "text": "Current screen"},
+                    ],
+                }
+            )
+            # Add assistant message to outputs to reflect the action, similar to composed_grounded.py
+            pre_output_items.append(
+                {
+                    "type": "message",
+                    "role": "assistant",
+                    "content": [
+                        {"type": "text", "text": "Taking a screenshot to see the current computer screen."}
+                    ],
+                }
+            )
+
+        # Smart-resize all screenshots and attach min/max pixel hints. Fail fast if deps missing.
+        # Also record the last resized width/height to unnormalize coordinates later.
+        last_rw: Optional[int] = None
+        last_rh: Optional[int] = None
+        MIN_PIXELS = 3136
+        MAX_PIXELS = 12845056
+        try:
+            from qwen_vl_utils import smart_resize  # type: ignore
+            from PIL import Image  # type: ignore
+            import base64, io
+        except Exception:
+            raise ImportError("qwen-vl-utils not installed. Please install it with `pip install cua-agent[qwen]`.")
+
+        for msg in completion_messages:
+            content = msg.get("content")
+            if not isinstance(content, list):
+                continue
+            for part in content:
+                if isinstance(part, dict) and part.get("type") == "image_url":
+                    url = (((part.get("image_url") or {}).get("url")) or "")
+                    # Expect data URL like data:image/png;base64,<b64>
+                    if url.startswith("data:") and "," in url:
+                        b64 = url.split(",", 1)[1]
+                        img_bytes = base64.b64decode(b64)
+                        im = Image.open(io.BytesIO(img_bytes))
+                        h, w = im.height, im.width
+                        rh, rw = smart_resize(h, w, factor=32, min_pixels=MIN_PIXELS, max_pixels=MAX_PIXELS)
+                        # Attach hints on this image block
+                        part["min_pixels"] = MIN_PIXELS
+                        part["max_pixels"] = MAX_PIXELS
+                        last_rw, last_rh = rw, rh
+
         api_kwargs: Dict[str, Any] = {
             "model": model,
             "messages": completion_messages,
@@ -291,8 +356,10 @@ class Qwen3VlConfig(AsyncAgentConfig):
         if tool_call and isinstance(tool_call, dict):
             fn_name = tool_call.get("name") or "computer"
             raw_args = tool_call.get("arguments") or {}
-            # Unnormalize coordinates to actual screen size when possible
-            args = await _unnormalize_coordinate(raw_args, computer_handler)
+            # Unnormalize coordinates to actual screen size using last resized dims
+            if last_rw is None or last_rh is None:
+                raise RuntimeError("No screenshots found to derive dimensions for coordinate unnormalization.")
+            args = await _unnormalize_coordinate(raw_args, (last_rw, last_rh))
 
             # Build an OpenAI-style tool call so we can reuse the converter
             fake_cm = {
@@ -314,7 +381,8 @@ class Qwen3VlConfig(AsyncAgentConfig):
             fake_cm = {"role": "assistant", "content": content_text}
             output_items.extend(convert_completion_messages_to_responses_items([fake_cm]))
 
-        return {"output": output_items, "usage": usage}
+        # Prepend any pre_output_items (e.g., simulated screenshot-taking message)
+        return {"output": (pre_output_items + output_items), "usage": usage}
 
     def get_capabilities(self) -> List[AgentCapability]:
         return ["step"]
@@ -353,7 +421,7 @@ class Qwen3VlConfig(AsyncAgentConfig):
         # Build Nous system (lazy import inside helper already raises clear guidance if missing)
         nous_system = _build_nous_system([reduced_tool["function"]])
 
-        # Optionally compute min/max pixels via smart_resize if available
+        # Pre-process using smart_resize
         min_pixels = 3136
         max_pixels = 12845056
         try:
@@ -368,9 +436,6 @@ class Qwen3VlConfig(AsyncAgentConfig):
             h, w = im.height, im.width
             # Qwen notebook suggests factor=32 and a wide min/max range
             rh, rw = smart_resize(h, w, factor=32, min_pixels=min_pixels, max_pixels=max_pixels)
-            # Use total pixels as hints
-            min_pixels = min(3136, rh * rw)
-            max_pixels = max(12845056, rh * rw)
         except Exception:
             raise ImportError("qwen-vl-utils not installed. Please install it with `pip install cua-agent[qwen]`.")
 
@@ -403,7 +468,7 @@ class Qwen3VlConfig(AsyncAgentConfig):
         content_text = (((choice.get("message") or {}).get("content")) or "")
         tool_call = _parse_tool_call_from_text(content_text) or {}
         args = tool_call.get("arguments") or {}
-        args = await _unnormalize_coordinate(args, kwargs.get("computer_handler"))
+        args = await _unnormalize_coordinate(args, (rh, rw))
         coord = args.get("coordinate")
         if isinstance(coord, (list, tuple)) and len(coord) >= 2:
             return int(coord[0]), int(coord[1])
