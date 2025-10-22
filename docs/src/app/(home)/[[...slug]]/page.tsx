@@ -154,8 +154,8 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
                         {link.includes('python')
                           ? 'Python'
                           : link.includes('typescript')
-                          ? 'TypeScript'
-                          : `Source ${index + 1}`}
+                            ? 'TypeScript'
+                            : `Source ${index + 1}`}
                         <ExternalLink className="w-4 h-4 ml-auto" />
                       </a>
                     ))}

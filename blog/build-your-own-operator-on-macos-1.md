@@ -216,14 +216,12 @@ Each response contains:
 Let's break down the main components of our system and how they work together:
 
 1. **The Virtual Machine (VM)**
-
    - Think of this as a safe playground for our AI
    - It's a complete macOS system running inside your computer
    - Anything the AI does stays inside this VM, keeping your main system safe
    - We use `lume` to create and manage this VM
 
 2. **The Computer Interface (CUI)**
-
    - This is how we control the VM
    - It can move the mouse, type text, and take screenshots
    - Works like a remote control for the VM
@@ -303,7 +301,6 @@ This design keeps everything organized and safe. The AI can only interact with t
    ```
 
    **Important Storage Notes:**
-
    - Initial download requires 80GB of free space
    - After first run, space usage reduces to ~30GB due to macOS's sparse file system
    - VMs are stored in `~/.lume`
