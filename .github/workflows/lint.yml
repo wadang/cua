@@ -57,4 +57,4 @@ jobs:
 
       # JS/TS/Markdown/YAML checks
       - name: Prettier check
-        run: uv run prettier --check "**/*.{ts,tsx,js,jsx,json,md,yaml,yml}"
+        run: pnpm prettier --check "**/*.{ts,tsx,js,jsx,json,md,yaml,yml}"
