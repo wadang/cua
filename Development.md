@@ -258,7 +258,7 @@ uv run black .
 uv run isort .
 
 # Run Ruff linter with auto-fix
-uv run ruff check --ignore E501,E402,I001,I002 .
+uv run ruff check .
 
 # Run type checking with MyPy
 uv run mypy .
@@ -283,7 +283,7 @@ uv run pre-commit run
 # Python checks
 uv run black --check .
 uv run isort --check .
-uv run ruff check --ignore E501,E402,I001,I002 .
+uv run ruff check .
 uv run mypy .
 
 # JavaScript/TypeScript checks

@@ -70,12 +70,12 @@ cua-mcp-server = { workspace = true }
 
 [tool.black]
 line-length = 100
-target-version = ["py311"]
+target-version = ["py312"]
 
 [tool.ruff]
 fix = true
 line-length = 100
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "B", "I"]
@@ -92,7 +92,7 @@ docstring-code-format = true
 check_untyped_defs = true
 disallow_untyped_defs = true
 ignore_missing_imports = true
-python_version = "3.11"
+python_version = "3.12"
 show_error_codes = true
 strict = true
 warn_return_any = true
@@ -100,6 +100,7 @@ warn_unused_ignores = false
 
 [tool.isort]
 profile = "black"
+py_version = 312
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

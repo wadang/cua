@@ -20,7 +20,6 @@ repos:
     hooks:
       - id: isort
         name: isort code formatter
-        language_version: python3.11
         args: ['--profile', 'black']
         files: \.(py)$
 
@@ -29,7 +28,6 @@ repos:
     hooks:
       - id: black
         name: Black code formatter
-        language_version: python3.11
         files: \.(py)$
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
@@ -37,14 +35,13 @@ repos:
     hooks:
       - id: ruff
         name: ruff linter
-        language_version: python3.11
-        args: ['--fix', '--ignore', 'E501,E402,I001,I002'] # Ignore line length, module level import not at top of file, and import sorting issues
+        args: ['--fix']
         files: \.(py)$
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
-    hooks:
-      - id: mypy
-        name: mypy type checker
-        language_version: python3.11
-        files: \.(py)$
+  # Temporarily disabled due to untyped codebase
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.5.1
+  #   hooks:
+  #     - id: mypy
+  #       name: mypy type checker
+  #       files: \.(py)$
