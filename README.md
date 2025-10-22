@@ -14,13 +14,6 @@
 
 </div>
 
-> We're hosting **The Computer-Use Agents SOTA Challenge concluded** at [Hack the North](https://hackthenorth.com) and online!
->
-> > **Track A (On-site @ UWaterloo)**: 🏆 ~~Prize: **YC interview guaranteed**.~~ **Concluded**  
-> > **Track B (Remote)**: 🏆 ~~Prize: **Cash award**.~~ **Concluded - Winners will be announced soon**
-> >
-> > > ~~👉 Sign up here: [trycua.com/hackathon](https://www.trycua.com/hackathon)~~
-
 **Cua** ("koo-ah") is Docker for [Computer-Use Agents](https://www.oneusefulthing.org/p/when-you-give-a-claude-a-mouse) - it enables AI agents to control full operating systems in virtual containers and deploy them locally or to the cloud.
 
 <div align="center">
