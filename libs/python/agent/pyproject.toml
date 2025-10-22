@@ -104,6 +104,10 @@ all = [
     "hud-python==0.4.52",
     # gemini requirements
     "google-genai>=1.41.0",
+    # qwen requirements
+    "qwen-vl-utils",
+    "qwen-agent",
+    "Pillow>=10.0.0",
 ]
 
 [tool.uv]
