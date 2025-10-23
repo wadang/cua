@@ -139,35 +139,35 @@ These are the valid model configurations for `ComputerAgent(model="...")`:
 
 The following table shows which capabilities are supported by each model:
 
-| Model                                                           | Computer-Use | Grounding | Tools | VLM |
-| --------------------------------------------------------------- | :----------: | :-------: | :---: | :-: |
-| [Claude Sonnet/Haiku](https://www.anthropic.com/claude)         |      ✓       |     ✓     |   ✓   |  ✓  |
-| [OpenAI CU Preview](https://openai.com/index/computer-use/)     |      ✓       |     ✓     |       |  ✓  |
-| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                 |      ✓       |     ✓     |   ✓   |  ✓  |
-| [Gemini CU Preview](https://ai.google.dev/)                     |      ✓       |     ✓     |       |  ✓  |
-| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)     |      ✓       |     ✓     |   ✓   |  ✓  |
-| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B) |      ✓       |     ✓     |   ✓   |  ✓  |
-| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)            |              |     ✓     |       |     |
-| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                 |              |     ✓     |       |     |
-| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)              |              |     ✓     |       |     |
-| [OmniParser](https://github.com/microsoft/OmniParser)           |              |     ✓     |       |     |
+| Model                                                                                                                            | Computer-Use | Grounding | Tools | VLM |
+| -------------------------------------------------------------------------------------------------------------------------------- | :----------: | :-------: | :---: | :-: |
+| [Claude Sonnet/Haiku](https://docs.claude.com/en/docs/agents-and-tools/tool-use/computer-use-tool#how-to-implement-computer-use) |      ✓       |     ✓     |   ✓   |  ✓  |
+| [OpenAI CU Preview](https://platform.openai.com/docs/models/computer-use-preview)                                                |      ✓       |     ✓     |       |  ✓  |
+| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                                                                                  |      ✓       |     ✓     |   ✓   |  ✓  |
+| [Gemini CU Preview](https://ai.google.dev/gemini-api/docs/computer-use)                                                          |      ✓       |     ✓     |       |  ✓  |
+| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)                                                                      |      ✓       |     ✓     |   ✓   |  ✓  |
+| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B)                                                                  |      ✓       |     ✓     |   ✓   |  ✓  |
+| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)                                                                             |              |     ✓     |       |     |
+| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                                                                                  |              |     ✓     |       |     |
+| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)                                                                               |              |     ✓     |       |     |
+| [OmniParser](https://github.com/microsoft/OmniParser)                                                                            |              |     ✓     |       |     |
 
 ### Model IDs
 
 These are some examples of valid model IDs for a `ComputerAgent`:
 
-| Model                                                           | Model IDs                                                        |
-| --------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [Claude Sonnet/Haiku](https://www.anthropic.com/claude)         | `anthropic/claude-sonnet-4-5`, `anthropic/claude-haiku-4-5`      |
-| [OpenAI CU Preview](https://openai.com/index/computer-use/)     | `openai/computer-use-preview`                                    |
-| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                 | `openrouter/z-ai/glm-4.5v`, `huggingface-local/zai-org/GLM-4.5V` |
-| [Gemini CU Preview](https://ai.google.dev/)                     | `gemini-2.5-computer-use-preview`                                |
-| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)     | `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`      |
-| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B) | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                |
-| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)            | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                     |
-| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                 | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                  |
-| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)              | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                 |
-| [OmniParser](https://github.com/microsoft/OmniParser)           | `omniparser`                                                     |
+| Model                                                                                                                            | Model IDs                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Claude Sonnet/Haiku](https://docs.claude.com/en/docs/agents-and-tools/tool-use/computer-use-tool#how-to-implement-computer-use) | `anthropic/claude-sonnet-4-5`, `anthropic/claude-haiku-4-5`      |
+| [OpenAI CU Preview](https://platform.openai.com/docs/models/computer-use-preview)                                                | `openai/computer-use-preview`                                    |
+| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                                                                                  | `openrouter/z-ai/glm-4.5v`, `huggingface-local/zai-org/GLM-4.5V` |
+| [Gemini CU Preview](https://ai.google.dev/gemini-api/docs/computer-use)                                                          | `gemini-2.5-computer-use-preview`                                |
+| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)                                                                      | `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`      |
+| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B)                                                                  | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                |
+| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)                                                                             | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                     |
+| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                                                                                  | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                  |
+| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)                                                                               | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                 |
+| [OmniParser](https://github.com/microsoft/OmniParser)                                                                            | `omniparser`                                                     |
 
 Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
 
