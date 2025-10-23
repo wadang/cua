@@ -201,10 +201,8 @@ async with Computer(
 
 # Resources
 
-- [How to use the MCP Server with Claude Desktop or other MCP clients](./libs/python/mcp-server/README.md) - One of the easiest ways to get started with Cua
-- [How to use OpenAI Computer-Use, Anthropic, OmniParser, or UI-TARS for your Computer-Use Agent](./libs/python/agent/README.md)
-- [How to use Lume CLI for managing desktops](./libs/lume/README.md)
-- [Training Computer-Use Models: Collecting Human Trajectories with Cua (Part 1)](https://www.trycua.com/blog/training-computer-use-models-trajectories-1)
+- [Cua Blog](https://www.trycua.com/blog)
+- [Cua Docs](https://docs.trycua.com)
 
 ## Modules
 
