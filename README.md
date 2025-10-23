@@ -150,6 +150,7 @@ The following table shows which capabilities are supported by each model:
 | [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)                                                                             |              |     ✓     |       |     |
 | [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                                                                                  |              |     ✓     |       |     |
 | [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)                                                                               |              |     ✓     |       |     |
+| [Moondream](https://huggingface.co/moondream/moondream3-preview)                                                                 |              |     ✓     |       |     |
 | [OmniParser](https://github.com/microsoft/OmniParser)                                                                            |              |     ✓     |       |     |
 
 ### Model IDs
@@ -167,6 +168,7 @@ These are some examples of valid model IDs for a `ComputerAgent`:
 | [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)                                                                             | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                     |
 | [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                                                                                  | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                  |
 | [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)                                                                               | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                 |
+| [Moondream](https://huggingface.co/moondream/moondream3-preview)                                                                 | `moondream3`                                                     |
 | [OmniParser](https://github.com/microsoft/OmniParser)                                                                            | `omniparser`                                                     |
 
 Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
