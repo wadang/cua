@@ -126,12 +126,16 @@ Cua uses the OpenAI Agent response format.
 
 ## Model Configuration
 
-These are the valid model configurations for a `ComputerAgent`:
+These are the valid model configurations for `ComputerAgent(model="...")`:
 
-1. `{computer-use-model}`
-2. `{grounding-model}+{any-vlm-with-tools}`
-3. `moondream3+{any-llm-with-tools}`
-4. `human/human` ([Human-in-the-Loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop))
+| Configuration                            | Description                                                                                                                                         |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{computer-use-model}`                   | A single model to perform all computer-use tasks                                                                                                    |
+| `{grounding-model}+{any-vlm-with-tools}` | [Composed](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) with VLM for captioning and grounding LLM for element detection |
+| `moondream3+{any-llm-with-tools}`        | [Composed](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) with Moondream3 for captioning and UI element detection         |
+| `human/human`                            | A [human-in-the-loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop) in place of a model                                |
+
+### Model Capabilities
 
 The following table shows which capabilities are supported by each model:
 
