@@ -33,68 +33,13 @@ With the Agent SDK, you can:
 - use new UI agent models and UI grounding models from the Model Zoo below with just a model string (e.g., `ComputerAgent(model="openai/computer-use-preview")`)
 - use API or local inference by changing a prefix (e.g., `openai/`, `openrouter/`, `ollama/`, `huggingface-local/`, `mlx/`, [etc.](https://docs.litellm.ai/docs/providers))
 
-# Model Configuration Options
-
-## Valid Configuration Patterns
-
-These are the valid model configurations for a `ComputerAgent`:
-
-1. `{computer-use-model}`
-2. `{grounding-model}+{any-vlm-with-tools}`
-3. `moondream3+{any-llm-with-tools}`
-4. `human/human` ([Human-in-the-Loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop))
-
----
-
-## Model Compatibility Matrix
-
-The following table shows which capabilities each model supports:
-
-| Model                                                           | Computer-Use | Grounding | Tools | VLM |
-| --------------------------------------------------------------- | :----------: | :-------: | :---: | :-: |
-| [Claude Sonnet/Haiku](https://www.anthropic.com/claude)         |      ✓       |     ✓     |   ✓   |  ✓  |
-| [OpenAI CU Preview](https://openai.com/index/computer-use/)     |      ✓       |     ✓     |       |  ✓  |
-| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                 |      ✓       |     ✓     |   ✓   |  ✓  |
-| [Gemini CU Preview](https://ai.google.dev/)                     |      ✓       |     ✓     |       |  ✓  |
-| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)     |      ✓       |     ✓     |   ✓   |  ✓  |
-| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B) |      ✓       |     ✓     |   ✓   |  ✓  |
-| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)            |              |     ✓     |       |     |
-| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                 |              |     ✓     |       |     |
-| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)              |              |     ✓     |       |     |
-| [OmniParser](https://github.com/microsoft/OmniParser)           |              |     ✓     |       |     |
-
----
-
-## Model Directory
-
-These are some examples of valid model IDs for a `ComputerAgent`:
-
-| Model                                                           | Model IDs                                                        |
-| --------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [Claude Sonnet/Haiku](https://www.anthropic.com/claude)         | `anthropic/claude-sonnet-4-5`, `anthropic/claude-haiku-4-5`      |
-| [OpenAI CU Preview](https://openai.com/index/computer-use/)     | `openai/computer-use-preview`                                    |
-| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                 | `openrouter/z-ai/glm-4.5v`, `huggingface-local/zai-org/GLM-4.5V` |
-| [Gemini CU Preview](https://ai.google.dev/)                     | `gemini-2.5-computer-use-preview`                                |
-| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)     | `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`      |
-| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B) | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                |
-| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)            | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                     |
-| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                 | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                  |
-| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)              | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                 |
-| [OmniParser](https://github.com/microsoft/OmniParser)           | `omniparser`                                                     |
-
-Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
-
-<br/>
-
 # Quick Start
 
 - [Clone a starter template and run the code in <1 min](https://github.com/trycua/agent-template) (⭐️ Recommended!)
 - [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
 - [Get started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
 
-<br/>
-
-# Usage ([Docs](https://docs.trycua.com/docs))
+# Agent Usage
 
 ```bash
 pip install cua-agent[all]
@@ -117,7 +62,7 @@ async for result in agent.run(messages):
             print(item["content"][0]["text"])
 ```
 
-### Output format
+## Output format
 
 Cua uses the OpenAI Agent response format.
 
@@ -179,7 +124,50 @@ Cua uses the OpenAI Agent response format.
 
 </details>
 
-# Computer ([Docs](https://docs.trycua.com/docs/computer-sdk/computers))
+## Model Configuration
+
+These are the valid model configurations for a `ComputerAgent`:
+
+1. `{computer-use-model}`
+2. `{grounding-model}+{any-vlm-with-tools}`
+3. `moondream3+{any-llm-with-tools}`
+4. `human/human` ([Human-in-the-Loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop))
+
+The following table shows which capabilities are supported by each model:
+
+| Model                                                           | Computer-Use | Grounding | Tools | VLM |
+| --------------------------------------------------------------- | :----------: | :-------: | :---: | :-: |
+| [Claude Sonnet/Haiku](https://www.anthropic.com/claude)         |      ✓       |     ✓     |   ✓   |  ✓  |
+| [OpenAI CU Preview](https://openai.com/index/computer-use/)     |      ✓       |     ✓     |       |  ✓  |
+| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                 |      ✓       |     ✓     |   ✓   |  ✓  |
+| [Gemini CU Preview](https://ai.google.dev/)                     |      ✓       |     ✓     |       |  ✓  |
+| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)     |      ✓       |     ✓     |   ✓   |  ✓  |
+| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B) |      ✓       |     ✓     |   ✓   |  ✓  |
+| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)            |              |     ✓     |       |     |
+| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                 |              |     ✓     |       |     |
+| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)              |              |     ✓     |       |     |
+| [OmniParser](https://github.com/microsoft/OmniParser)           |              |     ✓     |       |     |
+
+### Model IDs
+
+These are some examples of valid model IDs for a `ComputerAgent`:
+
+| Model                                                           | Model IDs                                                        |
+| --------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Claude Sonnet/Haiku](https://www.anthropic.com/claude)         | `anthropic/claude-sonnet-4-5`, `anthropic/claude-haiku-4-5`      |
+| [OpenAI CU Preview](https://openai.com/index/computer-use/)     | `openai/computer-use-preview`                                    |
+| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                 | `openrouter/z-ai/glm-4.5v`, `huggingface-local/zai-org/GLM-4.5V` |
+| [Gemini CU Preview](https://ai.google.dev/)                     | `gemini-2.5-computer-use-preview`                                |
+| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)     | `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`      |
+| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B) | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                |
+| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)            | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                     |
+| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                 | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                  |
+| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)              | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                 |
+| [OmniParser](https://github.com/microsoft/OmniParser)           | `omniparser`                                                     |
+
+Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
+
+# Computer
 
 ```bash
 pip install cua-computer[all]
@@ -202,12 +190,7 @@ async with Computer(
     await computer.interface.type("Hello!")
 ```
 
-# Resources
-
-- [Cua Blog](https://www.trycua.com/blog)
-- [Cua Docs](https://docs.trycua.com)
-
-## Modules
+# Modules
 
 | Module                                                            | Description                                                          | Installation                                                                                        |
 | ----------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -222,11 +205,18 @@ async with Computer(
 | [**Core (Python)**](./libs/python/core/README.md)                 | Python Core utilities                                                | `pip install cua-core`                                                                              |
 | [**Core (Typescript)**](./libs/typescript/core/README.md)         | Typescript Core utilities                                            | `npm install @trycua/core`                                                                          |
 
-## Community
+# Resources
+
+- [Cua Blog](https://www.trycua.com/blog)
+- [Cua Docs](https://docs.trycua.com)
+
+# Community and Contributions
+
+We welcome contributions to Cua! Please refer to our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 Join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss ideas, get assistance, or share your demos!
 
-## License
+# License
 
 Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE.md) file for details.
 
@@ -234,17 +224,13 @@ Portions of this project, specifically components adapted from Kasm Technologies
 
 Microsoft's OmniParser, which is used in this project, is licensed under the Creative Commons Attribution 4.0 International License (CC-BY-4.0). See the [OmniParser LICENSE](https://github.com/microsoft/OmniParser/blob/master/LICENSE) for details.
 
-### Third-Party Licenses and Optional Components
+## Third-Party Licenses and Optional Components
 
 Some optional extras for this project depend on third-party packages that are licensed under terms different from the MIT License.
 
 - The optional "omni" extra (installed via `pip install "cua-agent[omni]"`) installs the `cua-som` module, which includes `ultralytics` and is licensed under the AGPL-3.0.
 
 When you choose to install and use such optional extras, your use, modification, and distribution of those third-party components are governed by their respective licenses (e.g., AGPL-3.0 for `ultralytics`).
-
-## Contributing
-
-We welcome contributions to Cua! Please refer to our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ## Trademarks
 
@@ -254,13 +240,13 @@ Microsoft is a registered trademark of Microsoft Corporation.
 
 This project is not affiliated with, endorsed by, or sponsored by Apple Inc., Canonical Ltd., Microsoft Corporation, or Kasm Technologies.
 
-## Stargazers
+# Stargazers
 
 Thank you to all our supporters!
 
 [![Stargazers over time](https://starchart.cc/trycua/cua.svg?variant=adaptive)](https://starchart.cc/trycua/cua)
 
-## Sponsors
+# Sponsors
 
 Thank you to all our [GitHub Sponsors](https://github.com/sponsors/trycua)!
 
