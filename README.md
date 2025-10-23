@@ -117,7 +117,12 @@ async for result in agent.run(messages):
             print(item["content"][0]["text"])
 ```
 
-### Output format (OpenAI Agent Responses Format):
+### Output format
+
+Cua uses the OpenAI Agent response format.
+
+<details>
+<summary>Example</summary>
 
 ```json
 {
@@ -171,6 +176,8 @@ async for result in agent.run(messages):
   }
 }
 ```
+
+</details>
 
 # Computer ([Docs](https://docs.trycua.com/docs/computer-sdk/computers))
 
