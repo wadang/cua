@@ -33,23 +33,56 @@ With the Agent SDK, you can:
 - use new UI agent models and UI grounding models from the Model Zoo below with just a model string (e.g., `ComputerAgent(model="openai/computer-use-preview")`)
 - use API or local inference by changing a prefix (e.g., `openai/`, `openrouter/`, `ollama/`, `huggingface-local/`, `mlx/`, [etc.](https://docs.litellm.ai/docs/providers))
 
-### CUA Model Zoo 🐨
+# Model Configuration Options
 
-| [All-in-one CUAs](https://docs.trycua.com/docs/agent-sdk/supported-agents/computer-use-agents) | [UI Grounding Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) | [UI Planning Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) |
-| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `anthropic/claude-sonnet-4-5-20250929`, `anthropic/claude-haiku-4-5-20251001`                  | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                                                   | any all-in-one CUA                                                                            |
-| `openai/computer-use-preview`                                                                  | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                                                | any VLM (using liteLLM, requires `tools` parameter)                                           |
-| `openrouter/z-ai/glm-4.5v`                                                                     | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                                               | any LLM (using liteLLM, requires `moondream3+` prefix )                                       |
-| `gemini-2.5-computer-use-preview-10-2025`                                                      | any-all-in-one CUA                                                                             |                                                                                               |
-| `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`                                    |                                                                                                |                                                                                               |
-| `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                                              |                                                                                                |
-| `moondream3+{ui planning}` (supports text-only models)                                         |                                                                                                |
-| `omniparser+{ui planning}`                                                                     |                                                                                                |                                                                                               |
-| `{ui grounding}+{ui planning}`                                                                 |                                                                                                |                                                                                               |
+## Valid Configuration Patterns
 
-- `human/human` → [Human-in-the-Loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop)
+These are the valid model configurations for a `ComputerAgent`:
 
-Missing a model? [Raise a feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
+1. `{computer-use-model}`
+2. `{grounding-model}+{any-vlm-with-tools}`
+3. `moondream3+{any-llm-with-tools}`
+4. `human/human` ([Human-in-the-Loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop))
+
+---
+
+## Model Compatibility Matrix
+
+The following table shows which capabilities each model supports:
+
+| Model                                                           | Computer-Use | Grounding | Tools | VLM |
+| --------------------------------------------------------------- | :----------: | :-------: | :---: | :-: |
+| [Claude Sonnet/Haiku](https://www.anthropic.com/claude)         |      ✓       |     ✓     |   ✓   |  ✓  |
+| [OpenAI CU Preview](https://openai.com/index/computer-use/)     |      ✓       |     ✓     |       |  ✓  |
+| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                 |      ✓       |     ✓     |   ✓   |  ✓  |
+| [Gemini CU Preview](https://ai.google.dev/)                     |      ✓       |     ✓     |       |  ✓  |
+| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)     |      ✓       |     ✓     |   ✓   |  ✓  |
+| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B) |      ✓       |     ✓     |   ✓   |  ✓  |
+| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)            |              |     ✓     |       |     |
+| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                 |              |     ✓     |       |     |
+| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)              |              |     ✓     |       |     |
+| [OmniParser](https://github.com/microsoft/OmniParser)           |              |     ✓     |       |     |
+
+---
+
+## Model Directory
+
+These are some examples of valid model IDs for a `ComputerAgent`:
+
+| Model                                                           | Model IDs                                                        |
+| --------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Claude Sonnet/Haiku](https://www.anthropic.com/claude)         | `anthropic/claude-sonnet-4-5`, `anthropic/claude-haiku-4-5`      |
+| [OpenAI CU Preview](https://openai.com/index/computer-use/)     | `openai/computer-use-preview`                                    |
+| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                 | `openrouter/z-ai/glm-4.5v`, `huggingface-local/zai-org/GLM-4.5V` |
+| [Gemini CU Preview](https://ai.google.dev/)                     | `gemini-2.5-computer-use-preview`                                |
+| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)     | `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`      |
+| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B) | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                |
+| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)            | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                     |
+| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                 | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                  |
+| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)              | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                 |
+| [OmniParser](https://github.com/microsoft/OmniParser)           | `omniparser`                                                     |
+
+Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
 
 <br/>
 
