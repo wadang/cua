@@ -15,6 +15,7 @@ from . import (
     omniparser,
     openai,
     opencua,
+    qwen,
     uitars,
 )
 
@@ -31,4 +32,5 @@ __all__ = [
     "holo",
     "moondream3",
     "gemini",
+    "qwen",
 ]
