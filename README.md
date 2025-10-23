@@ -155,7 +155,8 @@ The following table shows which capabilities are supported by each model:
 
 ### Model IDs
 
-These are some examples of valid model IDs for a `ComputerAgent`:
+<details>
+<summary>Examples of valid model IDs</summary>
 
 | Model                                                                                                                            | Model IDs                                                        |
 | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
@@ -170,6 +171,8 @@ These are some examples of valid model IDs for a `ComputerAgent`:
 | [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)                                                                               | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                 |
 | [Moondream](https://huggingface.co/moondream/moondream3-preview)                                                                 | `moondream3`                                                     |
 | [OmniParser](https://github.com/microsoft/OmniParser)                                                                            | `omniparser`                                                     |
+
+</details>
 
 Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
 
