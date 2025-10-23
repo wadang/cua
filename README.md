@@ -122,56 +122,52 @@ async for result in agent.run(messages):
 ```json
 {
   "output": [
-    # user input
     {
-        "role": "user",
-        "content": "go to trycua on gh"
-    },
-    # first agent turn adds the model output to the history
-    {
-        "summary": [
-            {
-                "text": "Searching Firefox for Trycua GitHub",
-                "type": "summary_text"
-            }
-        ],
-        "type": "reasoning"
+      "role": "user",
+      "content": "go to trycua on gh"
     },
     {
-        "action": {
-            "text": "Trycua GitHub",
-            "type": "type"
-        },
-        "call_id": "call_QI6OsYkXxl6Ww1KvyJc4LKKq",
-        "status": "completed",
-        "type": "computer_call"
-    },
-    # second agent turn adds the computer output to the history
-    {
-        "type": "computer_call_output",
-        "call_id": "call_QI6OsYkXxl6Ww1KvyJc4LKKq",
-        "output": {
-            "type": "input_image",
-            "image_url": "data:image/png;base64,..."
+      "summary": [
+        {
+          "text": "Searching Firefox for Trycua GitHub",
+          "type": "summary_text"
         }
+      ],
+      "type": "reasoning"
     },
-    # final agent turn adds the agent output text to the history
     {
-        "type": "message",
-        "role": "assistant",
-        "content": [
-          {
-            "text": "Success! The Trycua GitHub page has been opened.",
-            "type": "output_text"
-          }
-        ]
+      "action": {
+        "text": "Trycua GitHub",
+        "type": "type"
+      },
+      "call_id": "call_QI6OsYkXxl6Ww1KvyJc4LKKq",
+      "status": "completed",
+      "type": "computer_call"
+    },
+    {
+      "type": "computer_call_output",
+      "call_id": "call_QI6OsYkXxl6Ww1KvyJc4LKKq",
+      "output": {
+        "type": "input_image",
+        "image_url": "data:image/png;base64,..."
+      }
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "text": "Success! The Trycua GitHub page has been opened.",
+          "type": "output_text"
+        }
+      ]
     }
   ],
   "usage": {
-      "prompt_tokens": 150,
-      "completion_tokens": 75,
-      "total_tokens": 225,
-      "response_cost": 0.01,
+    "prompt_tokens": 150,
+    "completion_tokens": 75,
+    "total_tokens": 225,
+    "response_cost": 0.01
   }
 }
 ```
