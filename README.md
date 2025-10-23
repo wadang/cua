@@ -33,36 +33,13 @@ With the Agent SDK, you can:
 - use new UI agent models and UI grounding models from the Model Zoo below with just a model string (e.g., `ComputerAgent(model="openai/computer-use-preview")`)
 - use API or local inference by changing a prefix (e.g., `openai/`, `openrouter/`, `ollama/`, `huggingface-local/`, `mlx/`, [etc.](https://docs.litellm.ai/docs/providers))
 
-### CUA Model Zoo 🐨
-
-| [All-in-one CUAs](https://docs.trycua.com/docs/agent-sdk/supported-agents/computer-use-agents) | [UI Grounding Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) | [UI Planning Models](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) |
-| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `anthropic/claude-sonnet-4-5-20250929`, `anthropic/claude-haiku-4-5-20251001`                  | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                                                   | any all-in-one CUA                                                                            |
-| `openai/computer-use-preview`                                                                  | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                                                | any VLM (using liteLLM, requires `tools` parameter)                                           |
-| `openrouter/z-ai/glm-4.5v`                                                                     | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                                               | any LLM (using liteLLM, requires `moondream3+` prefix )                                       |
-| `gemini-2.5-computer-use-preview-10-2025`                                                      | any-all-in-one CUA                                                                             |                                                                                               |
-| `openrouter/qwen/qwen3-vl-235b-a22b-instruct`                                                  |                                                                                                |                                                                                               |
-| `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`                                    |                                                                                                |                                                                                               |
-| `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                                              |                                                                                                |
-| `moondream3+{ui planning}` (supports text-only models)                                         |                                                                                                |
-| `omniparser+{ui planning}`                                                                     |                                                                                                |                                                                                               |
-| `{ui grounding}+{ui planning}`                                                                 |                                                                                                |                                                                                               |
-
-- `human/human` → [Human-in-the-Loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop)
-
-Missing a model? [Raise a feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
-
-<br/>
-
 # Quick Start
 
 - [Clone a starter template and run the code in <1 min](https://github.com/trycua/agent-template) (⭐️ Recommended!)
 - [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
 - [Get started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
 
-<br/>
-
-# Usage ([Docs](https://docs.trycua.com/docs))
+# Agent Usage
 
 ```bash
 pip install cua-agent[all]
@@ -85,66 +62,121 @@ async for result in agent.run(messages):
             print(item["content"][0]["text"])
 ```
 
-### Output format (OpenAI Agent Responses Format):
+## Output format
+
+Cua uses the OpenAI Agent response format.
+
+<details>
+<summary>Example</summary>
 
 ```json
 {
   "output": [
-    # user input
     {
-        "role": "user",
-        "content": "go to trycua on gh"
-    },
-    # first agent turn adds the model output to the history
-    {
-        "summary": [
-            {
-                "text": "Searching Firefox for Trycua GitHub",
-                "type": "summary_text"
-            }
-        ],
-        "type": "reasoning"
+      "role": "user",
+      "content": "go to trycua on gh"
     },
     {
-        "action": {
-            "text": "Trycua GitHub",
-            "type": "type"
-        },
-        "call_id": "call_QI6OsYkXxl6Ww1KvyJc4LKKq",
-        "status": "completed",
-        "type": "computer_call"
-    },
-    # second agent turn adds the computer output to the history
-    {
-        "type": "computer_call_output",
-        "call_id": "call_QI6OsYkXxl6Ww1KvyJc4LKKq",
-        "output": {
-            "type": "input_image",
-            "image_url": "data:image/png;base64,..."
+      "summary": [
+        {
+          "text": "Searching Firefox for Trycua GitHub",
+          "type": "summary_text"
         }
+      ],
+      "type": "reasoning"
     },
-    # final agent turn adds the agent output text to the history
     {
-        "type": "message",
-        "role": "assistant",
-        "content": [
-          {
-            "text": "Success! The Trycua GitHub page has been opened.",
-            "type": "output_text"
-          }
-        ]
+      "action": {
+        "text": "Trycua GitHub",
+        "type": "type"
+      },
+      "call_id": "call_QI6OsYkXxl6Ww1KvyJc4LKKq",
+      "status": "completed",
+      "type": "computer_call"
+    },
+    {
+      "type": "computer_call_output",
+      "call_id": "call_QI6OsYkXxl6Ww1KvyJc4LKKq",
+      "output": {
+        "type": "input_image",
+        "image_url": "data:image/png;base64,..."
+      }
+    },
+    {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+        {
+          "text": "Success! The Trycua GitHub page has been opened.",
+          "type": "output_text"
+        }
+      ]
     }
   ],
   "usage": {
-      "prompt_tokens": 150,
-      "completion_tokens": 75,
-      "total_tokens": 225,
-      "response_cost": 0.01,
+    "prompt_tokens": 150,
+    "completion_tokens": 75,
+    "total_tokens": 225,
+    "response_cost": 0.01
   }
 }
 ```
 
-# Computer ([Docs](https://docs.trycua.com/docs/computer-sdk/computers))
+</details>
+
+## Model Configuration
+
+These are the valid model configurations for `ComputerAgent(model="...")`:
+
+| Configuration                            | Description                                                                                                                                         |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{computer-use-model}`                   | A single model to perform all computer-use tasks                                                                                                    |
+| `{grounding-model}+{any-vlm-with-tools}` | [Composed](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) with VLM for captioning and grounding LLM for element detection |
+| `moondream3+{any-llm-with-tools}`        | [Composed](https://docs.trycua.com/docs/agent-sdk/supported-agents/composed-agents) with Moondream3 for captioning and UI element detection         |
+| `human/human`                            | A [human-in-the-loop](https://docs.trycua.com/docs/agent-sdk/supported-agents/human-in-the-loop) in place of a model                                |
+
+### Model Capabilities
+
+The following table shows which capabilities are supported by each model:
+
+| Model                                                                                                                            | Computer-Use | Grounding | Tools | VLM |
+| -------------------------------------------------------------------------------------------------------------------------------- | :----------: | :-------: | :---: | :-: |
+| [Claude Sonnet/Haiku](https://docs.claude.com/en/docs/agents-and-tools/tool-use/computer-use-tool#how-to-implement-computer-use) |      ✓       |     ✓     |   ✓   |  ✓  |
+| [OpenAI CU Preview](https://platform.openai.com/docs/models/computer-use-preview)                                                |      ✓       |     ✓     |       |  ✓  |
+| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                                                                                  |      ✓       |     ✓     |   ✓   |  ✓  |
+| [Gemini CU Preview](https://ai.google.dev/gemini-api/docs/computer-use)                                                          |      ✓       |     ✓     |       |  ✓  |
+| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)                                                                      |      ✓       |     ✓     |   ✓   |  ✓  |
+| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B)                                                                  |      ✓       |     ✓     |   ✓   |  ✓  |
+| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)                                                                             |              |     ✓     |       |     |
+| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                                                                                  |              |     ✓     |       |     |
+| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)                                                                               |              |     ✓     |       |     |
+| [Moondream](https://huggingface.co/moondream/moondream3-preview)                                                                 |              |     ✓     |       |     |
+| [OmniParser](https://github.com/microsoft/OmniParser)                                                                            |              |     ✓     |       |     |
+
+### Model IDs
+
+<details>
+<summary>Examples of valid model IDs</summary>
+
+| Model                                                                                                                            | Model IDs                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Claude Sonnet/Haiku](https://docs.claude.com/en/docs/agents-and-tools/tool-use/computer-use-tool#how-to-implement-computer-use) | `anthropic/claude-sonnet-4-5`, `anthropic/claude-haiku-4-5`      |
+| [OpenAI CU Preview](https://platform.openai.com/docs/models/computer-use-preview)                                                | `openai/computer-use-preview`                                    |
+| [GLM-V](https://huggingface.co/THUDM/glm-4v-9b)                                                                                  | `openrouter/z-ai/glm-4.5v`, `huggingface-local/zai-org/GLM-4.5V` |
+| [Gemini CU Preview](https://ai.google.dev/gemini-api/docs/computer-use)                                                          | `gemini-2.5-computer-use-preview`                                |
+| [InternVL](https://huggingface.co/OpenGVLab/InternVL3_5-1B)                                                                      | `huggingface-local/OpenGVLab/InternVL3_5-{1B,2B,4B,8B,...}`      |
+| [UI-TARS](https://huggingface.co/ByteDance-Seed/UI-TARS-1.5-7B)                                                                  | `huggingface-local/ByteDance-Seed/UI-TARS-1.5-7B`                |
+| [OpenCUA](https://huggingface.co/xlangai/OpenCUA-7B)                                                                             | `huggingface-local/xlangai/OpenCUA-{7B,32B}`                     |
+| [GTA](https://huggingface.co/HelloKKMe/GTA1-7B)                                                                                  | `huggingface-local/HelloKKMe/GTA1-{7B,32B,72B}`                  |
+| [Holo](https://huggingface.co/Hcompany/Holo1.5-3B)                                                                               | `huggingface-local/Hcompany/Holo1.5-{3B,7B,72B}`                 |
+| [Moondream](https://huggingface.co/moondream/moondream3-preview)                                                                 | `moondream3`                                                     |
+| [OmniParser](https://github.com/microsoft/OmniParser)                                                                            | `omniparser`                                                     |
+
+</details>
+
+Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
+
+# Computer
 
 ```bash
 pip install cua-computer[all]
@@ -167,33 +199,31 @@ async with Computer(
     await computer.interface.type("Hello!")
 ```
 
+# Modules
+
+| Module                                                                                               | Description                                                          | Installation                                                                                        |
+| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [**Lume**](./libs/lume/README.md)                                                                    | VM management for macOS/Linux using Apple's Virtualization.Framework | `curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh \| bash` |
+| [**Lumier**](./libs/lumier/README.md)                                                                | Docker interface for macOS and Linux VMs                             | `docker pull trycua/lumier:latest`                                                                  |
+| **Computer ([Python](./libs/python/computer/README.md)/[TS](./libs/typescript/computer/README.md))** | Interface for controlling virtual machines                           | `pip install "cua-computer[all]"`<br>`npm install @trycua/computer`                                 |
+| [**Agent**](./libs/python/agent/README.md)                                                           | AI agent framework for automating tasks                              | `pip install "cua-agent[all]"`                                                                      |
+| [**MCP Server**](./libs/python/mcp-server/README.md)                                                 | MCP server for using CUA with Claude Desktop                         | `pip install cua-mcp-server`                                                                        |
+| [**SOM**](./libs/python/som/README.md)                                                               | Self-of-Mark library for Agent                                       | `pip install cua-som`                                                                               |
+| [**Computer Server**](./libs/python/computer-server/README.md)                                       | Server component for Computer                                        | `pip install cua-computer-server`                                                                   |
+| **Core ([Python](./libs/python/core/README.md)/[TS](./libs/typescript/core/README.md))**             | Core utilities                                                       | `pip install cua-core`<br>`npm install @trycua/core`                                                |
+
 # Resources
 
-- [How to use the MCP Server with Claude Desktop or other MCP clients](./libs/python/mcp-server/README.md) - One of the easiest ways to get started with Cua
-- [How to use OpenAI Computer-Use, Anthropic, OmniParser, or UI-TARS for your Computer-Use Agent](./libs/python/agent/README.md)
-- [How to use Lume CLI for managing desktops](./libs/lume/README.md)
-- [Training Computer-Use Models: Collecting Human Trajectories with Cua (Part 1)](https://www.trycua.com/blog/training-computer-use-models-trajectories-1)
+- [Cua Blog](https://www.trycua.com/blog)
+- [Cua Docs](https://docs.trycua.com)
 
-## Modules
+# Community and Contributions
 
-| Module                                                            | Description                                                          | Installation                                                                                        |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| [**Lume**](./libs/lume/README.md)                                 | VM management for macOS/Linux using Apple's Virtualization.Framework | `curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh \| bash` |
-| [**Lumier**](./libs/lumier/README.md)                             | Docker interface for macOS and Linux VMs                             | `docker pull trycua/lumier:latest`                                                                  |
-| [**Computer (Python)**](./libs/python/computer/README.md)         | Python Interface for controlling virtual machines                    | `pip install "cua-computer[all]"`                                                                   |
-| [**Computer (Typescript)**](./libs/typescript/computer/README.md) | Typescript Interface for controlling virtual machines                | `npm install @trycua/computer`                                                                      |
-| [**Agent**](./libs/python/agent/README.md)                        | AI agent framework for automating tasks                              | `pip install "cua-agent[all]"`                                                                      |
-| [**MCP Server**](./libs/python/mcp-server/README.md)              | MCP server for using CUA with Claude Desktop                         | `pip install cua-mcp-server`                                                                        |
-| [**SOM**](./libs/python/som/README.md)                            | Self-of-Mark library for Agent                                       | `pip install cua-som`                                                                               |
-| [**Computer Server**](./libs/python/computer-server/README.md)    | Server component for Computer                                        | `pip install cua-computer-server`                                                                   |
-| [**Core (Python)**](./libs/python/core/README.md)                 | Python Core utilities                                                | `pip install cua-core`                                                                              |
-| [**Core (Typescript)**](./libs/typescript/core/README.md)         | Typescript Core utilities                                            | `npm install @trycua/core`                                                                          |
-
-## Community
+We welcome contributions to Cua! Please refer to our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 Join our [Discord community](https://discord.com/invite/mVnXXpdE85) to discuss ideas, get assistance, or share your demos!
 
-## License
+# License
 
 Cua is open-sourced under the MIT License - see the [LICENSE](LICENSE.md) file for details.
 
@@ -201,17 +231,13 @@ Portions of this project, specifically components adapted from Kasm Technologies
 
 Microsoft's OmniParser, which is used in this project, is licensed under the Creative Commons Attribution 4.0 International License (CC-BY-4.0). See the [OmniParser LICENSE](https://github.com/microsoft/OmniParser/blob/master/LICENSE) for details.
 
-### Third-Party Licenses and Optional Components
+## Third-Party Licenses and Optional Components
 
 Some optional extras for this project depend on third-party packages that are licensed under terms different from the MIT License.
 
 - The optional "omni" extra (installed via `pip install "cua-agent[omni]"`) installs the `cua-som` module, which includes `ultralytics` and is licensed under the AGPL-3.0.
 
 When you choose to install and use such optional extras, your use, modification, and distribution of those third-party components are governed by their respective licenses (e.g., AGPL-3.0 for `ultralytics`).
-
-## Contributing
-
-We welcome contributions to Cua! Please refer to our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
 ## Trademarks
 
@@ -221,13 +247,13 @@ Microsoft is a registered trademark of Microsoft Corporation.
 
 This project is not affiliated with, endorsed by, or sponsored by Apple Inc., Canonical Ltd., Microsoft Corporation, or Kasm Technologies.
 
-## Stargazers
+# Stargazers
 
 Thank you to all our supporters!
 
 [![Stargazers over time](https://starchart.cc/trycua/cua.svg?variant=adaptive)](https://starchart.cc/trycua/cua)
 
-## Sponsors
+# Sponsors
 
 Thank you to all our [GitHub Sponsors](https://github.com/sponsors/trycua)!
 
