@@ -41,12 +41,18 @@ With the Agent SDK, you can:
 
 # Agent Usage
 
+Install the agent SDK:
+
 ```bash
 pip install cua-agent[all]
 ```
 
+Initialize a computer agent using a [model configuration string](#model-configuration) and a [computer instance](#computer-usage):
+
 ```python
 from agent import ComputerAgent
+
+# ComputerAgent works with any computer initialized with the Computer SDK
 
 agent = ComputerAgent(
     model="anthropic/claude-3-5-sonnet-20241022",
@@ -176,22 +182,26 @@ The following table shows which capabilities are supported by each model:
 
 Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
 
-# Computer
+# Computer Usage
+
+Install the computer SDK:
 
 ```bash
-pip install cua-computer[all]
+pip install cua-computer
 ```
+
+Initialize a computer:
 
 ```python
 from computer import Computer
 
-async with Computer(
-    os_type="linux",
-    provider_type="cloud",
+computer = Computer(
+    os_type="linux",  # or "macos", "windows"
+    provider_type="cloud",  # or "lume", "docker", "windows_sandbox"
     name="your-sandbox-name",
-    api_key="your-api-key"
-) as computer:
-    # Take screenshot
+    api_key="your-api-key"  # only for cloud
+    # or use_host_computer_server=True for host desktop
+)
     screenshot = await computer.interface.screenshot()
 
     # Click and type
