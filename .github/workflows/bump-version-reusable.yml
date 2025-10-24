@@ -1,0 +1,53 @@
+name: Bump Version (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      package_name:
+        description: 'Package display name (e.g., cua-core)'
+        required: true
+        type: string
+      package_directory:
+        description: 'Package directory relative to repo root (e.g., libs/python/core)'
+        required: true
+        type: string
+      bump_type:
+        description: 'Version bump type (patch, minor, or major)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bump2version
+        run: |
+          cd ${{ inputs.package_directory }}
+          bump2version ${{ inputs.bump_type }}
+
+      - name: Push changes
+        run: |
+          git push origin main --follow-tags
