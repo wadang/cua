@@ -24,66 +24,230 @@ on:
           - minor
           - major
 
+permissions:
+  contents: write
+
 jobs:
   bump-agent:
     if: inputs.service == 'cua-agent'
-    uses: ./.github/workflows/bump-version-reusable.yml
-    with:
-      package_name: "cua-agent"
-      package_directory: "libs/python/agent"
-      bump_type: ${{ inputs.bump_type }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bump2version
+        run: |
+          cd libs/python/agent
+          bump2version ${{ inputs.bump_type }}
+
+      - name: Push changes
+        run: |
+          git push origin main --follow-tags
 
   bump-computer:
     if: inputs.service == 'cua-computer'
-    uses: ./.github/workflows/bump-version-reusable.yml
-    with:
-      package_name: "cua-computer"
-      package_directory: "libs/python/computer"
-      bump_type: ${{ inputs.bump_type }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bump2version
+        run: |
+          cd libs/python/computer
+          bump2version ${{ inputs.bump_type }}
+
+      - name: Push changes
+        run: |
+          git push origin main --follow-tags
 
   bump-computer-server:
     if: inputs.service == 'cua-computer-server'
-    uses: ./.github/workflows/bump-version-reusable.yml
-    with:
-      package_name: "cua-computer-server"
-      package_directory: "libs/python/computer-server"
-      bump_type: ${{ inputs.bump_type }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bump2version
+        run: |
+          cd libs/python/computer-server
+          bump2version ${{ inputs.bump_type }}
+
+      - name: Push changes
+        run: |
+          git push origin main --follow-tags
 
   bump-core:
     if: inputs.service == 'cua-core'
-    uses: ./.github/workflows/bump-version-reusable.yml
-    with:
-      package_name: "cua-core"
-      package_directory: "libs/python/core"
-      bump_type: ${{ inputs.bump_type }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bump2version
+        run: |
+          cd libs/python/core
+          bump2version ${{ inputs.bump_type }}
+
+      - name: Push changes
+        run: |
+          git push origin main --follow-tags
 
   bump-mcp-server:
     if: inputs.service == 'cua-mcp-server'
-    uses: ./.github/workflows/bump-version-reusable.yml
-    with:
-      package_name: "cua-mcp-server"
-      package_directory: "libs/python/mcp-server"
-      bump_type: ${{ inputs.bump_type }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bump2version
+        run: |
+          cd libs/python/mcp-server
+          bump2version ${{ inputs.bump_type }}
+
+      - name: Push changes
+        run: |
+          git push origin main --follow-tags
 
   bump-som:
     if: inputs.service == 'cua-som'
-    uses: ./.github/workflows/bump-version-reusable.yml
-    with:
-      package_name: "cua-som"
-      package_directory: "libs/python/som"
-      bump_type: ${{ inputs.bump_type }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bump2version
+        run: |
+          cd libs/python/som
+          bump2version ${{ inputs.bump_type }}
+
+      - name: Push changes
+        run: |
+          git push origin main --follow-tags
 
   bump-pylume:
     if: inputs.service == 'pylume'
-    uses: ./.github/workflows/bump-version-reusable.yml
-    with:
-      package_name: "pylume"
-      package_directory: "libs/python/pylume"
-      bump_type: ${{ inputs.bump_type }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bump2version
+        run: pip install bump2version
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bump2version
+        run: |
+          cd libs/python/pylume
+          bump2version ${{ inputs.bump_type }}
+
+      - name: Push changes
+        run: |
+          git push origin main --follow-tags
