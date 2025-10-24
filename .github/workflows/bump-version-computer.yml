@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       bump_type:
-        description: 'Version bump type'
+        description: "Version bump type"
         required: true
         type: choice
         options:
@@ -16,7 +16,7 @@ jobs:
   bump:
     uses: ./.github/workflows/bump-version-reusable.yml
     with:
-      package_name: 'cua-computer'
-      package_directory: 'libs/python/computer'
+      package_name: "cua-computer"
+      package_directory: "libs/python/computer"
       bump_type: ${{ inputs.bump_type }}
     secrets: inherit

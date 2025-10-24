@@ -355,17 +355,18 @@ Cua uses automated GitHub Actions workflows to bump package versions. Click the 
 
 ### Version Bump Workflows
 
-| Package | Workflow Link |
-|---------|---------------|
-| **cua-core** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-core.yml) |
-| **cua-computer** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer.yml) |
-| **cua-agent** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-agent.yml) |
-| **cua-som** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-som.yml) |
-| **pylume** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-pylume.yml) |
+| Package                 | Workflow Link                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| **cua-core**            | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-core.yml)            |
+| **cua-computer**        | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer.yml)        |
+| **cua-agent**           | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-agent.yml)           |
+| **cua-som**             | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-som.yml)             |
+| **pylume**              | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-pylume.yml)          |
 | **cua-computer-server** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer-server.yml) |
-| **cua-mcp-server** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-mcp-server.yml) |
+| **cua-mcp-server**      | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-mcp-server.yml)      |
 
 **How to use:**
+
 1. Click the workflow link for the package you want to bump
 2. Click the "Run workflow" button in the GitHub UI
 3. Select the bump type from the dropdown (patch/minor/major)

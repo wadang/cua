@@ -13,6 +13,7 @@
 ## Task 1: Create Reusable Workflow
 
 **Files:**
+
 - Create: `.github/workflows/bump-version-reusable.yml`
 
 **Step 1: Create the reusable workflow file**
@@ -84,6 +85,7 @@ Expected: No syntax errors
 **Step 3: Verify structure**
 
 Check that:
+
 - File has correct `workflow_call` trigger
 - All 3 inputs are defined (package_name, package_directory, bump_type)
 - Permissions include `contents: write`
@@ -101,6 +103,7 @@ git commit -m "feat: add reusable bump version workflow"
 ## Task 2: Create Caller Workflow for cua-core
 
 **Files:**
+
 - Create: `.github/workflows/bump-version-core.yml`
 
 **Step 1: Create the caller workflow file**
@@ -141,6 +144,7 @@ Expected: No syntax errors
 **Step 3: Verify structure**
 
 Check that:
+
 - File has `workflow_dispatch` trigger with bump_type input
 - Input type is `choice` with options: patch, minor, major
 - Job calls reusable workflow with correct path
@@ -159,6 +163,7 @@ git commit -m "feat: add bump version workflow for cua-core"
 ## Task 3: Create Caller Workflow for cua-computer
 
 **Files:**
+
 - Create: `.github/workflows/bump-version-computer.yml`
 
 **Step 1: Create the caller workflow file**
@@ -206,6 +211,7 @@ git commit -m "feat: add bump version workflow for cua-computer"
 ## Task 4: Create Caller Workflow for cua-agent
 
 **Files:**
+
 - Create: `.github/workflows/bump-version-agent.yml`
 
 **Step 1: Create the caller workflow file**
@@ -253,6 +259,7 @@ git commit -m "feat: add bump version workflow for cua-agent"
 ## Task 5: Create Caller Workflow for cua-som
 
 **Files:**
+
 - Create: `.github/workflows/bump-version-som.yml`
 
 **Step 1: Create the caller workflow file**
@@ -300,6 +307,7 @@ git commit -m "feat: add bump version workflow for cua-som"
 ## Task 6: Create Caller Workflow for pylume
 
 **Files:**
+
 - Create: `.github/workflows/bump-version-pylume.yml`
 
 **Step 1: Create the caller workflow file**
@@ -347,6 +355,7 @@ git commit -m "feat: add bump version workflow for pylume"
 ## Task 7: Create Caller Workflow for cua-computer-server
 
 **Files:**
+
 - Create: `.github/workflows/bump-version-computer-server.yml`
 
 **Step 1: Create the caller workflow file**
@@ -394,6 +403,7 @@ git commit -m "feat: add bump version workflow for cua-computer-server"
 ## Task 8: Create Caller Workflow for cua-mcp-server
 
 **Files:**
+
 - Create: `.github/workflows/bump-version-mcp-server.yml`
 
 **Step 1: Create the caller workflow file**
@@ -441,6 +451,7 @@ git commit -m "feat: add bump version workflow for cua-mcp-server"
 ## Task 9: Update Development.md
 
 **Files:**
+
 - Modify: `Development.md` (replace "Releasing Packages" section)
 
 **Step 1: Read the current Development.md**
@@ -453,7 +464,7 @@ Expected: See current content about Makefile and bump2version
 
 Replace the entire "Releasing Packages" section (starting at line ~350) with:
 
-```markdown
+````markdown
 ## Releasing Packages
 
 Cua uses automated GitHub Actions workflows to bump package versions. Click the links below to trigger a version bump:
@@ -462,17 +473,18 @@ Cua uses automated GitHub Actions workflows to bump package versions. Click the 
 
 ### Version Bump Workflows
 
-| Package | Workflow Link |
-|---------|---------------|
-| **cua-core** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-core.yml) |
-| **cua-computer** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer.yml) |
-| **cua-agent** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-agent.yml) |
-| **cua-som** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-som.yml) |
-| **pylume** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-pylume.yml) |
+| Package                 | Workflow Link                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| **cua-core**            | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-core.yml)            |
+| **cua-computer**        | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer.yml)        |
+| **cua-agent**           | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-agent.yml)           |
+| **cua-som**             | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-som.yml)             |
+| **pylume**              | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-pylume.yml)          |
 | **cua-computer-server** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer-server.yml) |
-| **cua-mcp-server** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-mcp-server.yml) |
+| **cua-mcp-server**      | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-mcp-server.yml)      |
 
 **How to use:**
+
 1. Click the workflow link for the package you want to bump
 2. Click the "Run workflow" button in the GitHub UI
 3. Select the bump type from the dropdown (patch/minor/major)
@@ -492,6 +504,7 @@ git log --oneline | grep "Bump"
 # Example output:
 # a1b2c3d Bump version: 0.1.8 → 0.1.9
 ```
+````
 
 **Step 2: Revert the commit**
 
@@ -523,6 +536,7 @@ git push origin main
 ```
 
 **Per-package tag patterns:**
+
 - All packages use tags like `v{version}` (e.g., `v0.1.9`, `v1.0.0`)
 - Each package's .bumpversion.cfg defines the exact tag format
 
@@ -539,7 +553,8 @@ make show-versions
 ```
 
 **Note:** For production releases, always use the GitHub Actions workflows above instead of running Makefile commands directly.
-```
+
+````
 
 **Step 3: Verify the changes**
 
@@ -552,13 +567,14 @@ Expected: See new content with workflow links table
 ```bash
 git add Development.md
 git commit -m "docs: update Development.md with version bump workflow links"
-```
+````
 
 ---
 
 ## Task 10: Add Note to Makefile (Optional)
 
 **Files:**
+
 - Modify: `Makefile`
 
 **Step 1: Add deprecation note at the top of version bump section**

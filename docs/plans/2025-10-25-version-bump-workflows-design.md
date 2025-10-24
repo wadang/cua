@@ -23,6 +23,7 @@ Replace Makefile-based bump2version commands with GitHub Actions workflow_dispat
 **Rationale:** Follows GitHub Actions best practices, maintains DRY principle, easy to update core logic.
 
 **File Structure:**
+
 ```
 .github/workflows/
 ├── bump-version-reusable.yml          # Core reusable workflow
@@ -42,14 +43,17 @@ Replace Makefile-based bump2version commands with GitHub Actions workflow_dispat
 **File:** `.github/workflows/bump-version-reusable.yml`
 
 **Inputs:**
+
 - `package_name` (string): Display name (e.g., "cua-core")
 - `package_directory` (string): Path relative to repo root (e.g., "libs/python/core")
 - `bump_type` (string): patch/minor/major (passed from caller)
 
 **Permissions:**
+
 - `contents: write` - Required to push commits and tags
 
 **Jobs:**
+
 1. **checkout**: Fetch repository with full history (needed for tags)
 2. **setup-python**: Install Python 3.11+
 3. **install-bump2version**: Install via pip
@@ -96,15 +100,15 @@ jobs:
 
 **Package-Specific Values:**
 
-| Workflow File | package_name | package_directory |
-|--------------|--------------|-------------------|
-| bump-version-core.yml | cua-core | libs/python/core |
-| bump-version-computer.yml | cua-computer | libs/python/computer |
-| bump-version-agent.yml | cua-agent | libs/python/agent |
-| bump-version-som.yml | cua-som | libs/python/som |
-| bump-version-pylume.yml | pylume | libs/python/pylume |
+| Workflow File                    | package_name        | package_directory           |
+| -------------------------------- | ------------------- | --------------------------- |
+| bump-version-core.yml            | cua-core            | libs/python/core            |
+| bump-version-computer.yml        | cua-computer        | libs/python/computer        |
+| bump-version-agent.yml           | cua-agent           | libs/python/agent           |
+| bump-version-som.yml             | cua-som             | libs/python/som             |
+| bump-version-pylume.yml          | pylume              | libs/python/pylume          |
 | bump-version-computer-server.yml | cua-computer-server | libs/python/computer-server |
-| bump-version-mcp-server.yml | cua-mcp-server | libs/python/mcp-server |
+| bump-version-mcp-server.yml      | cua-mcp-server      | libs/python/mcp-server      |
 
 ## Development.md Changes
 
@@ -113,24 +117,29 @@ jobs:
 **New content includes:**
 
 1. **Link table** with workflow_dispatch links for all packages:
+
    ```markdown
    ### cua-core
+
    - [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-core.yml) - Select patch/minor/major
 
    ### cua-computer
+
    - [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer.yml) - Select patch/minor/major
 
    ... (continue for all 7 packages)
    ```
 
 2. **Branch Protection Note:**
+
    ```markdown
    > **Note:** The main branch is currently not protected. If branch protection is enabled in the future,
    > the github-actions bot must be added to the bypass list for these workflows to commit directly.
    ```
 
 3. **Rollback Instructions:**
-   ```markdown
+
+   ````markdown
    ### Rolling Back a Version Bump
 
    If you need to revert a version bump:
@@ -139,13 +148,16 @@ jobs:
       ```bash
       git log --oneline | grep "Bump {package-name}"
       ```
+   ````
 
    2. Revert the commit:
+
       ```bash
       git revert <commit-hash>
       ```
 
    3. Delete the tag locally and remotely:
+
       ```bash
       # Find the tag (usually v{version})
       git tag -l
@@ -166,6 +178,9 @@ jobs:
    - cua-core: Look for tags like `v0.1.x` in `libs/python/core`
    - cua-computer: Look for tags like `v0.1.x` in `libs/python/computer`
    - etc.
+
+   ```
+
    ```
 
 ## Error Handling
@@ -205,6 +220,7 @@ jobs:
 Keep the Makefile targets for local testing, but update Development.md to recommend GitHub Actions workflows as the primary method.
 
 **Makefile note to add:**
+
 ```makefile
 # NOTE: For releases, prefer using GitHub Actions workflows (see Development.md)
 # These targets are kept for local testing only
