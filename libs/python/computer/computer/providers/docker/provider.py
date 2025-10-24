@@ -309,8 +309,17 @@ class DockerProvider(BaseVMProvider):
 
             # Apply display resolution if provided (e.g., "1024x768")
             display_resolution = run_opts.get("display")
-            if isinstance(display_resolution, str) and display_resolution:
-                cmd.extend(["-e", f"VNC_RESOLUTION={display_resolution}"])
+            if (
+                isinstance(display_resolution, dict)
+                and "width" in display_resolution
+                and "height" in display_resolution
+            ):
+                cmd.extend(
+                    [
+                        "-e",
+                        f"VNC_RESOLUTION={display_resolution['width']}x{display_resolution['height']}",
+                    ]
+                )
 
             # Add the image
             cmd.append(docker_image)
