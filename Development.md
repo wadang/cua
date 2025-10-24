@@ -358,6 +358,7 @@ Cua uses an automated GitHub Actions workflow to bump package versions.
 All packages are managed through a single consolidated workflow: [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version.yml)
 
 **Supported packages:**
+
 - cua-agent
 - cua-computer
 - cua-computer-server
