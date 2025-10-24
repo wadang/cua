@@ -20,12 +20,12 @@
   <video src="https://github.com/user-attachments/assets/c619b4ea-bb8e-4382-860e-f3757e36af20" width="600" controls></video>
 </div>
 
-With the Computer SDK, you can:
+With the [Computer SDK](#computer-sdk), you can:
 
 - automate Windows, Linux, and macOS VMs with a consistent, [pyautogui-like API](https://docs.trycua.com/docs/libraries/computer#interface-actions)
 - create & manage VMs [locally](https://docs.trycua.com/docs/computer-sdk/computers#cua-local-containers) or using [Cua cloud](https://www.trycua.com/)
 
-With the Agent SDK, you can:
+With the [Agent SDK](#agent-sdk), you can:
 
 - run computer-use models with a [consistent schema](https://docs.trycua.com/docs/agent-sdk/message-format)
 - benchmark on OSWorld-Verified, SheetBench-V2, and more [with a single line of code using HUD](https://docs.trycua.com/docs/agent-sdk/integrations/hud) ([Notebook](https://github.com/trycua/cua/blob/main/notebooks/eval_osworld.ipynb))
@@ -39,7 +39,7 @@ With the Agent SDK, you can:
 - [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
 - [Get started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
 
-# Agent Usage
+# Agent SDK
 
 Install the agent SDK:
 
@@ -182,7 +182,9 @@ The following table shows which capabilities are supported by each model:
 
 Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
 
-# Computer Usage
+Learn more in the [Agent SDK documentation](./libs/python/agent/README.md).
+
+# Computer SDK
 
 Install the computer SDK:
 
@@ -202,25 +204,85 @@ computer = Computer(
     api_key="your-api-key"  # only for cloud
     # or use_host_computer_server=True for host desktop
 )
+
+try:
+    await computer.run()
+
+    # Take a screenshot
     screenshot = await computer.interface.screenshot()
 
     # Click and type
     await computer.interface.left_click(100, 100)
     await computer.interface.type("Hello!")
+finally:
+    await computer.close()
 ```
+
+Learn more in the [Computer SDK documentation](./libs/python/computer/README.md).
+
+# MCP Server
+
+Install the MCP server:
+
+```bash
+pip install cua-mcp-server
+```
+
+Learn more in the [MCP Server documentation](./libs/python/mcp-server/README.md).
+
+# Computer Server
+
+Install the Computer Server:
+
+```bash
+pip install cua-computer-server
+python -m computer_server
+```
+
+Learn more in the [Computer Server documentation](./libs/python/computer-server/README.md).
+
+# Lume
+
+Install Lume:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh | bash
+```
+
+Learn more in the [Lume documentation](./libs/lume/README.md).
+
+# Lumier
+
+Install Lumier:
+
+```bash
+docker pull trycua/lumier:latest
+```
+
+Learn more in the [Lumier documentation](./libs/lumier/README.md).
+
+# SOM
+
+Install SOM:
+
+```bash
+pip install cua-som
+```
+
+Learn more in the [SOM documentation](./libs/python/som/README.md).
 
 # Modules
 
-| Module                                                                                               | Description                                                          | Installation                                                                                        |
-| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| [**Lume**](./libs/lume/README.md)                                                                    | VM management for macOS/Linux using Apple's Virtualization.Framework | `curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh \| bash` |
-| [**Lumier**](./libs/lumier/README.md)                                                                | Docker interface for macOS and Linux VMs                             | `docker pull trycua/lumier:latest`                                                                  |
-| **Computer ([Python](./libs/python/computer/README.md)/[TS](./libs/typescript/computer/README.md))** | Interface for controlling virtual machines                           | `pip install "cua-computer[all]"`<br>`npm install @trycua/computer`                                 |
-| [**Agent**](./libs/python/agent/README.md)                                                           | AI agent framework for automating tasks                              | `pip install "cua-agent[all]"`                                                                      |
-| [**MCP Server**](./libs/python/mcp-server/README.md)                                                 | MCP server for using CUA with Claude Desktop                         | `pip install cua-mcp-server`                                                                        |
-| [**SOM**](./libs/python/som/README.md)                                                               | Self-of-Mark library for Agent                                       | `pip install cua-som`                                                                               |
-| [**Computer Server**](./libs/python/computer-server/README.md)                                       | Server component for Computer                                        | `pip install cua-computer-server`                                                                   |
-| **Core ([Python](./libs/python/core/README.md)/[TS](./libs/typescript/core/README.md))**             | Core utilities                                                       | `pip install cua-core`<br>`npm install @trycua/core`                                                |
+| Module                                                                                               | Description                                                          |
+| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [**Agent**](./libs/python/agent/README.md)                                                           | AI agent framework for automating tasks                              |
+| **Computer ([Python](./libs/python/computer/README.md)/[TS](./libs/typescript/computer/README.md))** | Interface for controlling virtual machines                           |
+| [**MCP Server**](./libs/python/mcp-server/README.md)                                                 | MCP server for using CUA with Claude Desktop                         |
+| [**Computer Server**](./libs/python/computer-server/README.md)                                       | Server component for Computer                                        |
+| [**Lume**](./libs/lume/README.md)                                                                    | VM management for macOS/Linux using Apple's Virtualization.Framework |
+| [**Lumier**](./libs/lumier/README.md)                                                                | Docker interface for macOS and Linux VMs                             |
+| [**SOM**](./libs/python/som/README.md)                                                               | Set-of-Mark library for Agent                                        |
+| **Core ([Python](./libs/python/core/README.md)/[TS](./libs/typescript/core/README.md))**             | Core utilities                                                       |
 
 # Resources
 
