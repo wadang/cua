@@ -20,12 +20,12 @@
   <video src="https://github.com/user-attachments/assets/c619b4ea-bb8e-4382-860e-f3757e36af20" width="600" controls></video>
 </div>
 
-With the Computer SDK, you can:
+With the [Computer SDK](#computer-sdk), you can:
 
 - automate Windows, Linux, and macOS VMs with a consistent, [pyautogui-like API](https://docs.trycua.com/docs/libraries/computer#interface-actions)
 - create & manage VMs [locally](https://docs.trycua.com/docs/computer-sdk/computers#cua-local-containers) or using [Cua cloud](https://www.trycua.com/)
 
-With the Agent SDK, you can:
+With the [Agent SDK](#agent-sdk), you can:
 
 - run computer-use models with a [consistent schema](https://docs.trycua.com/docs/agent-sdk/message-format)
 - benchmark on OSWorld-Verified, SheetBench-V2, and more [with a single line of code using HUD](https://docs.trycua.com/docs/agent-sdk/integrations/hud) ([Notebook](https://github.com/trycua/cua/blob/main/notebooks/eval_osworld.ipynb))
@@ -33,20 +33,86 @@ With the Agent SDK, you can:
 - use new UI agent models and UI grounding models from the Model Zoo below with just a model string (e.g., `ComputerAgent(model="openai/computer-use-preview")`)
 - use API or local inference by changing a prefix (e.g., `openai/`, `openrouter/`, `ollama/`, `huggingface-local/`, `mlx/`, [etc.](https://docs.litellm.ai/docs/providers))
 
+# Modules
+
+<table>
+<tr>
+<td width="25%" align="center" valign="top">
+
+[**Agent**](#agent-sdk)<br />
+AI agent framework for automating tasks
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[Computer](#computer-sdk)**<br />
+TypeScript/Python SDK for controlling Cua environments
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[MCP Server](#mcp-server)**<br />
+MCP server for using Cua agents and computers
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[Computer Server](#computer-server)**<br />
+Server component that runs on Cua environments
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="25%" align="center" valign="top">
+
+**[Lume](#lume)**<br />
+VM management for macOS
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[Lumier](#lumier)**<br />
+Docker interface for macOS/Linux VMs
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[SOM](#som)**<br />
+Set-of-Mark library for Agent
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[Core](#core)**<br />
+Core utilities for Cua
+
+</td>
+</tr>
+</table>
+
 # Quick Start
 
-- [Clone a starter template and run the code in <1 min](https://github.com/trycua/agent-template) (⭐️ Recommended!)
-- [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
-- [Get started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
+- [Clone a starter template and run the code in <1 min](https://github.com/trycua/agent-template)
+- [Get started with the Cua SDKs](https://docs.trycua.com/docs/quickstart-devs)
+- [Get started with the Cua CLI](https://docs.trycua.com/docs/quickstart-cli)
 
-# Agent Usage
+# Agent SDK
+
+Install the agent SDK:
 
 ```bash
 pip install cua-agent[all]
 ```
 
+Initialize a computer agent using a [model configuration string](#model-configuration) and a [computer instance](#computer-usage):
+
 ```python
 from agent import ComputerAgent
+
+# ComputerAgent works with any computer initialized with the Computer SDK
 
 agent = ComputerAgent(
     model="anthropic/claude-3-5-sonnet-20241022",
@@ -176,41 +242,94 @@ The following table shows which capabilities are supported by each model:
 
 Missing a model? Create a [feature request](https://github.com/trycua/cua/issues/new?assignees=&labels=enhancement&projects=&title=%5BAgent%5D%3A+Add+model+support+for+) or [contribute](https://github.com/trycua/cua/blob/main/CONTRIBUTING.md)!
 
-# Computer
+Learn more in the [Agent SDK documentation](./libs/python/agent/README.md).
+
+# Computer SDK
+
+Install the computer SDK:
 
 ```bash
-pip install cua-computer[all]
+pip install cua-computer
 ```
+
+Initialize a computer:
 
 ```python
 from computer import Computer
 
-async with Computer(
-    os_type="linux",
-    provider_type="cloud",
+computer = Computer(
+    os_type="linux",  # or "macos", "windows"
+    provider_type="cloud",  # or "lume", "docker", "windows_sandbox"
     name="your-sandbox-name",
-    api_key="your-api-key"
-) as computer:
-    # Take screenshot
+    api_key="your-api-key"  # only for cloud
+    # or use_host_computer_server=True for host desktop
+)
+
+try:
+    await computer.run()
+
+    # Take a screenshot
     screenshot = await computer.interface.screenshot()
 
     # Click and type
     await computer.interface.left_click(100, 100)
     await computer.interface.type("Hello!")
+finally:
+    await computer.close()
 ```
 
-# Modules
+Learn more in the [Computer SDK documentation](./libs/python/computer/README.md).
 
-| Module                                                                                               | Description                                                          | Installation                                                                                        |
-| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| [**Lume**](./libs/lume/README.md)                                                                    | VM management for macOS/Linux using Apple's Virtualization.Framework | `curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh \| bash` |
-| [**Lumier**](./libs/lumier/README.md)                                                                | Docker interface for macOS and Linux VMs                             | `docker pull trycua/lumier:latest`                                                                  |
-| **Computer ([Python](./libs/python/computer/README.md)/[TS](./libs/typescript/computer/README.md))** | Interface for controlling virtual machines                           | `pip install "cua-computer[all]"`<br>`npm install @trycua/computer`                                 |
-| [**Agent**](./libs/python/agent/README.md)                                                           | AI agent framework for automating tasks                              | `pip install "cua-agent[all]"`                                                                      |
-| [**MCP Server**](./libs/python/mcp-server/README.md)                                                 | MCP server for using CUA with Claude Desktop                         | `pip install cua-mcp-server`                                                                        |
-| [**SOM**](./libs/python/som/README.md)                                                               | Self-of-Mark library for Agent                                       | `pip install cua-som`                                                                               |
-| [**Computer Server**](./libs/python/computer-server/README.md)                                       | Server component for Computer                                        | `pip install cua-computer-server`                                                                   |
-| **Core ([Python](./libs/python/core/README.md)/[TS](./libs/typescript/core/README.md))**             | Core utilities                                                       | `pip install cua-core`<br>`npm install @trycua/core`                                                |
+# MCP Server
+
+Install the MCP server:
+
+```bash
+pip install cua-mcp-server
+```
+
+Learn more in the [MCP Server documentation](./libs/python/mcp-server/README.md).
+
+# Computer Server
+
+Install the Computer Server:
+
+```bash
+pip install cua-computer-server
+python -m computer_server
+```
+
+Learn more in the [Computer Server documentation](./libs/python/computer-server/README.md).
+
+# Lume
+
+Install Lume:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/lume/scripts/install.sh | bash
+```
+
+Learn more in the [Lume documentation](./libs/lume/README.md).
+
+# Lumier
+
+Install Lumier:
+
+```bash
+docker pull trycua/lumier:latest
+```
+
+Learn more in the [Lumier documentation](./libs/lumier/README.md).
+
+# SOM
+
+Install SOM:
+
+```bash
+pip install cua-som
+```
+
+Learn more in the [SOM documentation](./libs/python/som/README.md).
 
 # Resources
 
