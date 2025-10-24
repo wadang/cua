@@ -307,6 +307,11 @@ class DockerProvider(BaseVMProvider):
             cmd.extend(["-e", "VNC_PW=password"])  # Set VNC password
             cmd.extend(["-e", "VNCOPTIONS=-disableBasicAuth"])  # Disable VNC basic auth
 
+            # Apply display resolution if provided (e.g., "1024x768")
+            display_resolution = run_opts.get("display")
+            if isinstance(display_resolution, str) and display_resolution:
+                cmd.extend(["-e", f"VNC_RESOLUTION={display_resolution}"])
+
             # Add the image
             cmd.append(docker_image)
 
