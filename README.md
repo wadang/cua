@@ -33,12 +33,6 @@ With the [Agent SDK](#agent-sdk), you can:
 - use new UI agent models and UI grounding models from the Model Zoo below with just a model string (e.g., `ComputerAgent(model="openai/computer-use-preview")`)
 - use API or local inference by changing a prefix (e.g., `openai/`, `openrouter/`, `ollama/`, `huggingface-local/`, `mlx/`, [etc.](https://docs.litellm.ai/docs/providers))
 
-# Quick Start
-
-- [Clone a starter template and run the code in <1 min](https://github.com/trycua/agent-template) (⭐️ Recommended!)
-- [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
-- [Get started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
-
 # Modules
 
 <table>
@@ -98,6 +92,12 @@ Core utilities for Cua
 </td>
 </tr>
 </table>
+
+# Quick Start
+
+- [Clone a starter template and run the code in <1 min](https://github.com/trycua/agent-template)
+- [Get started with the Cua SDKs](https://docs.trycua.com/docs/quickstart-devs)
+- [Get started with the Cua CLI](https://docs.trycua.com/docs/quickstart-cli)
 
 # Agent SDK
 
