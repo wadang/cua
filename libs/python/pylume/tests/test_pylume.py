@@ -6,7 +6,6 @@ All external dependencies are mocked.
 """
 
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
 
 
 class TestPylumeImports:
