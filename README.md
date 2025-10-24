@@ -39,6 +39,66 @@ With the [Agent SDK](#agent-sdk), you can:
 - [Get started with the Computer-Use Agent CLI](https://docs.trycua.com/docs/quickstart-cli)
 - [Get started with the Python SDKs](https://docs.trycua.com/docs/quickstart-devs)
 
+# Modules
+
+<table>
+<tr>
+<td width="25%" align="center" valign="top">
+
+[**Agent**](#agent-sdk)<br />
+AI agent framework for automating tasks
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[Computer](#computer-sdk)**<br />
+Interface for controlling virtual machines
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[MCP Server](#mcp-server)**<br />
+MCP server for using CUA with Claude Desktop
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[Computer Server](#computer-server)**<br />
+Server component for Computer
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="25%" align="center" valign="top">
+
+**[Lume](#lume)**<br />
+VM management for macOS/Linux using Apple's Virtualization.Framework
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[Lumier](#lumier)**<br />
+Docker interface for macOS and Linux VMs
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[SOM](#som)**<br />
+Set-of-Mark library for Agent
+
+</td>
+<td width="25%" align="center" valign="top">
+
+**[Core](#core)**<br />
+Core utilities
+
+</td>
+</tr>
+</table>
+
 # Agent SDK
 
 Install the agent SDK:
@@ -270,19 +330,6 @@ pip install cua-som
 ```
 
 Learn more in the [SOM documentation](./libs/python/som/README.md).
-
-# Modules
-
-| Module                                                                                               | Description                                                          |
-| ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| [**Agent**](./libs/python/agent/README.md)                                                           | AI agent framework for automating tasks                              |
-| **Computer ([Python](./libs/python/computer/README.md)/[TS](./libs/typescript/computer/README.md))** | Interface for controlling virtual machines                           |
-| [**MCP Server**](./libs/python/mcp-server/README.md)                                                 | MCP server for using CUA with Claude Desktop                         |
-| [**Computer Server**](./libs/python/computer-server/README.md)                                       | Server component for Computer                                        |
-| [**Lume**](./libs/lume/README.md)                                                                    | VM management for macOS/Linux using Apple's Virtualization.Framework |
-| [**Lumier**](./libs/lumier/README.md)                                                                | Docker interface for macOS and Linux VMs                             |
-| [**SOM**](./libs/python/som/README.md)                                                               | Set-of-Mark library for Agent                                        |
-| **Core ([Python](./libs/python/core/README.md)/[TS](./libs/typescript/core/README.md))**             | Core utilities                                                       |
 
 # Resources
 
