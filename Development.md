@@ -349,67 +349,94 @@ For Swift code in the `libs/lume` directory:
 
 ## Releasing Packages
 
-Cua uses `bump2version` to manage package versions across all Python modules. A Makefile is provided to simplify the release process.
+Cua uses automated GitHub Actions workflows to bump package versions. Click the links below to trigger a version bump:
 
-### Prerequisites
+> **Note:** The main branch is currently not protected. If branch protection is enabled in the future, the github-actions bot must be added to the bypass list for these workflows to commit directly.
 
-#### install `bump2version`
+### Version Bump Workflows
 
-using brew
+| Package | Workflow Link |
+|---------|---------------|
+| **cua-core** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-core.yml) |
+| **cua-computer** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer.yml) |
+| **cua-agent** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-agent.yml) |
+| **cua-som** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-som.yml) |
+| **pylume** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-pylume.yml) |
+| **cua-computer-server** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer-server.yml) |
+| **cua-mcp-server** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-mcp-server.yml) |
 
-```
-brew install bumpversion
-```
+**How to use:**
+1. Click the workflow link for the package you want to bump
+2. Click the "Run workflow" button in the GitHub UI
+3. Select the bump type from the dropdown (patch/minor/major)
+4. Click "Run workflow" to start the version bump
+5. The workflow will automatically commit changes and push to main
 
-### View Current Versions
+### Rolling Back a Version Bump
+
+If you need to revert a version bump, follow these steps:
+
+**Step 1: Find the version bump commit**
 
 ```bash
+# List recent commits
+git log --oneline | grep "Bump"
+
+# Example output:
+# a1b2c3d Bump cua-core to v0.1.9
+```
+
+**Step 2: Revert the commit**
+
+```bash
+# Revert the specific commit
+git revert <commit-hash>
+
+# Example:
+# git revert a1b2c3d
+```
+
+**Step 3: Delete the git tag**
+
+```bash
+# List tags to find the version tag
+git tag -l
+
+# Delete the tag locally (use the correct package-specific format)
+git tag -d core-v0.1.9
+
+# Delete the tag remotely
+git push origin :refs/tags/core-v0.1.9
+```
+
+**Step 4: Push the revert**
+
+```bash
+git push origin main
+```
+
+**Per-package tag patterns:**
+
+Each package uses its own tag format defined in `.bumpversion.cfg`:
+
+- **cua-core**: `core-v{version}` (e.g., `core-v0.1.9`)
+- **cua-computer**: `computer-v{version}` (e.g., `computer-v0.4.7`)
+- **cua-agent**: `agent-v{version}` (e.g., `agent-v0.4.35`)
+- **cua-som**: `som-v{version}` (e.g., `som-v0.1.3`)
+- **pylume**: `pylume-v{version}` (e.g., `pylume-v0.2.1`)
+- **cua-computer-server**: `computer-server-v{version}` (e.g., `computer-server-v0.1.27`)
+- **cua-mcp-server**: `mcp-server-v{version}` (e.g., `mcp-server-v0.1.14`)
+
+### Local Testing (Advanced)
+
+The Makefile targets are kept for local testing only:
+
+```bash
+# Test version bump locally (dry run)
+make dry-run-patch-core
+
+# View current versions
 make show-versions
 ```
 
-### Bump Package Versions
-
-To bump a specific package version:
-
-```bash
-# Patch version bump (e.g., 0.1.8 → 0.1.9)
-make bump-patch-core          # cua-core
-make bump-patch-pylume        # pylume
-make bump-patch-computer      # cua-computer
-make bump-patch-som           # cua-som
-make bump-patch-agent         # cua-agent
-make bump-patch-computer-server  # cua-computer-server
-make bump-patch-mcp-server    # cua-mcp-server
-
-# Minor version bump (e.g., 0.1.8 → 0.2.0)
-make bump-minor-core          # Replace 'core' with any package name
-
-# Major version bump (e.g., 0.1.8 → 1.0.0)
-make bump-major-core          # Replace 'core' with any package name
-```
-
-### Dry Run (Test Before Bumping)
-
-To preview changes without modifying files:
-
-```bash
-make dry-run-patch-core       # Test patch bump for cua-core
-make dry-run-minor-pylume     # Test minor bump for pylume
-make dry-run-major-agent      # Test major bump for cua-agent
-```
-
-### Bump All Packages (Use with Caution)
-
-```bash
-make bump-all-patch           # Bumps patch version for ALL packages
-```
-
-### After Bumping
-
-After running any bump command, push your changes:
-
-```bash
-git push origin main && git push origin --tags
-```
-
-For more details, run `make help` or see the [Makefile](./Makefile).
+**Note:** For production releases, always use the GitHub Actions workflows above instead of running Makefile commands directly.
