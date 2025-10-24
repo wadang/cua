@@ -349,29 +349,31 @@ For Swift code in the `libs/lume` directory:
 
 ## Releasing Packages
 
-Cua uses automated GitHub Actions workflows to bump package versions. Click the links below to trigger a version bump:
+Cua uses an automated GitHub Actions workflow to bump package versions.
 
 > **Note:** The main branch is currently not protected. If branch protection is enabled in the future, the github-actions bot must be added to the bypass list for these workflows to commit directly.
 
-### Version Bump Workflows
+### Version Bump Workflow
 
-| Package                 | Workflow Link                                                                                    |
-| ----------------------- | ------------------------------------------------------------------------------------------------ |
-| **cua-core**            | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-core.yml)            |
-| **cua-computer**        | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer.yml)        |
-| **cua-agent**           | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-agent.yml)           |
-| **cua-som**             | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-som.yml)             |
-| **pylume**              | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-pylume.yml)          |
-| **cua-computer-server** | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-computer-server.yml) |
-| **cua-mcp-server**      | [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version-mcp-server.yml)      |
+All packages are managed through a single consolidated workflow: [Bump Version](https://github.com/trycua/cua/actions/workflows/bump-version.yml)
+
+**Supported packages:**
+- cua-agent
+- cua-computer
+- cua-computer-server
+- cua-core
+- cua-mcp-server
+- cua-som
+- pylume
 
 **How to use:**
 
-1. Click the workflow link for the package you want to bump
+1. Navigate to the [Bump Version workflow](https://github.com/trycua/cua/actions/workflows/bump-version.yml)
 2. Click the "Run workflow" button in the GitHub UI
-3. Select the bump type from the dropdown (patch/minor/major)
-4. Click "Run workflow" to start the version bump
-5. The workflow will automatically commit changes and push to main
+3. Select the **service/package** you want to bump from the first dropdown
+4. Select the **bump type** (patch/minor/major) from the second dropdown
+5. Click "Run workflow" to start the version bump
+6. The workflow will automatically commit changes and push to main
 
 ### Rolling Back a Version Bump
 
