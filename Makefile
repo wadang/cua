@@ -14,6 +14,9 @@ help: ## Show this help message
 	@echo ""
 	@echo "After bumping, push changes with: git push origin main"
 
+# NOTE: For production releases, prefer using GitHub Actions workflows (see Development.md)
+# These targets are kept for local testing and dry-runs only.
+
 # Core package targets
 bump-patch-core: ## Bump patch version of cua-core (0.1.8 → 0.1.9)
 	@echo "Bumping cua-core patch version..."
