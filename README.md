@@ -52,19 +52,19 @@ AI agent framework for automating tasks
 <td width="25%" align="center" valign="top">
 
 **[Computer](#computer-sdk)**<br />
-Interface for controlling virtual machines
+TypeScript/Python SDK for controlling Cua environments
 
 </td>
 <td width="25%" align="center" valign="top">
 
 **[MCP Server](#mcp-server)**<br />
-MCP server for using CUA with Claude Desktop
+MCP server for using Cua agents and computers
 
 </td>
 <td width="25%" align="center" valign="top">
 
 **[Computer Server](#computer-server)**<br />
-Server component for Computer
+Server component that runs on Cua environments
 
 </td>
 </tr>
@@ -75,13 +75,13 @@ Server component for Computer
 <td width="25%" align="center" valign="top">
 
 **[Lume](#lume)**<br />
-VM management for macOS/Linux using Apple's Virtualization.Framework
+VM management for macOS
 
 </td>
 <td width="25%" align="center" valign="top">
 
 **[Lumier](#lumier)**<br />
-Docker interface for macOS and Linux VMs
+Docker interface for macOS/Linux VMs
 
 </td>
 <td width="25%" align="center" valign="top">
@@ -93,7 +93,7 @@ Set-of-Mark library for Agent
 <td width="25%" align="center" valign="top">
 
 **[Core](#core)**<br />
-Core utilities
+Core utilities for Cua
 
 </td>
 </tr>
