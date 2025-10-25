@@ -19,6 +19,8 @@ class TestMCPServerImports:
             assert mcp_server is not None
         except ImportError:
             pytest.skip("mcp_server module not installed")
+        except SystemExit:
+            pytest.skip("MCP dependencies (mcp.server.fastmcp) not available")
 
 
 class TestMCPServerInitialization:
@@ -32,6 +34,8 @@ class TestMCPServerInitialization:
             assert server is not None
         except ImportError:
             pytest.skip("MCP server module not available")
+        except SystemExit:
+            pytest.skip("MCP dependencies (mcp.server.fastmcp) not available")
         except Exception as e:
             # Some initialization errors are acceptable in unit tests
             pytest.skip(f"MCP server initialization requires specific setup: {e}")
