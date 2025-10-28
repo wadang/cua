@@ -340,26 +340,7 @@ class OmniparserConfig(AsyncAgentConfig):
         if _on_api_start:
             await _on_api_start(api_kwargs)
 
-        # Debug: Check for duplicate IDs
-        import json as json_module
-        all_ids = []
-        all_call_ids = []
-        for msg in messages:
-            if msg.get("id"):
-                all_ids.append(msg.get("id"))
-            if msg.get("call_id"):
-                all_call_ids.append(msg.get("call_id"))
-
-        duplicate_ids = [x for x in all_ids if all_ids.count(x) > 1]
-        duplicate_call_ids = [x for x in all_call_ids if all_call_ids.count(x) > 1]
-
-        if duplicate_ids:
-            print(f"WARNING: Duplicate IDs found: {set(duplicate_ids)}")
-        if duplicate_call_ids:
-            print(f"WARNING: Duplicate call_ids found: {set(duplicate_call_ids)}")
-
-        print("=== Messages being sent ===")
-        print(json_module.dumps(messages, indent=2)[:2000])
+        print(str(api_kwargs)[:1000])
 
         # Use liteLLM responses
         response = await litellm.aresponses(**api_kwargs)
