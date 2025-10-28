@@ -124,7 +124,7 @@ class CustomComputerHandler(AsyncComputerHandler):
 
     async def screenshot(self, text: Optional[str] = None) -> str:
         """Take a screenshot and return as base64 string.
-        
+
         Args:
             text: Optional descriptive text (for compatibility with GPT-4o models, ignored)
         """
