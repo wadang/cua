@@ -64,7 +64,7 @@ class Computer:
         verbosity: Union[int, LogLevel] = logging.INFO,
         telemetry_enabled: bool = True,
         provider_type: Union[str, VMProviderType] = VMProviderType.LUME,
-        port: Optional[int] = 7777,
+        port: Optional[int] = None,
         noVNC_port: Optional[int] = 8006,
         host: str = os.environ.get("PYLUME_HOST", "localhost"),
         storage: Optional[str] = None,
@@ -91,7 +91,8 @@ class Computer:
                       LogLevel enum values are still accepted for backward compatibility
             telemetry_enabled: Whether to enable telemetry tracking. Defaults to True.
             provider_type: The VM provider type to use (lume, qemu, cloud)
-            port: Optional port to use for the VM provider server
+            port: Optional port to use for the VM provider server (defaults per provider,
+                  e.g. 8000 for Docker, 7777 for Lume/Lumier)
             noVNC_port: Optional port for the noVNC web interface (Lumier provider)
             host: Host to use for VM provider connections (e.g. "localhost", "host.docker.internal")
             storage: Optional path for persistent VM storage (Lumier provider)
@@ -110,13 +111,37 @@ class Computer:
                 image = "trycua/cua-ubuntu:latest"
         image = str(image)
 
+        # Normalize provider type to enum for consistent comparisons
+        if isinstance(provider_type, str):
+            provider_type_normalized = provider_type.lower()
+            try:
+                provider_type_enum = VMProviderType(provider_type_normalized)
+            except ValueError as exc:
+                raise ValueError(f"Unsupported provider type: {provider_type}") from exc
+        elif isinstance(provider_type, VMProviderType):
+            provider_type_enum = provider_type
+        else:
+            raise ValueError(f"Unsupported provider type: {provider_type!r}")
+
+        # Determine sensible default ports per provider if none supplied
+        default_port_by_provider = {
+            VMProviderType.DOCKER: 8000,
+            VMProviderType.LUME: 7777,
+            VMProviderType.LUMIER: 7777,
+            VMProviderType.WINSANDBOX: 7777,
+            VMProviderType.CLOUD: 7777,
+        }
+        resolved_port = port if port is not None else default_port_by_provider.get(
+            provider_type_enum, 7777
+        )
+
         # Store original parameters
         self.image = image
-        self.port = port
+        self.port = resolved_port
         self.noVNC_port = noVNC_port
         self.host = host
         self.os_type = os_type
-        self.provider_type = provider_type
+        self.provider_type = provider_type_enum
         self.ephemeral = ephemeral
 
         self.api_key = api_key
@@ -163,6 +188,8 @@ class Computer:
         # Configure component loggers with proper hierarchy
         self.vm_logger = Logger("computer.vm", verbosity)
         self.interface_logger = Logger("computer.interface", verbosity)
+        self._interface_port_override: Optional[int] = None
+        self._last_vm_info: Optional[Dict[str, Any]] = None
 
         if not use_host_computer_server:
             if ":" not in image:
@@ -259,10 +286,21 @@ class Computer:
                 # Create the interface with explicit type annotation
                 from .interface.base import BaseComputerInterface
 
+                if self.port:
+                    try:
+                        self._interface_port_override = int(self.port)
+                    except (TypeError, ValueError):
+                        self.logger.debug(
+                            f"Invalid host computer server port {self.port!r}; using default"
+                        )
+                        self._interface_port_override = None
+
                 self._interface = cast(
                     BaseComputerInterface,
                     InterfaceFactory.create_interface_for_os(
-                        os=self.os_type, ip_address=ip_address  # type: ignore[arg-type]
+                        os=self.os_type,
+                        ip_address=ip_address,  # type: ignore[arg-type]
+                        port=self._interface_port_override,
                     ),
                 )
 
@@ -287,7 +325,7 @@ class Computer:
                         storage = "ephemeral" if self.ephemeral else self.storage
                         verbose = self.verbosity >= LogLevel.DEBUG
                         ephemeral = self.ephemeral
-                        port = self.port if self.port is not None else 7777
+                        port = self.port
                         host = self.host if self.host else "localhost"
                         image = self.image
                         shared_path = self.shared_path
@@ -384,11 +422,24 @@ class Computer:
 
                     vm = await self.config.vm_provider.get_vm(self.config.name)
                     self.logger.verbose(f"Found existing VM: {self.config.name}")
+                    if isinstance(vm, dict):
+                        self._last_vm_info = vm
+                        self._update_ports_from_vm_info(vm)
                     is_running = vm.get("status") == "running"
                 except Exception as e:
                     self.logger.error(f"VM not found: {self.config.name}")
                     self.logger.error(f"Error: {e}")
                     raise RuntimeError(f"VM {self.config.name} could not be found or created.")
+
+                # For Docker provider, prime interface port override with requested host port
+                if self.provider_type == VMProviderType.DOCKER and self.port:
+                    try:
+                        self._interface_port_override = int(self.port)
+                    except (TypeError, ValueError):
+                        self.logger.debug(
+                            f"Invalid Docker API port override {self.port!r}; falling back to defaults"
+                        )
+                        self._interface_port_override = None
 
                 # Start the VM if it's not running
                 if not is_running:
@@ -425,6 +476,25 @@ class Computer:
                     if self.shared_directories:
                         run_opts["shared_directories"] = shared_dirs.copy()
 
+                    # Provider-specific run options
+                    if self.provider_type == VMProviderType.DOCKER:
+                        if self.port:
+                            try:
+                                run_opts["api_port"] = int(self.port)
+                            except (TypeError, ValueError):
+                                self.logger.warning(
+                                    f"Unable to coerce Docker API port {self.port!r} to int; "
+                                    "continuing without override"
+                                )
+                        if self.noVNC_port:
+                            try:
+                                run_opts["vnc_port"] = int(self.noVNC_port)
+                            except (TypeError, ValueError):
+                                self.logger.warning(
+                                    f"Unable to coerce Docker VNC port {self.noVNC_port!r} to int; "
+                                    "continuing without override"
+                                )
+
                     # Run the VM with the provider
                     try:
                         if self.config.vm_provider is None:
@@ -446,6 +516,9 @@ class Computer:
                             run_opts=run_opts,
                             storage=storage_param,
                         )
+                        self._last_vm_info = response if isinstance(response, dict) else None
+                        if self.provider_type == VMProviderType.DOCKER:
+                            self._update_ports_from_vm_info(self._last_vm_info)
                         self.logger.info(f"VM run response: {response if response else 'None'}")
                     except Exception as run_error:
                         self.logger.error(f"Failed to run VM: {run_error}")
@@ -469,6 +542,16 @@ class Computer:
                     # If we get here, we have a valid IP
                     self.logger.info(f"VM is ready with IP: {ip}")
                     ip_address = ip
+                    if self.provider_type == VMProviderType.DOCKER and self.config.vm_provider:
+                        try:
+                            vm_info = await self.config.vm_provider.get_vm(self.config.name)
+                            if isinstance(vm_info, dict):
+                                self._last_vm_info = vm_info
+                            self._update_ports_from_vm_info(vm_info)
+                        except Exception as vm_info_error:
+                            self.logger.debug(
+                                f"Unable to refresh Docker VM info after startup: {vm_info_error}"
+                            )
                 except TimeoutError as timeout_error:
                     self.logger.error(str(timeout_error))
                     raise RuntimeError(f"VM startup timed out: {timeout_error}")
@@ -480,74 +563,115 @@ class Computer:
             self.logger.error(traceback.format_exc())
             raise RuntimeError(f"Failed to initialize computer: {e}")
 
+        # Verify we have a valid IP before initializing the interface
+        if not ip_address or ip_address == "unknown" or ip_address == "0.0.0.0":
+            raise RuntimeError(f"Cannot initialize interface - invalid IP address: {ip_address}")
+
+        # Initialize the interface using the factory with the specified OS
+        default_interface_port = 8443 if self.api_key else 8000
+        resolved_interface_port = (
+            self._interface_port_override
+            if self._interface_port_override is not None
+            else default_interface_port
+        )
+        self.logger.info(
+            f"Initializing interface for {self.os_type} at {ip_address}:{resolved_interface_port}"
+        )
+        from .interface.base import BaseComputerInterface
+
+        # Pass authentication credentials if using cloud provider
+        if self.provider_type == VMProviderType.CLOUD and self.api_key and self.config.name:
+            self._interface = cast(
+                BaseComputerInterface,
+                InterfaceFactory.create_interface_for_os(
+                    os=self.os_type,
+                    ip_address=ip_address,
+                    api_key=self.api_key,
+                    vm_name=self.config.name,
+                    port=self._interface_port_override,
+                ),
+            )
+        else:
+            self._interface = cast(
+                BaseComputerInterface,
+                InterfaceFactory.create_interface_for_os(
+                    os=self.os_type,
+                    ip_address=ip_address,
+                    port=self._interface_port_override,
+                ),
+            )
+
+        # Wait for the WebSocket interface to be ready
+        self.logger.info("Connecting to WebSocket interface...")
+
         try:
-            # Verify we have a valid IP before initializing the interface
-            if not ip_address or ip_address == "unknown" or ip_address == "0.0.0.0":
-                raise RuntimeError(
-                    f"Cannot initialize interface - invalid IP address: {ip_address}"
-                )
+            # Use a single timeout for the entire connection process
+            # The VM should already be ready at this point, so we're just establishing the connection
+            await self._interface.wait_for_ready(timeout=30)
+            self.logger.info("WebSocket interface connected successfully")
+        except TimeoutError as e:
+            self.logger.error(f"Failed to connect to WebSocket interface at {ip_address}")
+            raise TimeoutError(
+                f"Could not connect to WebSocket interface at {ip_address}:{resolved_interface_port}/ws: {str(e)}"
+            )
+            # self.logger.warning(
+            #     f"Could not connect to WebSocket interface at {ip_address}:8000/ws: {str(e)}, expect missing functionality"
+            # )
 
-            # Initialize the interface using the factory with the specified OS
-            self.logger.info(f"Initializing interface for {self.os_type} at {ip_address}")
-            from .interface.base import BaseComputerInterface
+        # Create an event to keep the VM running in background if needed
+        if not self.use_host_computer_server:
+            self._stop_event = asyncio.Event()
+            self._keep_alive_task = asyncio.create_task(self._stop_event.wait())
 
-            # Pass authentication credentials if using cloud provider
-            if self.provider_type == VMProviderType.CLOUD and self.api_key and self.config.name:
-                self._interface = cast(
-                    BaseComputerInterface,
-                    InterfaceFactory.create_interface_for_os(
-                        os=self.os_type,
-                        ip_address=ip_address,
-                        api_key=self.api_key,
-                        vm_name=self.config.name,
-                    ),
-                )
-            else:
-                self._interface = cast(
-                    BaseComputerInterface,
-                    InterfaceFactory.create_interface_for_os(
-                        os=self.os_type, ip_address=ip_address
-                    ),
-                )
+        self.logger.info("Computer is ready")
 
-            # Wait for the WebSocket interface to be ready
-            self.logger.info("Connecting to WebSocket interface...")
+        # Set the initialization flag and clear the initializing flag
+        self._initialized = True
 
-            try:
-                # Use a single timeout for the entire connection process
-                # The VM should already be ready at this point, so we're just establishing the connection
-                await self._interface.wait_for_ready(timeout=30)
-                self.logger.info("WebSocket interface connected successfully")
-            except TimeoutError as e:
-                self.logger.error(f"Failed to connect to WebSocket interface at {ip_address}")
-                raise TimeoutError(
-                    f"Could not connect to WebSocket interface at {ip_address}:8000/ws: {str(e)}"
-                )
-                # self.logger.warning(
-                #     f"Could not connect to WebSocket interface at {ip_address}:8000/ws: {str(e)}, expect missing functionality"
-                # )
+        # Set this instance as the default computer for remote decorators
+        helpers.set_default_computer(self)
 
-            # Create an event to keep the VM running in background if needed
-            if not self.use_host_computer_server:
-                self._stop_event = asyncio.Event()
-                self._keep_alive_task = asyncio.create_task(self._stop_event.wait())
+        self.logger.info("Computer successfully initialized")
 
-            self.logger.info("Computer is ready")
-
-            # Set the initialization flag and clear the initializing flag
-            self._initialized = True
-
-            # Set this instance as the default computer for remote decorators
-            helpers.set_default_computer(self)
-
-            self.logger.info("Computer successfully initialized")
-        except Exception as e:
-            raise
-        finally:
-            # Log initialization time for performance monitoring
-            duration_ms = (time.time() - start_time) * 1000
-            self.logger.debug(f"Computer initialization took {duration_ms:.2f}ms")
+        # Log initialization time for performance monitoring
+        duration_ms = (time.time() - start_time) * 1000
+        self.logger.debug(f"Computer initialization took {duration_ms:.2f}ms")
         return
+
+    def _update_ports_from_vm_info(self, vm_info: Optional[Dict[str, Any]]) -> None:
+        """Update resolved Docker host ports from VM info."""
+        if self.provider_type != VMProviderType.DOCKER:
+            return
+
+        resolved_port: Optional[int] = None
+        if isinstance(vm_info, dict):
+            ports = vm_info.get("ports")
+            if isinstance(ports, dict):
+                raw_port = ports.get("8000/tcp")
+                if isinstance(raw_port, list):
+                    for entry in raw_port:
+                        if isinstance(entry, dict) and entry.get("HostPort"):
+                            raw_port = entry.get("HostPort")
+                            break
+                if isinstance(raw_port, dict):
+                    raw_port = raw_port.get("HostPort")
+                if isinstance(raw_port, str) and raw_port.isdigit():
+                    resolved_port = int(raw_port)
+                elif isinstance(raw_port, (int, float)):
+                    resolved_port = int(raw_port)
+
+        if resolved_port is None and self.port:
+            try:
+                resolved_port = int(self.port)
+            except (TypeError, ValueError):
+                resolved_port = None
+
+        if resolved_port is not None:
+            if resolved_port != self._interface_port_override:
+                self.logger.debug(
+                    f"Resolved Docker API port for {self.config.name}: {resolved_port}"
+                )
+            self._interface_port_override = resolved_port
 
     async def disconnect(self) -> None:
         """Disconnect from the computer's WebSocket interface."""
@@ -582,6 +706,8 @@ class Computer:
 
             await self.disconnect()
             self.logger.info("Computer stopped")
+            self._interface_port_override = None
+            self._last_vm_info = None
         except Exception as e:
             self.logger.debug(
                 f"Error during cleanup: {e}"
@@ -638,8 +764,27 @@ class Computer:
                     f"Provider has no restart_vm; performing stop+start for {self.config.name}..."
                 )
                 await self.config.vm_provider.stop_vm(name=self.config.name, storage=storage_param)
+                run_opts: Dict[str, Any] = {}
+                if self.provider_type == VMProviderType.DOCKER:
+                    if self.port:
+                        try:
+                            run_opts["api_port"] = int(self.port)
+                        except (TypeError, ValueError):
+                            self.logger.warning(
+                                f"Unable to coerce Docker API port {self.port!r} during restart"
+                            )
+                    if self.noVNC_port:
+                        try:
+                            run_opts["vnc_port"] = int(self.noVNC_port)
+                        except (TypeError, ValueError):
+                            self.logger.warning(
+                                f"Unable to coerce Docker VNC port {self.noVNC_port!r} during restart"
+                            )
                 await self.config.vm_provider.run_vm(
-                    image=self.image, name=self.config.name, run_opts={}, storage=storage_param
+                    image=self.image,
+                    name=self.config.name,
+                    run_opts=run_opts,
+                    storage=storage_param,
                 )
         except Exception as e:
             self.logger.error(f"Failed to restart VM via provider: {e}")
@@ -660,8 +805,26 @@ class Computer:
                 max_retries = 30
                 retry_delay = 2
             ip_address = await self.get_ip(max_retries=max_retries, retry_delay=retry_delay)
+            if self.provider_type == VMProviderType.DOCKER and self.config.vm_provider:
+                try:
+                    vm_info = await self.config.vm_provider.get_vm(self.config.name)
+                    if isinstance(vm_info, dict):
+                        self._last_vm_info = vm_info
+                    self._update_ports_from_vm_info(vm_info)
+                except Exception as vm_info_error:
+                    self.logger.debug(
+                        f"Unable to refresh Docker VM info after restart: {vm_info_error}"
+                    )
 
-            self.logger.info(f"Re-initializing interface for {self.os_type} at {ip_address}")
+            default_interface_port = 8443 if self.api_key else 8000
+            resolved_interface_port = (
+                self._interface_port_override
+                if self._interface_port_override is not None
+                else default_interface_port
+            )
+            self.logger.info(
+                f"Re-initializing interface for {self.os_type} at {ip_address}:{resolved_interface_port}"
+            )
             from .interface.base import BaseComputerInterface
 
             if self.provider_type == VMProviderType.CLOUD and self.api_key and self.config.name:
@@ -672,6 +835,7 @@ class Computer:
                         ip_address=ip_address,
                         api_key=self.api_key,
                         vm_name=self.config.name,
+                        port=self._interface_port_override,
                     ),
                 )
             else:
@@ -680,6 +844,7 @@ class Computer:
                     InterfaceFactory.create_interface_for_os(
                         os=self.os_type,
                         ip_address=ip_address,
+                        port=self._interface_port_override,
                     ),
                 )
 

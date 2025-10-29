@@ -17,6 +17,8 @@ class BaseComputerInterface(ABC):
         password: str = "lume",
         api_key: Optional[str] = None,
         vm_name: Optional[str] = None,
+        port: Optional[int] = None,
+        secure_port: Optional[int] = None,
     ):
         """Initialize interface.
 
@@ -26,6 +28,8 @@ class BaseComputerInterface(ABC):
             password: Password for authentication
             api_key: Optional API key for cloud authentication
             vm_name: Optional VM name for cloud authentication
+            port: Optional override for unsecured API port (default 8000)
+            secure_port: Optional override for secured API port (default 8443)
         """
         self.ip_address = ip_address
         self.username = username
@@ -33,6 +37,8 @@ class BaseComputerInterface(ABC):
         self.api_key = api_key
         self.vm_name = vm_name
         self.logger = Logger("cua.interface", LogLevel.NORMAL)
+        self.port = port if port is not None else 8000
+        self.secure_port = secure_port if secure_port is not None else 8443
 
         # Optional default delay time between commands (in seconds)
         self.delay: float = 0.0

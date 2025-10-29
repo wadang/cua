@@ -29,9 +29,19 @@ class GenericComputerInterface(BaseComputerInterface):
         password: str = "lume",
         api_key: Optional[str] = None,
         vm_name: Optional[str] = None,
+        port: Optional[int] = None,
+        secure_port: Optional[int] = None,
         logger_name: str = "computer.interface.generic",
     ):
-        super().__init__(ip_address, username, password, api_key, vm_name)
+        super().__init__(
+            ip_address,
+            username,
+            password,
+            api_key,
+            vm_name,
+            port=port,
+            secure_port=secure_port,
+        )
         self._ws = None
         self._reconnect_task = None
         self._closed = False
@@ -70,7 +80,7 @@ class GenericComputerInterface(BaseComputerInterface):
             WebSocket URI for the Computer API Server
         """
         protocol = "wss" if self.api_key else "ws"
-        port = "8443" if self.api_key else "8000"
+        port = self.secure_port if self.api_key else self.port
         return f"{protocol}://{self.ip_address}:{port}/ws"
 
     @property
@@ -81,7 +91,7 @@ class GenericComputerInterface(BaseComputerInterface):
             REST URI for the Computer API Server
         """
         protocol = "https" if self.api_key else "http"
-        port = "8443" if self.api_key else "8000"
+        port = self.secure_port if self.api_key else self.port
         return f"{protocol}://{self.ip_address}:{port}/cmd"
 
     # Mouse actions

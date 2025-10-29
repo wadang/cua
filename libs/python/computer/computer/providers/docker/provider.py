@@ -62,7 +62,7 @@ class DockerProvider(BaseVMProvider):
             vnc_port: Port for VNC interface (default: 6901)
         """
         self.host = host
-        self.api_port = 8000
+        self.api_port = port or 8000
         self.vnc_port = vnc_port
         self.ephemeral = ephemeral
 
