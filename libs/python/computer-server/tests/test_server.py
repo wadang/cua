@@ -5,8 +5,9 @@ Following SRP: This file tests server initialization and basic operations.
 All external dependencies are mocked.
 """
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
 
 
 class TestServerImports:
@@ -16,6 +17,7 @@ class TestServerImports:
         """Test that server module can be imported."""
         try:
             import computer_server
+
             assert computer_server is not None
         except ImportError:
             pytest.skip("computer_server module not installed")
@@ -29,6 +31,7 @@ class TestServerInitialization:
         """Basic smoke test: verify server components can be imported."""
         try:
             from computer_server import server
+
             assert server is not None
         except ImportError:
             pytest.skip("Server module not available")

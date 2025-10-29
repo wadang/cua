@@ -15,6 +15,7 @@ class TestSomImports:
         """Test that som module can be imported."""
         try:
             import som
+
             assert som is not None
         except ImportError:
             pytest.skip("som module not installed")
@@ -23,6 +24,7 @@ class TestSomImports:
         """Test that OmniParser can be imported."""
         try:
             from som import OmniParser
+
             assert OmniParser is not None
         except ImportError:
             pytest.skip("som module not available")
@@ -32,7 +34,8 @@ class TestSomImports:
     def test_models_import(self):
         """Test that model classes can be imported."""
         try:
-            from som import BoundingBox, UIElement, ParseResult
+            from som import BoundingBox, ParseResult, UIElement
+
             assert BoundingBox is not None
             assert UIElement is not None
             assert ParseResult is not None
@@ -49,8 +52,9 @@ class TestSomModels:
         """Test BoundingBox class structure."""
         try:
             from som import BoundingBox
+
             # Check the class exists and has expected structure
-            assert hasattr(BoundingBox, '__init__')
+            assert hasattr(BoundingBox, "__init__")
         except ImportError:
             pytest.skip("som models not available")
         except Exception as e:
@@ -60,8 +64,9 @@ class TestSomModels:
         """Test UIElement class structure."""
         try:
             from som import UIElement
+
             # Check the class exists and has expected structure
-            assert hasattr(UIElement, '__init__')
+            assert hasattr(UIElement, "__init__")
         except ImportError:
             pytest.skip("som models not available")
         except Exception as e:

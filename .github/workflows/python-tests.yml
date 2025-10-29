@@ -3,23 +3,23 @@ name: Python Unit Tests
 on:
   pull_request:
     paths:
-      - 'libs/python/**'
-      - '.github/workflows/python-tests.yml'
+      - "libs/python/**"
+      - ".github/workflows/python-tests.yml"
   push:
     branches:
       - main
     paths:
-      - 'libs/python/**'
-      - '.github/workflows/python-tests.yml'
-  workflow_dispatch:  # Allow manual trigger
+      - "libs/python/**"
+      - ".github/workflows/python-tests.yml"
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
   test:
     name: Test ${{ matrix.package }}
     runs-on: ubuntu-latest
-    
+
     strategy:
-      fail-fast: false  # Test all packages even if one fails
+      fail-fast: false # Test all packages even if one fails
       matrix:
         package:
           - core
@@ -29,20 +29,20 @@ jobs:
           - mcp-server
           - pylume
           - som
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-      
+          python-version: "3.12"
+
       - name: Install uv
         run: |
           pip install uv
-      
+
       - name: Install package and dependencies
         run: |
           cd libs/python/${{ matrix.package }}
@@ -53,7 +53,7 @@ jobs:
             uv pip install --system pytest pytest-asyncio pytest-mock pytest-cov
           fi
         shell: bash
-      
+
       - name: Run tests
         run: |
           cd libs/python/${{ matrix.package }}
@@ -64,8 +64,8 @@ jobs:
           fi
         shell: bash
         env:
-          CUA_TELEMETRY_DISABLED: "1"  # Disable telemetry during tests
-      
+          CUA_TELEMETRY_DISABLED: "1" # Disable telemetry during tests
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         if: always()
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: always()
-    
+
     steps:
       - name: Check test results
         run: |

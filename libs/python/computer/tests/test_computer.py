@@ -5,8 +5,9 @@ Following SRP: This file tests ONE class (Computer).
 All external dependencies (providers, interfaces) are mocked.
 """
 
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
 
 
 class TestComputerImport:
@@ -15,13 +16,13 @@ class TestComputerImport:
     def test_computer_class_exists(self):
         """Test that Computer class can be imported."""
         from computer import Computer
-        
+
         assert Computer is not None
 
     def test_vm_provider_type_exists(self):
         """Test that VMProviderType enum can be imported."""
         from computer import VMProviderType
-        
+
         assert VMProviderType is not None
 
 
@@ -31,15 +32,15 @@ class TestComputerInitialization:
     def test_computer_class_can_be_imported(self, disable_telemetry):
         """Test that Computer class can be imported without errors."""
         from computer import Computer
-        
+
         assert Computer is not None
 
     def test_computer_has_required_methods(self, disable_telemetry):
         """Test that Computer class has required methods."""
         from computer import Computer
-        
-        assert hasattr(Computer, '__aenter__')
-        assert hasattr(Computer, '__aexit__')
+
+        assert hasattr(Computer, "__aenter__")
+        assert hasattr(Computer, "__aexit__")
 
 
 class TestComputerContextManager:
@@ -48,11 +49,11 @@ class TestComputerContextManager:
     def test_computer_is_async_context_manager(self, disable_telemetry):
         """Test that Computer has async context manager methods."""
         from computer import Computer
-        
-        assert hasattr(Computer, '__aenter__')
-        assert hasattr(Computer, '__aexit__')
-        assert callable(getattr(Computer, '__aenter__'))
-        assert callable(getattr(Computer, '__aexit__'))
+
+        assert hasattr(Computer, "__aenter__")
+        assert hasattr(Computer, "__aexit__")
+        assert callable(Computer.__aenter__)
+        assert callable(Computer.__aexit__)
 
 
 class TestComputerInterface:
@@ -61,6 +62,6 @@ class TestComputerInterface:
     def test_computer_class_structure(self, disable_telemetry):
         """Test that Computer class has expected structure."""
         from computer import Computer
-        
+
         # Verify Computer is a class
         assert isinstance(Computer, type)

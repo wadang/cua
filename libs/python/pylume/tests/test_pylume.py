@@ -15,6 +15,7 @@ class TestPylumeImports:
         """Test that pylume module can be imported."""
         try:
             import pylume
+
             assert pylume is not None
         except ImportError:
             pytest.skip("pylume module not installed")
@@ -27,6 +28,7 @@ class TestPylumeInitialization:
         """Basic smoke test: verify pylume components can be imported."""
         try:
             import pylume
+
             # Check for basic attributes
             assert pylume is not None
         except ImportError:

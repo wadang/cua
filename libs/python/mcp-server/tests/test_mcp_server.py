@@ -5,8 +5,9 @@ Following SRP: This file tests MCP server initialization.
 All external dependencies are mocked.
 """
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
 
 
 class TestMCPServerImports:
@@ -16,6 +17,7 @@ class TestMCPServerImports:
         """Test that mcp_server module can be imported."""
         try:
             import mcp_server
+
             assert mcp_server is not None
         except ImportError:
             pytest.skip("mcp_server module not installed")
@@ -31,6 +33,7 @@ class TestMCPServerInitialization:
         """Basic smoke test: verify MCP server components can be imported."""
         try:
             from mcp_server import server
+
             assert server is not None
         except ImportError:
             pytest.skip("MCP server module not available")

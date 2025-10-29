@@ -58,7 +58,7 @@ from unittest.mock import patch
 
 class TestMyFeature:
     """Test MyFeature class."""
-    
+
     def test_initialization(self):
         """Test that feature initializes."""
         from my_package import MyFeature
@@ -78,6 +78,7 @@ def mock_api():
 ## 🔄 CI/CD
 
 Tests run automatically on every PR via GitHub Actions (`.github/workflows/python-tests.yml`):
+
 - Matrix strategy: each package tested separately
 - Python 3.12
 - ~2 minute runtime
@@ -91,11 +92,12 @@ Tests run automatically on every PR via GitHub Actions (`.github/workflows/pytho
 **Async tests error**: Install `pytest-asyncio` and use `@pytest.mark.asyncio`
 
 **Mock not working**: Patch at usage location, not definition:
+
 ```python
 # ✅ Right
 @patch("my_package.module.external_function")
 
-# ❌ Wrong  
+# ❌ Wrong
 @patch("external_library.function")
 ```
 
