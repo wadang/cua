@@ -18,7 +18,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt install -y python3.11 python3-pip python3-tk python3-dev \
 gnome-screenshot wmctrl ffmpeg socat xclip
-
+RUN apt install -y imagemagick
 RUN pip install cua-computer-server
 
 # Install Firefox
